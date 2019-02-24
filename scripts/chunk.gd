@@ -1,10 +1,9 @@
 extends GridMap
 
-onready var blocks = preload("res://block.meshlib")
+onready var blocks = preload("res://block.meshlib").duplicate()
 onready var World = get_node("/root/World")
 
 func _ready():
-	
 	# tex order = right, front, back, left, top, bottom
 	generate_block_mesh(1, "bedrock", single_sided_block("dark_stone"))
 	generate_block_mesh(2, "stone", single_sided_block("greystone"))
@@ -16,37 +15,37 @@ func _ready():
 	generate_block_mesh(8, "grass", single_sided_block("grass"))
 	generate_block_mesh(9, "tnt", single_sided_block("tnt"))
 	generate_block_mesh(10, "rock", single_sided_block("bedrock"))
-
+	
 	# assign mesh library to the chunk
-	theme = blocks
 	cell_size = Vector3(1, 1, 1)
 	cell_center_x = true
 	cell_center_y = true
 	cell_center_z = true
 
 	if World.world_seed == 0:
-		print(blocks.find_item_by_name("grass"))
-		print(get_meshes())
 		generate_flat_terrain()
-		#set_cell_item(0, 0, 0, 8, 0)
-		#set_cell_item(0, 2, 0, 1, 0)
+		#print(blocks.find_item_by_name("grass"))
+		#print(get_meshes())
+		#print(theme.get_item_list())
 
 func generate_flat_terrain():
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
-				set_cell_item(x, y, z, 1, 0)
+				if y > 10:
+					set_cell_item(x, y, z, 8, 0)
+				else:
+					set_cell_item(x, y, z, 2, 0)
 				#print(str(x, ", ", y, ", ", z))
-	make_baked_meshes()
 
 func generate_block_mesh(id, block_name, textures):
-	var item_mesh = blocks.get_item_mesh(0)
-	var item_shapes = blocks.get_item_shapes(0)
+	var item_mesh = blocks.get_item_mesh(0).duplicate()
+	var item_shapes = blocks.get_item_shapes(0).duplicate()
 	blocks.create_item(id)
 	
 	for i in range(0, textures.size()):
 		var mat = SpatialMaterial.new()
-		print("res://textures/" + textures[i] + ".png")
+		#print("res://textures/" + textures[i] + ".png")
 		var tex = load("res://textures/" + textures[i] + ".png")
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(3, 3, 3)
@@ -56,6 +55,8 @@ func generate_block_mesh(id, block_name, textures):
 	blocks.set_item_mesh(id, item_mesh)
 	blocks.set_item_shapes(id, item_shapes)
 	blocks.set_item_name(id, block_name)
+	theme = blocks
+	make_baked_meshes()
 
 func single_sided_block(data):
 	var arr = Array()
