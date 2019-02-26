@@ -12,7 +12,7 @@ func _ready():
 	generate_block_mesh(5, "leaves", single_sided_block("leaves_green"))
 	generate_block_mesh(6, "trunk", single_sided_block("tree_exterior"))
 	generate_block_mesh(7, "wood", single_sided_block("wood"))
-	generate_block_mesh(8, "grass", single_sided_block("grass"))
+	generate_block_mesh(8, "grass", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass", "dirt" ])
 	generate_block_mesh(9, "tnt", single_sided_block("tnt"))
 	generate_block_mesh(10, "rock", single_sided_block("bedrock"))
 	
@@ -32,8 +32,10 @@ func generate_flat_terrain():
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
-				if y > 10:
+				if y >= 15:
 					set_cell_item(x, y, z, 8, 0)
+				elif y > 17:
+					set_cell_item(x, y, z, 3, 0)
 				else:
 					set_cell_item(x, y, z, 2, 0)
 				#print(str(x, ", ", y, ", ", z))

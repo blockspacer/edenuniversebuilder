@@ -13,7 +13,6 @@ config_version=3
 config/name="edenuniversebuilder"
 run/main_scene="res://scenes/world.tscn"
 boot_splash/image="res://textures/splash.png"
-config/icon="res://icon.png"
 
 [input]
 
