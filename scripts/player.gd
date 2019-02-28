@@ -15,6 +15,9 @@ var build_origin = Vector3()
 var build_normal = Vector3()
 var building = 0
 
+var move_mode = "fly"
+var action_mode = "nothing"
+
 # fly variables
 const FLY_SPEED = 40
 const FLY_ACCEL = 4
@@ -38,32 +41,99 @@ func _ready():
 	camera_height_center = OS.get_window_size().y / 2
 
 func _physics_process(delta):
-	walk(delta)
+	if move_mode == "fly":
+		fly(delta)
+	else:
+		walk(delta)
 	
 	if building > 0:
 		print("building...")
+		cast_ray()
+		#break_block()
+		#place_block()
+		building = 0
+
+func cast_ray():
 		var space_state = get_world().direct_space_state
 		var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
-		var impulse
-		var impact_position
 		if result:
-			#impulse = (result.position - global_transform.origin).normalised()
-			#impact_position = result.position
-			#var position = result.positon - result.collider.global_transform.origin
 			print("Hit: ", result.position)
 			
 			var x = int(round(result.position.x))
 			var y = int(round(result.position.y))
 			var z = int(round(result.position.z))
 			
+			if x - result.position.x >= 0.4: 
+				x -= 1
+			if y - result.position.y >= 0.4: 
+				y -= 1
+			if z - result.position.z >= 0.4: 
+				z -= 1
+			
 			print("Removing block ", x, ", ", y, ", ", z, "...")
+			print("Normal: ", result.normal)
 			
-			var chunk_x = World.get_chunk(Vector3(x, y, z))
-			print("Edding chunk: ", chunk_x, ", ", 0)
-			var Chunk = get_node("/root/World/" + str(chunk_x) + ", " + str(0))
+			var normal_x = int(round(result.normal.x))
+			var normal_y = int(round(result.normal.y))
+			var normal_z = int(round(result.normal.z))
 			
-			Chunk.break_block(x, y, z)
-		building = 0
+			if action_mode == "burn":
+				pass
+			elif action_mode == "mine":
+				if normal_x == 1 and normal_y == 0 and normal_z == 0:
+					x -= 1
+				elif normal_x == 0 and normal_y == 1 and normal_z == 0:
+					y -= 1
+				elif normal_x == 0 and normal_y == 0 and normal_z == 1:
+					x -= 1
+					y -= 1
+					z -= 1
+				elif normal_x == -1 and normal_y == 0 and normal_z == 0:
+					z -= 1
+				elif normal_x == 0 and normal_y == 0 and normal_z == -1:
+					x -= 1
+					y -= 1
+				
+				#if normal_x >= -0.5:
+					#x += 1
+				#elif normal_y >= -0.5:
+					#y += 1
+				#elif normal_z >= -0.5:
+					#z += 1
+				
+				var location = World.get_chunk(Vector3(x, y, z))
+				#print("Edding chunk: ", location)
+				
+				if World.chunk_index.has(location):
+					var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+					Chunk.break_block(x, y, z)
+				else:
+					print("Error: Invalid chunk!")
+			elif action_mode == "build":
+				if normal_x == 1 and normal_y == 0 and normal_z == 0:
+					x -= 1
+				elif normal_x == 0 and normal_y == 1 and normal_z == 0:
+					y -= 1
+				elif normal_x == 0 and normal_y == 0 and normal_z == 1:
+					x -= 1
+					y -= 1
+					z -= 1
+				elif normal_x == -1 and normal_y == 0 and normal_z == 0:
+					z -= 1
+				elif normal_x == 0 and normal_y == 0 and normal_z == -1:
+					x -= 1
+					y -= 1
+					
+				var location = World.get_chunk(Vector3(x, y, z))
+				#print("Edding chunk: ", location)
+				
+				if World.chunk_index.has(location):
+					var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+					Chunk.place_block(3, x, y, z)
+				else:
+					print("Error: Invalid chunk!")
+			elif action_mode == "paint":
+				pass
 
 func walk(delta):
 	# reset the direction of  the player
@@ -151,8 +221,23 @@ func _input(event):
 			$Head/Camera.rotate_x(deg2rad(change))
 			camera_angle += change
 	
-	if Input.is_action_pressed("build"):
+	if Input.is_action_pressed("fly"):
+		if move_mode == "walk":
+			move_mode = "fly"
+		else:
+			move_mode = "walk"
+	
+	if Input.is_action_pressed("action"):
 		var camera = $Head/Camera
 		build_origin = camera.project_ray_origin(Vector2(camera_width_center, camera_height_center))
 		build_normal = camera.project_ray_normal(Vector2(camera_width_center, camera_height_center)) * build_range
 		building = 1
+	
+	if Input.is_action_pressed("burn"):
+		action_mode = "burn"
+	if Input.is_action_pressed("mine"):
+		action_mode = "mine"
+	if Input.is_action_pressed("build"):
+		action_mode = "build"
+	if Input.is_action_pressed("paint"):
+		action_mode = "paint"
