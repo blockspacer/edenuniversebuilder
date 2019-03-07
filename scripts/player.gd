@@ -15,7 +15,7 @@ var build_origin = Vector3()
 var build_normal = Vector3()
 var building = 0
 
-var move_mode = "fly"
+var move_mode = "walk"
 var action_mode = "nothing"
 
 # fly variables
@@ -141,7 +141,7 @@ func walk(delta):
 	
 	# get the rotation of the camera
 	var aim = $Head/Camera.get_global_transform().basis
-	if Input.is_action_pressed("move_forward"):
+	if Input.is_action_pressed("move_forward") or World.player_move_forward:
 		direction -= aim.z
 	if Input.is_action_pressed("move_backward"):
 		direction += aim.z

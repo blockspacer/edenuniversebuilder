@@ -43,13 +43,13 @@ func generate_flat_terrain():
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
-				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
-				if y >= 15:
-					set_cell_item(x, y, z, 8, 0)
-				elif y > 10:
-					set_cell_item(x, y, z, 3, 0)
-				else:
-					set_cell_item(x, y, z, 2, 0)
+				if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
+					if y >= 15:
+						set_cell_item(x, y, z, 8, 0)
+					elif y > 10:
+						set_cell_item(x, y, z, 3, 0)
+					else:
+						set_cell_item(x, y, z, 2, 0)
 					#print(str(x, ", ", y, ", ", z))
 
 func generate_random_terrain():

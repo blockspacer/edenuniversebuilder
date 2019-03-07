@@ -1,16 +1,23 @@
 extends Spatial
 
 onready var chunk_template = preload("res://scenes/chunk.tscn")
-onready var Player = get_node("/root/World/Player")
+onready var player_template = preload("res://scenes/player.tscn")
+onready var Player = null
 
 var world_seed = 0
 var chunk_index = {}
 var temp_player_chunk = Vector3(0, 0, 0)
 
+var player_move_forward = false
+
 func _ready():
 	
-	if Player == null:
-		Player = get_node("/root/Main Menu/World/Player")
+	if world_seed != -1:
+		Player = player_template.instance()
+		add_child(Player)
+	
+	#if Player == null:
+		#Player = get_node("/root/Main Menu/World/Player")
 	
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	create_world(2, 1)
@@ -58,14 +65,17 @@ func _process(delta):
 	if (Input.is_action_just_pressed("restart")):
 		get_tree().reload_current_scene()
 	
-	var player_chunk = get_chunk(Player.translation)
-	if player_chunk != temp_player_chunk:
-		print(player_chunk)
-		temp_player_chunk = player_chunk
+	if world_seed != -1:
+		var player_chunk = get_chunk(Player.translation)
+		if player_chunk != temp_player_chunk:
+			print(player_chunk)
+			temp_player_chunk = player_chunk
 	
-	#if !(chunk_index.has(get_chunk(Player.translation))):
+		#if !(chunk_index.has(get_chunk(Player.translation))):
 		#create_surrounding_chunks(get_chunk(Player.translation))
-	create_surrounding_chunks(get_chunk(Player.translation))
+		create_surrounding_chunks(get_chunk(Player.translation))
+	else:
+		create_surrounding_chunks(get_chunk(Vector3(0, 0, 0)))
 
 func create_surrounding_chunks(center_chunk):
 	for x in range(3):
@@ -74,3 +84,10 @@ func create_surrounding_chunks(center_chunk):
 				if !(chunk_index.has(Vector3(x + center_chunk.x - 1, y + center_chunk.y - 1, z + center_chunk.z - 1))):
 					#print("Creating chunk... ")
 					create_chunk(Vector3(x + center_chunk.x - 1, y + center_chunk.y - 1, z + center_chunk.z - 1))
+
+func _on_ForwardButton_pressed():
+	player_move_forward = true
+
+
+func _on_ForwardButton_released():
+	player_move_forward = false
