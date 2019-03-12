@@ -3,7 +3,10 @@ extends GridMap
 onready var blocks = preload("res://block.meshlib").duplicate()
 onready var World = get_node("/root/World")
 
+onready var Debug = preload("res://scripts/debug.gd").new()
+
 var chunk_location = Vector3(0, 0, 0)
+var chunk_address = 0
 
 func _ready():
 	
@@ -28,11 +31,12 @@ func _ready():
 	cell_center_y = true
 	cell_center_z = true
 
-	if World.world_seed == 0:
+	if World.map_seed == 0:
 		if chunk_location.y == 0:
 			print("translation is equal to ", chunk_location)
-			generate_flat_terrain()
-	elif World.world_seed == -1:
+			#generate_flat_terrain()
+			load_terrain()
+	elif World.map_seed == -1:
 		if chunk_location.y == 0:
 			generate_random_terrain()
 		#print(blocks.find_item_by_name("grass"))
@@ -51,6 +55,46 @@ func generate_flat_terrain():
 					else:
 						set_cell_item(x, y, z, 2, 0)
 					#print(str(x, ", ", y, ", ", z))
+
+func load_terrain():
+	# Get the chunk data from the WORLD FILE.
+	#Debug.msg("Running GetChunkData on chunk ", ChunkMetadata[i].Address, "...", "Debug")
+	var EdenWorldDecoder = load("res://scripts/eden_world_decoder.gd").new()
+	EdenWorldDecoder.World = World
+	EdenWorldDecoder.init_world()
+	var ChunkData = EdenWorldDecoder.get_chunk_data(chunk_address)
+	
+	Debug.msg("Creating the chunk mesh... ", "Debug")
+	#CreateChunk(ChunkMetadata[i].Address, x, y, z)
+	
+	#Debug.msg("Registering blocks... ", "Debug")
+	#for Blocks in range(ChunkData.size()):
+		#Indexer.RegisterBlock(ChunkData[Blocks].Id, ChunkData[Blocks].Position.X, ChunkData[Blocks].Position.Y, ChunkData[Blocks].Position.Z, ChunkMetadata[i].Address, 0);
+	
+	# ==============================================================================
+	Debug.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug")
+	Debug.msg("Placing blocks... ", "Debug")
+	# Place all the blocks contained in the chunk data.
+	for Blocks in range(ChunkData.size()):
+		var x = ChunkData[Blocks].position.x
+		var y = ChunkData[Blocks].position.y
+		var z = ChunkData[Blocks].position.z
+		var id = ChunkData[Blocks].id
+		
+		set_cell_item(x, z, y, id, 0)
+		
+		#Logger.Log("Checking block...", "Debug");
+		#Logger.LogFloat("X: ", X, "", "Debug");
+		#Logger.LogFloat("Y: ", Y, "", "Debug");
+		#Logger.LogFloat("Z: ", Z, "", "Debug");
+		
+		#if !(Indexer.CheckBlock(X, Y+100, Z) && Indexer.CheckBlock(X, Y-100, Z) && Indexer.CheckBlock(X+100,Y, Z) && Indexer.CheckBlock(X-100, Y, Z) && Indexer.CheckBlock(X, Y, Z+100) && Indexer.CheckBlock(X, Y, Z-100)):
+			# Logger.LogInt("Placing block ", ChunkData[Blocks].Id, "...", "Debug");
+			#CreateBlock(ChunkData[Blocks].Id, ChunkMetadata[i].Address, X, Y, Z);
+			#LoadedBlocks++;
+	# ==============================================================================
+	#Status+=1
+	#LoadedChunks+=1
 
 func generate_random_terrain():
 	for x in range(16):

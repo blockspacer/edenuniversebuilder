@@ -6,7 +6,7 @@ onready var Dot = preload("res://scenes/dot.tscn")
 func _ready():
 	#$UI/Menu/LoadButton.grab_focus()
 	var world = World.instance()
-	world.world_seed = -1
+	world.map_seed = -1
 	add_child(world)
 	
 	draw_dots()
@@ -19,7 +19,9 @@ func draw_dots():
 			dot.rect_position = Vector2(x*40, y*40)
 
 func _process(delta):
-	pass
+	if Input.is_action_pressed("load_world"):
+			print("Loading world...")
+			get_tree().change_scene("res://scenes/world.tscn")
 	#if $UI/Menu/LoadButton.is_hovered():
 		#$UI/Menu/LoadButton.grab_focus()
 
