@@ -1,3 +1,4 @@
 *.png filter=lfs diff=lfs merge=lfs -text
 *.meshlib filter=lfs diff=lfs merge=lfs -text
 *.stex filter=lfs diff=lfs merge=lfs -text
+*.eden* filter=lfs diff=lfs merge=lfs -text

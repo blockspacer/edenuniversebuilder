@@ -3,7 +3,7 @@
 [ext_resource path="res://scripts/world.gd" type="Script" id=1]
 [ext_resource path="res://scenes/hud.tscn" type="PackedScene" id=2]
 
-[node name="World" type="Spatial"]
+[node name="World" type="Spatial" index="0"]
 
 script = ExtResource( 1 )
 

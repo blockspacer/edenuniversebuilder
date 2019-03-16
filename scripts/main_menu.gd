@@ -1,31 +1,30 @@
 extends Spatial
 
-onready var World = preload("res://scenes/world.tscn")
-onready var Dot = preload("res://scenes/dot.tscn")
+onready var world_template = preload("res://scenes/world.tscn")
+onready var dot_template = preload("res://scenes/dot.tscn")
+var Hud
 
 func _ready():
 	#$UI/Menu/LoadButton.grab_focus()
-	var world = World.instance()
-	world.map_seed = -1
-	add_child(world)
-	
+	var World = world_template.instance()
+	World.map_seed = -1
+	add_child(World)
+	Hud = World.Hud
 	draw_dots()
 
 func draw_dots():
 	for x in range(40):
 		for y in range(40):
-			var dot = Dot.instance()
+			var dot = dot_template.instance()
 			add_child(dot)
 			dot.rect_position = Vector2(x*40, y*40)
 
 func _process(delta):
-	if Input.is_action_pressed("load_world"):
-			print("Loading world...")
+	if Input.is_action_just_pressed("load_world"):
+			Hud.msg("Loading world...", "Info")
 			get_tree().change_scene("res://scenes/world.tscn")
-	#if $UI/Menu/LoadButton.is_hovered():
-		#$UI/Menu/LoadButton.grab_focus()
 
 
 func _on_LoadButton_released():
-	print("Loading world...")
+	Hud.msg("Loading world...", "Info")
 	get_tree().change_scene("res://scenes/world.tscn")

@@ -1,47 +1,135 @@
 extends GridMap
 
 onready var blocks = preload("res://block.meshlib").duplicate()
-onready var World = get_node("/root/World")
-
-onready var Debug = preload("res://scripts/debug.gd").new()
+var World
+var Hud
 
 var chunk_location = Vector3(0, 0, 0)
 var chunk_address = 0
 
 func _ready():
-	
-	if World == null:
-		World = get_node("/root/Main Menu/World")
+	Hud = World.Hud
 	
 	# tex order = right, front, back, left, top, bottom
-	generate_block_mesh(1, "bedrock", single_sided_block("dark_stone"))
-	generate_block_mesh(2, "stone", single_sided_block("greystone"))
+	generate_block_mesh(1, "bedrock", single_sided_block("bedrock"))
+	generate_block_mesh(2, "stone", single_sided_block("grey_stone"))
 	generate_block_mesh(3, "dirt", single_sided_block("dirt"))
 	generate_block_mesh(4, "sand", single_sided_block("sand"))
 	generate_block_mesh(5, "leaves", single_sided_block("leaves_green"))
-	generate_block_mesh(6, "trunk", single_sided_block("tree_exterior"))
+	generate_block_mesh(6, "trunk", two_sided_block("tree_side", "tree_top"))
 	generate_block_mesh(7, "wood", single_sided_block("wood"))
-	generate_block_mesh(8, "grass", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass", "dirt" ])
-	generate_block_mesh(9, "tnt", single_sided_block("tnt"))
-	generate_block_mesh(10, "rock", single_sided_block("bedrock"))
+	generate_block_mesh(8, "grass", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass_top", "dirt" ])
+	generate_block_mesh(9, "tnt", two_sided_block("tnt_side", "tnt_top"))
+	generate_block_mesh(10, "rock", single_sided_block("dark_stone"))
+	
+	generate_block_mesh(11, "weeds", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass_top", "dirt" ])
+	generate_block_mesh(12, "flowers", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass_top", "dirt" ])
+	generate_block_mesh(13, "brick", single_sided_block("brick"))
+	generate_block_mesh(14, "slate", single_sided_block("bedrock"))
+	generate_block_mesh(15, "ice", single_sided_block("ice"))
+	generate_block_mesh(16, "wallpaper", single_sided_block("crystal_white"))
+	generate_block_mesh(17, "trampoline", single_sided_block("trampoline"))
+	generate_block_mesh(18, "ladder", two_sided_block("ladder_side", "wood"))
+	generate_block_mesh(19, "cloud", single_sided_block("cloud"))
+	generate_block_mesh(20, "water", single_sided_block("water"))
+	
+	generate_block_mesh(21, "fence", single_sided_block("weave"))
+	generate_block_mesh(22, "ivy", single_sided_block("vine"))
+	generate_block_mesh(23, "lava", single_sided_block("lava"))
+	
+	# Triangles
+	
+	generate_block_mesh(24, "rock .S", single_sided_block("grey_stone"))
+	generate_block_mesh(25, "rock .W", single_sided_block("grey_stone"))
+	generate_block_mesh(26, "rock .N", single_sided_block("grey_stone"))
+	generate_block_mesh(27, "rock .E", single_sided_block("grey_stone"))
+	
+	generate_block_mesh(28, "wood .S", single_sided_block("wood"))
+	generate_block_mesh(29, "wood .W", single_sided_block("wood"))
+	generate_block_mesh(30, "wood .N", single_sided_block("wood"))
+	generate_block_mesh(31, "wood .E", single_sided_block("wood"))
+	
+	generate_block_mesh(32, "shing .S", single_sided_block("shingle"))
+	generate_block_mesh(33, "shing .W", single_sided_block("shingle"))
+	generate_block_mesh(34, "shing .N", single_sided_block("shingle"))
+	generate_block_mesh(35, "shing .E", single_sided_block("shingle"))
+	
+	generate_block_mesh(36, "ice .S", single_sided_block("ice"))
+	generate_block_mesh(37, "ice .W", single_sided_block("ice"))
+	generate_block_mesh(38, "ice .N", single_sided_block("ice"))
+	generate_block_mesh(39, "ice .E", single_sided_block("ice"))
+	
+	generate_block_mesh(40, "rock SE", single_sided_block("grey_stone"))
+	generate_block_mesh(41, "rock SW", single_sided_block("grey_stone"))
+	generate_block_mesh(42, "rock NW", single_sided_block("grey_stone"))
+	generate_block_mesh(43, "rock NE", single_sided_block("grey_stone"))
+	
+	generate_block_mesh(44, "wood SE", single_sided_block("wood"))
+	generate_block_mesh(45, "wood SW", single_sided_block("wood"))
+	generate_block_mesh(46, "wood NW", single_sided_block("wood"))
+	generate_block_mesh(47, "wood NE", single_sided_block("wood"))
+	
+	generate_block_mesh(48, "shing SE", single_sided_block("shingle"))
+	generate_block_mesh(49, "shing SW", single_sided_block("shingle"))
+	generate_block_mesh(50, "shing NW", single_sided_block("shingle"))
+	generate_block_mesh(51, "shing NE", single_sided_block("shingle"))
+	
+	generate_block_mesh(52, "ice SE", single_sided_block("ice"))
+	generate_block_mesh(53, "ice SW", single_sided_block("ice"))
+	generate_block_mesh(54, "ice NW", single_sided_block("ice"))
+	generate_block_mesh(55, "ice NE", single_sided_block("ice"))
+	
+	# =====
+	
+	generate_block_mesh(56, "shingles", single_sided_block("shingle"))
+	generate_block_mesh(57, "tile", single_sided_block("gradient"))
+	generate_block_mesh(58, "glass", single_sided_block("glass"))
+	
+	# Liquid
+	
+	generate_block_mesh(59, "water 3/4", single_sided_block("water"))
+	generate_block_mesh(60, "water 1/2", single_sided_block("water"))
+	generate_block_mesh(61, "water 1/4", single_sided_block("water"))
+	
+	generate_block_mesh(62, "lava 3/4", single_sided_block("lava"))
+	generate_block_mesh(63, "lava 1/2", single_sided_block("lava"))
+	generate_block_mesh(64, "lava 1/4", single_sided_block("lava"))
+	
+	# ======
+	
+	generate_block_mesh(65, "fireworks", two_sided_block("fireworks_side", "tnt_top"))
+	generate_block_mesh(66, "door N", single_sided_block("bedrock"))
+	generate_block_mesh(67, "door E", single_sided_block("bedrock"))
+	generate_block_mesh(68, "door S", single_sided_block("bedrock"))
+	generate_block_mesh(69, "door W", single_sided_block("bedrock"))
+	generate_block_mesh(70, "door top", single_sided_block("bedrock"))
+	
+	generate_block_mesh(71, "transcube", single_sided_block("bedrock"))
+	generate_block_mesh(72, "light", single_sided_block("bedrock"))
+	generate_block_mesh(73, "newflower", single_sided_block("bedrock"))
+	generate_block_mesh(74, "steel", single_sided_block("bedrock"))
+	
+	generate_block_mesh(75, "pN portal N", single_sided_block("bedrock"))
+	generate_block_mesh(76, "pE portal E", single_sided_block("bedrock"))
+	generate_block_mesh(77, "pS portal S", single_sided_block("bedrock"))
+	generate_block_mesh(78, "pW portal W", single_sided_block("bedrock"))
+	generate_block_mesh(79, "pT portal top", single_sided_block("bedrock"))
 	
 	# assign mesh library to the chunk
 	cell_size = Vector3(1, 1, 1)
 	cell_center_x = true
 	cell_center_y = true
 	cell_center_z = true
-
+	
 	if World.map_seed == 0:
 		if chunk_location.y == 0:
-			print("translation is equal to ", chunk_location)
+			Hud.msg("translation is equal to " + str(chunk_location), "Info")
 			#generate_flat_terrain()
 			load_terrain()
+	
 	elif World.map_seed == -1:
 		if chunk_location.y == 0:
 			generate_random_terrain()
-		#print(blocks.find_item_by_name("grass"))
-		#print(get_meshes())
-		#print(theme.get_item_list())
 
 func generate_flat_terrain():
 	for x in range(16):
@@ -54,26 +142,29 @@ func generate_flat_terrain():
 						set_cell_item(x, y, z, 3, 0)
 					else:
 						set_cell_item(x, y, z, 2, 0)
-					#print(str(x, ", ", y, ", ", z))
 
 func load_terrain():
 	# Get the chunk data from the WORLD FILE.
-	#Debug.msg("Running GetChunkData on chunk ", ChunkMetadata[i].Address, "...", "Debug")
+	#Hud.msg("Running GetChunkData on chunk ", ChunkMetadata[i].Address, "...", "Debug")
 	var EdenWorldDecoder = load("res://scripts/eden_world_decoder.gd").new()
 	EdenWorldDecoder.World = World
-	EdenWorldDecoder.init_world()
-	var ChunkData = EdenWorldDecoder.get_chunk_data(chunk_address)
+	EdenWorldDecoder.set_vars()
+	var ChunkData = EdenWorldDecoder.get_chunk_data(Vector2(chunk_location.x, chunk_location.z))
+	World.loaded = true
+	if typeof(ChunkData) == 1:
+		generate_flat_terrain()
+		return false
 	
-	Debug.msg("Creating the chunk mesh... ", "Debug")
+	Hud.msg("Creating the chunk mesh... ", "Debug")
 	#CreateChunk(ChunkMetadata[i].Address, x, y, z)
 	
-	#Debug.msg("Registering blocks... ", "Debug")
+	#Hud.msg("Registering blocks... ", "Debug")
 	#for Blocks in range(ChunkData.size()):
 		#Indexer.RegisterBlock(ChunkData[Blocks].Id, ChunkData[Blocks].Position.X, ChunkData[Blocks].Position.Y, ChunkData[Blocks].Position.Z, ChunkMetadata[i].Address, 0);
 	
 	# ==============================================================================
-	Debug.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug")
-	Debug.msg("Placing blocks... ", "Debug")
+	Hud.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug")
+	Hud.msg("Placing blocks... ", "Debug")
 	# Place all the blocks contained in the chunk data.
 	for Blocks in range(ChunkData.size()):
 		var x = ChunkData[Blocks].position.x
@@ -102,7 +193,7 @@ func generate_random_terrain():
 			for z in range(16):
 				randomize()
 				if floor(rand_range(0, 3)) == 1:
-					set_cell_item(x, y, z, floor(rand_range(1, 11)), 0)
+					set_cell_item(x, y, z, floor(rand_range(1, 80)), 0)
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				#if x == 0 and y == 0 and z == 0:
 					#if y >= 15:
@@ -111,7 +202,6 @@ func generate_random_terrain():
 						#set_cell_item(x, y, z, 3, 0)
 					#else:
 						#set_cell_item(x, y, z, 2, 0)
-						#print(str(x, ", ", y, ", ", z))
 
 func generate_matrix_terrain():
 	for x in range(16):
@@ -125,7 +215,6 @@ func generate_matrix_terrain():
 						set_cell_item(x, y, z, 3, 0)
 					else:
 						set_cell_item(x, y, z, 2, 0)
-						#print(str(x, ", ", y, ", ", z))
 
 func generate_block_mesh(id, block_name, textures):
 	var item_mesh = blocks.get_item_mesh(0).duplicate()
@@ -134,7 +223,6 @@ func generate_block_mesh(id, block_name, textures):
 	
 	for i in range(0, textures.size()):
 		var mat = SpatialMaterial.new()
-		#print("res://textures/" + textures[i] + ".png")
 		var tex = load("res://textures/" + textures[i] + ".png")
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(3, 3, 3)
@@ -152,16 +240,25 @@ func single_sided_block(data):
 		arr.append(data)
 	return arr
 
+func two_sided_block(side_tex, top_bot_tex):
+	var arr = Array()
+	for i in range(4):
+		arr.append(side_tex)
+	for i in range(2):
+		arr.append(top_bot_tex)
+	return arr
+
 func break_block(x, y, z):
 	var location = Vector3(x, y, z) - translation
-	print("Removing block from chunk location ", location)
+	Hud.msg("Removing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, -1, 0)
-	print("Chunk was", chunk_location)
+	Hud.msg("Chunk was" + str(chunk_location))
 
 func place_block(id, x, y, z):
 	var location = Vector3(x, y, z) - translation
-	print("Removing block from chunk location ", location)
+	Hud.msg("Placing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, id, 0)
+	Hud.msg("Chunk was" + str(chunk_location))
 
 #func _process(delta):
 #	# Called every frame. Delta is time since last frame.
