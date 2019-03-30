@@ -4,26 +4,29 @@
 
 extends Spatial
 
+############################## public variables ###############################
+
 var World
 var Hud
+
 
 var map_file = File.new()
 var ChunkLocations = Dictionary()
 var ChunkAddresses = Dictionary()
 var ChunkMetadata = Array()
 
+
 var worldAreaX = 0
 var worldAreaY = 0
 var worldAreaWidth = 0
 var worldAreaHeight = 0
 
-func _ready():
-	pass
 
-func _process(delta):
-	pass
 
-func set_vars():
+
+################################## functions ##################################
+
+func set_vars(): ##############################################################
 	Hud = World.Hud
 	map_file = World.map_file
 	ChunkLocations = World.ChunkLocations
@@ -35,7 +38,8 @@ func set_vars():
 	worldAreaWidth = World.worldAreaWidth
 	worldAreaHeight = World.worldAreaHeight
 
-func init_world():
+
+func init_world(): ############################################################
 	Hud.msg("We are online. Starting world convertion...", "Info")
 	if World.map_path == null:
 		Hud.msg("InitializeWorld: WorldPath is null", "Error");
@@ -52,11 +56,13 @@ func init_world():
 	Hud.msg("Geting world metadata...", "Info");
 	return get_metadata();
 
-func read_int(position):
+
+func read_int(position): ######################################################
 	map_file.seek(position)
 	return map_file.get_buffer(1)[0]
 
-func get_metadata():
+
+func get_metadata(): ##########################################################
 	# Open existing file
 	if map_file.open(World.map_path, File.READ) != 0:
 		Hud.msg("Error opening file", "Error")
@@ -131,7 +137,8 @@ func get_metadata():
 		return false;
 	return true;
 
-func get_chunk_data(location):
+
+func get_chunk_data(location): ################################################
 	if !ChunkAddresses.has(location):
 		Hud.msg("Chunk data does not exist!", "Error");
 		return false

@@ -1,13 +1,21 @@
 extends GridMap
 
+############################## public variables ###############################
+
 onready var blocks = preload("res://block.meshlib").duplicate()
 var World
 var Hud
 
+
 var chunk_location = Vector3(0, 0, 0)
 var chunk_address = 0
 
-func _ready():
+
+
+
+################################### signals ###################################
+
+func _ready(): ################################################################
 	Hud = World.Hud
 	
 	# tex order = right, front, back, left, top, bottom
@@ -124,18 +132,25 @@ func _ready():
 	if World.map_seed == 0:
 		if chunk_location.y == 0:
 			Hud.msg("translation is equal to " + str(chunk_location), "Info")
-			#generate_flat_terrain()
-			load_terrain()
+			generate_flat_terrain()
+			#load_terrain()
 	
 	elif World.map_seed == -1:
-		if chunk_location.y == 0:
-			generate_random_terrain()
+		pass
+		#if chunk_location.y == 0:
+			#generate_random_terrain()
 
-func generate_flat_terrain():
+
+
+
+################################## functions ##################################
+
+func generate_flat_terrain(): #################################################
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
-				if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
+				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
+				if y == 0:
 					if y >= 15:
 						set_cell_item(x, y, z, 8, 0)
 					elif y > 10:
@@ -143,7 +158,8 @@ func generate_flat_terrain():
 					else:
 						set_cell_item(x, y, z, 2, 0)
 
-func load_terrain():
+
+func load_terrain(): ##########################################################
 	# Get the chunk data from the WORLD FILE.
 	#Hud.msg("Running GetChunkData on chunk ", ChunkMetadata[i].Address, "...", "Debug")
 	var EdenWorldDecoder = load("res://scripts/eden_world_decoder.gd").new()
@@ -187,7 +203,8 @@ func load_terrain():
 	#Status+=1
 	#LoadedChunks+=1
 
-func generate_random_terrain():
+
+func generate_random_terrain(): ###############################################
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
@@ -203,7 +220,8 @@ func generate_random_terrain():
 					#else:
 						#set_cell_item(x, y, z, 2, 0)
 
-func generate_matrix_terrain():
+
+func generate_matrix_terrain(): ###############################################
 	for x in range(16):
 		for y in range(16):
 			for z in range(16):
@@ -216,7 +234,8 @@ func generate_matrix_terrain():
 					else:
 						set_cell_item(x, y, z, 2, 0)
 
-func generate_block_mesh(id, block_name, textures):
+
+func generate_block_mesh(id, block_name, textures): ###########################
 	var item_mesh = blocks.get_item_mesh(0).duplicate()
 	var item_shapes = blocks.get_item_shapes(0).duplicate()
 	blocks.create_item(id)
@@ -234,13 +253,15 @@ func generate_block_mesh(id, block_name, textures):
 	blocks.set_item_name(id, block_name)
 	theme = blocks
 
-func single_sided_block(data):
+
+func single_sided_block(data): ################################################
 	var arr = Array()
 	for i in range(6):
 		arr.append(data)
 	return arr
 
-func two_sided_block(side_tex, top_bot_tex):
+
+func two_sided_block(side_tex, top_bot_tex): ##################################
 	var arr = Array()
 	for i in range(4):
 		arr.append(side_tex)
@@ -248,19 +269,19 @@ func two_sided_block(side_tex, top_bot_tex):
 		arr.append(top_bot_tex)
 	return arr
 
-func break_block(x, y, z):
+
+func break_block(x, y, z): ####################################################
 	var location = Vector3(x, y, z) - translation
 	Hud.msg("Removing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, -1, 0)
 	Hud.msg("Chunk was" + str(chunk_location))
 
-func place_block(id, x, y, z):
+
+func place_block(id, x, y, z): ################################################
 	var location = Vector3(x, y, z) - translation
 	Hud.msg("Placing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, id, 0)
 	Hud.msg("Chunk was" + str(chunk_location))
 
-#func _process(delta):
-#	# Called every frame. Delta is time since last frame.
-#	# Update game logic here.
-#	pass
+
+

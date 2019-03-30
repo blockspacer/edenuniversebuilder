@@ -16,7 +16,11 @@ boot_splash/image="res://textures/splash.png"
 
 [display]
 
+window/size/width=1920
+window/size/height=1080
 window/handheld/emulate_touchscreen=true
+mouse_cursor/custom_image="res://cusor.png"
+mouse_cursor/custom_image_hotspot=Vector2( 0.5, 0.5 )
 
 [input]
 
@@ -49,6 +53,12 @@ build=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"",
 paint=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":52,"unicode":0,"echo":false,"script":null)
  ]
 load_world=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":76,"unicode":0,"echo":false,"script":null)
+ ]
+create_server=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":67,"unicode":0,"echo":false,"script":null)
+ ]
+join_server=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":74,"unicode":0,"echo":false,"script":null)
+ ]
+send_data=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":39,"unicode":0,"echo":false,"script":null)
  ]
 
 [rendering]

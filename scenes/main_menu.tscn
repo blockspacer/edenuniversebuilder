@@ -1,11 +1,69 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://scripts/main_menu.gd" type="Script" id=1]
 [ext_resource path="res://scenes/environment.tres" type="Environment" id=2]
-[ext_resource path="res://ui/edenlogo.png" type="Texture" id=3]
-[ext_resource path="res://ui/ipad~menu_text_load.png" type="Texture" id=4]
+[ext_resource path="res://fantasque-sans-mono.tres" type="DynamicFont" id=3]
+[ext_resource path="res://textures/glass.png" type="Texture" id=4]
+[ext_resource path="res://textures/fireworks_side.png" type="Texture" id=5]
+[ext_resource path="res://fantasque-sans-mono-regular.otf" type="DynamicFontData" id=6]
+[ext_resource path="res://textures/tnt_side.png" type="Texture" id=7]
+[ext_resource path="res://textures/steel.png" type="Texture" id=8]
+[ext_resource path="res://ui/ui_text/ipad~menu_options.png" type="Texture" id=9]
+[ext_resource path="res://ui/edenlogo.png" type="Texture" id=10]
+[ext_resource path="res://textures/glass2.png" type="Texture" id=11]
 
-[node name="Main Menu" type="Spatial"]
+[sub_resource type="DynamicFont" id=2]
+
+size = 25
+use_mipmaps = false
+use_filter = false
+font_data = ExtResource( 6 )
+_sections_unfolded = [ "Font", "Settings" ]
+
+[sub_resource type="DynamicFont" id=3]
+
+size = 39
+use_mipmaps = false
+use_filter = true
+font_data = ExtResource( 6 )
+_sections_unfolded = [ "Font", "Settings" ]
+
+[sub_resource type="DynamicFont" id=4]
+
+size = 80
+use_mipmaps = false
+use_filter = true
+font_data = ExtResource( 6 )
+_sections_unfolded = [ "Font", "Settings" ]
+
+[sub_resource type="DynamicFont" id=5]
+
+size = 20
+use_mipmaps = false
+use_filter = true
+font_data = ExtResource( 6 )
+_sections_unfolded = [ "Font", "Settings" ]
+
+[sub_resource type="Animation" id=6]
+
+resource_name = "Loading"
+length = 6.0
+loop = true
+step = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("UI/LoadingContainer/Container/CenterContainer/VBoxContainer/Label:text")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1, 2, 3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ "Loading", "Loading.", "Loading..", "Loading..." ]
+}
+
+[node name="Main Menu" type="Spatial" index="0"]
 
 script = ExtResource( 1 )
 
@@ -30,27 +88,111 @@ _sections_unfolded = [ "Transform" ]
 
 anchor_left = 0.0
 anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_right = 40.0
-margin_bottom = 40.0
+anchor_right = 1.0
+anchor_bottom = 1.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
 mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
 
-[node name="Menu" type="VBoxContainer" parent="UI" index="0"]
+[node name="Background" type="ColorRect" parent="UI" index="0"]
+
+show_behind_parent = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+color = Color( 0.230469, 0.230469, 0.230469, 0.353569 )
+_sections_unfolded = [ "Anchor", "Margin" ]
+
+[node name="Home" type="MarginContainer" parent="UI" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -20.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Anchor", "Margin", "Size Flags" ]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Home" index="0"]
 
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_left = 40.0
-margin_top = 40.0
-margin_right = 900.0
-margin_bottom = 390.0
+margin_left = 8.0
+margin_right = 1880.0
+margin_bottom = 1040.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+
+[node name="TopContainer" type="HBoxContainer" parent="UI/Home/VBoxContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1872.0
+margin_bottom = 812.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 0
+_sections_unfolded = [ "Margin", "Size Flags" ]
+
+[node name="News" type="Container" parent="UI/Home/VBoxContainer/TopContainer" index="0"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 600.0
+margin_bottom = 812.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_sections_unfolded = [ "Margin", "Rect", "Size Flags" ]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/News" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
 mouse_filter = 1
@@ -60,53 +202,561 @@ size_flags_vertical = 1
 alignment = 0
 _sections_unfolded = [ "Margin" ]
 
-[node name="TextureRect" type="TextureRect" parent="UI/Menu" index="0"]
+[node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer" index="0"]
 
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_right = 860.0
-margin_bottom = 267.0
+margin_right = 580.0
+margin_bottom = 23.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
-mouse_filter = 1
+mouse_filter = 2
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
-size_flags_vertical = 1
-texture = ExtResource( 3 )
-stretch_mode = 4
-_sections_unfolded = [ "Grow Direction", "Rect" ]
+size_flags_vertical = 4
+custom_fonts/font = ExtResource( 3 )
+text = "News"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "custom_fonts" ]
 
-[node name="ColorRect" type="ColorRect" parent="UI/Menu/TextureRect" index="0"]
+[node name="HSeparator" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer" index="1"]
 
-show_behind_parent = true
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_left = 83.0
-margin_top = 4.0
-margin_right = 769.0
-margin_bottom = 261.0
+margin_top = 27.0
+margin_right = 580.0
+margin_bottom = 37.0
+rect_min_size = Vector2( 0, 10 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
 mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
-color = Color( 0.230469, 0.230469, 0.230469, 1 )
+_sections_unfolded = [ "Rect" ]
 
-[node name="LoadButton_Old" type="TextureButton" parent="UI/Menu" index="1"]
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer" index="2"]
 
-visible = false
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_top = 271.0
-margin_right = 860.0
-margin_bottom = 271.0
+margin_top = 41.0
+margin_right = 580.0
+margin_bottom = 792.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = true
+focus_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/mono_font = ExtResource( 3 )
+custom_fonts/normal_font = ExtResource( 3 )
+bbcode_enabled = false
+bbcode_text = ""
+visible_characters = -1
+percent_visible = 1.0
+meta_underlined = true
+tab_size = 4
+text = "Reddit: https://www.reddit.com/r/edengame
+Official Website: https://edengame.net/
+Online World Search: https://app.edengame.net/search.html
+Popular List: http://edengame.net/popularlist.txt **(Outdated)**
+World Download: http://files.edengame.net/
+Wiki: http://edenworldbuilder.wikia.com/
+**==== Devoloper Links ====**
+Repository for version 2.1.0 (last update by Ari): https://github.com/JosephTheEngineer/Eden
+Repository for version 2.1.1 (last 2.x.x version): https://github.com/ryankontos/EdenWorldBuilder
+Repository for old pre3.0.0 (last UE4 version): https://gitlab.com/josephtheengineer/edenuniversebuilder-ue4
+Repository for version 3.0.0 (latest 3.x.x version): https://git.sr.ht/~josephtheengineer/edenuniversebuilder
+JosephTheEngineer's Twitter: https://twitter.com/JosephTheEngi"
+scroll_active = true
+scroll_following = false
+selection_enabled = true
+override_selected_font_color = false
+_sections_unfolded = [ "Rect", "Size Flags", "custom_fonts" ]
+
+[node name="Background" type="ColorRect" parent="UI/Home/VBoxContainer/TopContainer/News" index="1"]
+
+show_behind_parent = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
+_sections_unfolded = [ "Anchor", "Margin" ]
+
+[node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 604.0
+margin_right = 624.0
+margin_bottom = 812.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Chat" type="Container" parent="UI/Home/VBoxContainer/TopContainer" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 628.0
+margin_right = 1228.0
+margin_bottom = 812.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_sections_unfolded = [ "Size Flags" ]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat" index="0"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Margin" ]
+
+[node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 580.0
+margin_bottom = 23.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = ExtResource( 3 )
+text = "Chat"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "custom_fonts" ]
+
+[node name="HSeparator" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 27.0
+margin_right = 580.0
+margin_bottom = 37.0
+rect_min_size = Vector2( 0, 10 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Chat" type="RichTextLabel" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 41.0
+margin_right = 580.0
+margin_bottom = 484.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = true
+focus_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/mono_font = ExtResource( 3 )
+custom_fonts/normal_font = ExtResource( 3 )
+bbcode_enabled = false
+bbcode_text = ""
+visible_characters = -1
+percent_visible = 1.0
+meta_underlined = true
+tab_size = 4
+text = ""
+scroll_active = true
+scroll_following = true
+selection_enabled = true
+override_selected_font_color = false
+_sections_unfolded = [ "Size Flags", "custom_fonts" ]
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer" index="3"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 488.0
+margin_right = 580.0
+margin_bottom = 538.0
+rect_min_size = Vector2( 0, 50 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="MessageContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 376.0
+margin_bottom = 50.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_sections_unfolded = [ "Rect", "Size Flags" ]
+
+[node name="Container" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/MessageContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="MessageButton" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/MessageContainer/Container" index="0"]
+
+position = Vector2( 100.71, 8.41736 )
+scale = Vector2( 6.15978, 1.09345 )
+normal = ExtResource( 4 )
+pressed = ExtResource( 5 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/MessageContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 2 )
+text = "Edit message"
+align = 1
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "custom_colors", "custom_fonts" ]
+
+[node name="SendContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2" index="1"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 380.0
+margin_right = 580.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 200, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect", "Size Flags" ]
+
+[node name="Container" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/SendContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="SendButton" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/SendContainer/Container" index="0"]
+
+position = Vector2( 59.4449, 7.25098 )
+scale = Vector2( 2.47849, 1.09345 )
+normal = ExtResource( 4 )
+pressed = ExtResource( 5 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/SendContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 2 )
+text = "Send"
+align = 1
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Rect", "Visibility", "custom_fonts" ]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer" index="4"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 542.0
+margin_right = 580.0
+margin_bottom = 792.0
+rect_min_size = Vector2( 0, 250 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="CreateServerContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 200.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 200, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="CreateServerButton" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/CreateServerContainer" index="0"]
+
+editor/display_folded = true
+position = Vector2( 55, 30 )
+scale = Vector2( 3.5, 3.5 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/CreateServerContainer/CreateServerButton" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = -12.0
+margin_top = 34.0
+margin_right = 97.0
+margin_bottom = 63.0
+rect_scale = Vector2( 0.5, 0.5 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+text = "Create server"
+align = 1
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Rect" ]
+
+[node name="JoinServerContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 204.0
+margin_right = 404.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 200, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="JoinServerButton" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/JoinServerContainer" index="0"]
+
+editor/display_folded = true
+position = Vector2( 40, 30 )
+scale = Vector2( 3.5, 3.5 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/JoinServerContainer/JoinServerButton" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = -12.0
+margin_top = 34.0
+margin_right = 97.0
+margin_bottom = 63.0
+rect_scale = Vector2( 0.5, 0.5 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+text = "Join server"
+align = 1
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Background" type="ColorRect" parent="UI/Home/VBoxContainer/TopContainer/Chat" index="1"]
+
+show_behind_parent = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_right = 2.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
+_sections_unfolded = [ "Anchor", "Margin", "Size Flags" ]
+
+[node name="VSeparator2" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer" index="3"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 1232.0
+margin_right = 1252.0
+margin_bottom = 812.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Button" type="Button" parent="UI/Home/VBoxContainer/TopContainer" index="4"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 1256.0
+margin_right = 1268.0
+margin_bottom = 812.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
 focus_mode = 2
@@ -118,16 +768,532 @@ toggle_mode = false
 enabled_focus_mode = 2
 shortcut = null
 group = null
-texture_normal = ExtResource( 4 )
-expand = true
-stretch_mode = 3
-_sections_unfolded = [ "Textures" ]
+flat = false
+align = 1
 
-[node name="LoadButton" type="TouchScreenButton" parent="UI/Menu" index="2"]
+[node name="Planets" type="Container" parent="UI/Home/VBoxContainer/TopContainer" index="5"]
 
-position = Vector2( 244.211, 286.246 )
-scale = Vector2( 1.71169, 1.69865 )
-normal = ExtResource( 4 )
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 1272.0
+margin_right = 1872.0
+margin_bottom = 812.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_sections_unfolded = [ "Size Flags" ]
+
+[node name="Background" type="ColorRect" parent="UI/Home/VBoxContainer/TopContainer/Planets" index="0"]
+
+show_behind_parent = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
+_sections_unfolded = [ "Anchor", "Margin", "Size Flags" ]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Margin" ]
+
+[node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 614.0
+margin_bottom = 23.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = ExtResource( 3 )
+text = "Planets"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "custom_colors", "custom_fonts" ]
+
+[node name="HSeparator" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 27.0
+margin_right = 614.0
+margin_bottom = 37.0
+rect_min_size = Vector2( 0, 10 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="NewFlatWorld" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 41.0
+margin_right = 614.0
+margin_bottom = 166.0
+rect_min_size = Vector2( 0, 125 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="ButtonContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewFlatWorld" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 130.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 130, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="NewFlatWorld" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewFlatWorld/ButtonContainer" index="0"]
+
+position = Vector2( 6.36206, 5.00437 )
+scale = Vector2( 3.65727, 3.5523 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewFlatWorld" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 134.0
+margin_right = 154.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewFlatWorld" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 158.0
+margin_top = 42.0
+margin_right = 438.0
+margin_bottom = 83.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 3 )
+text = "New Flat World"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Margin", "custom_fonts" ]
+
+[node name="NewNaturalTerrain" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="3"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 170.0
+margin_right = 614.0
+margin_bottom = 295.0
+rect_min_size = Vector2( 0, 125 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="ButtonContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewNaturalTerrain" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 130.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 130, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="NewNaturalTerrain" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewNaturalTerrain/ButtonContainer" index="0"]
+
+position = Vector2( 6.36206, 5.00437 )
+scale = Vector2( 3.65727, 3.5523 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewNaturalTerrain" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 134.0
+margin_right = 154.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewNaturalTerrain" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 158.0
+margin_top = 42.0
+margin_right = 538.0
+margin_bottom = 83.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 3 )
+text = "New Natural Terrain"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Margin", "custom_fonts" ]
+
+[node name="TestWorld" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="4"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 299.0
+margin_right = 614.0
+margin_bottom = 424.0
+rect_min_size = Vector2( 0, 125 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="ButtonContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 130.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 130, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="TestWorld" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld/ButtonContainer" index="0"]
+
+position = Vector2( 6.36206, 5.00437 )
+scale = Vector2( 3.65727, 3.5523 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 134.0
+margin_right = 154.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 158.0
+margin_top = 42.0
+margin_right = 358.0
+margin_bottom = 83.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 3 )
+text = "Test World"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Margin", "custom_fonts" ]
+
+[node name="DirectCity" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer" index="5"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 428.0
+margin_right = 614.0
+margin_bottom = 553.0
+rect_min_size = Vector2( 0, 125 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="ButtonContainer" type="Container" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 130.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 130, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="DirectCity" type="TouchScreenButton" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity/ButtonContainer" index="0"]
+
+position = Vector2( 6.36206, 5.00437 )
+scale = Vector2( 3.65727, 3.5523 )
+normal = ExtResource( 7 )
+pressed = ExtResource( 8 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+_sections_unfolded = [ "Transform" ]
+
+[node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 134.0
+margin_right = 154.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 20, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 158.0
+margin_top = 42.0
+margin_right = 378.0
+margin_bottom = 83.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 3 )
+text = "Direct City"
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Margin", "custom_fonts" ]
+
+[node name="VSplitContainer" type="VSplitContainer" parent="UI/Home/VBoxContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 816.0
+margin_right = 1872.0
+margin_bottom = 836.0
+rect_min_size = Vector2( 0, 20 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+split_offset = 0
+collapsed = false
+dragger_visibility = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="BottomContainer" type="HBoxContainer" parent="UI/Home/VBoxContainer" index="2"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 840.0
+margin_right = 1872.0
+margin_bottom = 1040.0
+rect_min_size = Vector2( 0, 200 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="OptionsContainer" type="Container" parent="UI/Home/VBoxContainer/BottomContainer" index="0"]
+
+editor/display_folded = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 500.0
+margin_bottom = 200.0
+rect_min_size = Vector2( 500, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="OptionsButton" type="TouchScreenButton" parent="UI/Home/VBoxContainer/BottomContainer/OptionsContainer" index="0"]
+
+position = Vector2( 34.7203, 64.0487 )
+scale = Vector2( 1.30262, 1.30948 )
+normal = ExtResource( 9 )
 pressed = null
 bitmask = null
 shape = null
@@ -137,40 +1303,286 @@ passby_press = false
 action = ""
 visibility_mode = 0
 
-[node name="TextEdit" type="TextEdit" parent="UI/Menu/LoadButton" index="0"]
+[node name="CenterContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/BottomContainer" index="1"]
 
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_left = -1.0
-margin_top = 80.0
-margin_right = 221.0
-margin_bottom = 121.0
+margin_left = 504.0
+margin_right = 1468.0
+margin_bottom = 200.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
-focus_mode = 2
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 0
+_sections_unfolded = [ "Rect", "Size Flags" ]
+
+[node name="Logo" type="TextureRect" parent="UI/Home/VBoxContainer/BottomContainer" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 1472.0
+margin_right = 1872.0
+margin_bottom = 200.0
+rect_min_size = Vector2( 400, 0 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 10 )
+expand = true
+stretch_mode = 5
+_sections_unfolded = [ "Anchor", "Grow Direction", "Hint", "Margin", "Rect" ]
+
+[node name="ColorRect" type="ColorRect" parent="UI/Home/VBoxContainer/BottomContainer/Logo" index="0"]
+
+show_behind_parent = true
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -3.0
+margin_top = -3.0
+margin_right = -3.0
+margin_bottom = -43.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
 mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
-text = ""
-readonly = false
-highlight_current_line = false
-syntax_highlighting = false
-show_line_numbers = false
-highlight_all_occurrences = false
-override_selected_font_color = false
-context_menu_enabled = true
-smooth_scrolling = false
-v_scroll_speed = 80.0
-hiding_enabled = 0
-wrap_lines = false
-caret_block_mode = false
-caret_blink = false
-caret_blink_speed = 0.65
-caret_moving_by_right_click = true
+color = Color( 0.230469, 0.230469, 0.230469, 1 )
+_sections_unfolded = [ "Anchor", "Margin" ]
 
-[connection signal="released" from="UI/Menu/LoadButton" to="." method="_on_LoadButton_released"]
+[node name="SharedWorlds" type="MarginContainer" parent="UI" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 18.0
+margin_right = -20.0
+margin_bottom = -22.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="SharedWorldsButton" type="TouchScreenButton" parent="UI" index="3"]
+
+scale = Vector2( 1.79414, 27.0544 )
+normal = ExtResource( 11 )
+pressed = ExtResource( 5 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = ""
+visibility_mode = 0
+
+[node name="LoadingContainer" type="VBoxContainer" parent="UI" index="4"]
+
+editor/display_folded = true
+visible = false
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+_sections_unfolded = [ "Visibility" ]
+
+[node name="HSeparator" type="HSeparator" parent="UI/LoadingContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1920.0
+margin_bottom = 436.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 3
+_sections_unfolded = [ "Size Flags" ]
+
+[node name="Container" type="Container" parent="UI/LoadingContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 440.0
+margin_right = 1920.0
+margin_bottom = 640.0
+rect_min_size = Vector2( 0, 200 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_sections_unfolded = [ "Rect" ]
+
+[node name="Background" type="ColorRect" parent="UI/LoadingContainer/Container" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+color = Color( 0, 0, 0, 0.911608 )
+_sections_unfolded = [ "Anchor", "Grow Direction", "Hint", "Rect", "Size Flags" ]
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/LoadingContainer/Container" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+use_top_left = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/LoadingContainer/Container/CenterContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 710.0
+margin_top = 31.0
+margin_right = 1210.0
+margin_bottom = 168.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+alignment = 0
+
+[node name="Label" type="Label" parent="UI/LoadingContainer/Container/CenterContainer/VBoxContainer" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 500.0
+margin_bottom = 83.0
+rect_min_size = Vector2( 500, 50 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 4 )
+text = "Loading"
+align = 1
+clip_text = true
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Anchor", "Rect", "custom_fonts" ]
+
+[node name="Label2" type="Label" parent="UI/LoadingContainer/Container/CenterContainer/VBoxContainer" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 87.0
+margin_right = 500.0
+margin_bottom = 137.0
+rect_min_size = Vector2( 0, 50 )
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 4
+custom_fonts/font = SubResource( 5 )
+text = "Setting up world..."
+align = 1
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+_sections_unfolded = [ "Rect", "custom_fonts" ]
+
+[node name="HSeparator2" type="HSeparator" parent="UI/LoadingContainer" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 644.0
+margin_right = 1920.0
+margin_bottom = 1080.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 3
+_sections_unfolded = [ "Size Flags" ]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="2"]
+
+root_node = NodePath("..")
+autoplay = ""
+playback_process_mode = 1
+playback_default_blend_time = 0.0
+playback_speed = 1.0
+anims/Loading = SubResource( 6 )
+blend_times = [  ]
+_sections_unfolded = [ "Playback Options" ]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/MessageContainer/Container/MessageButton" to="." method="_on_MessageButton_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2/SendContainer/Container/SendButton" to="." method="_on_SendButton_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/CreateServerContainer/CreateServerButton" to="." method="_on_CreateServerButton_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer/JoinServerContainer/JoinServerButton" to="." method="_on_JoinServerButton_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewFlatWorld/ButtonContainer/NewFlatWorld" to="." method="_on_NewFlatWorld_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/NewNaturalTerrain/ButtonContainer/NewNaturalTerrain" to="." method="_on_NewNaturalTerrain_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld/ButtonContainer/TestWorld" to="." method="_on_TestWorld_released"]
+
+[connection signal="released" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity/ButtonContainer/DirectCity" to="." method="_on_DirectCity_released"]
+
+[connection signal="released" from="UI/SharedWorldsButton" to="." method="_on_SharedWorlds_released"]
 
 
