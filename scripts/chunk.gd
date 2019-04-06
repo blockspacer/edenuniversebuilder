@@ -16,6 +16,8 @@ var chunk_address = 0
 ################################### signals ###################################
 
 func _ready(): ################################################################
+	if chunk_location.y != 0:
+		return
 	Hud = World.Hud
 	
 	# tex order = right, front, back, left, top, bottom
@@ -128,6 +130,7 @@ func _ready(): ################################################################
 	cell_center_x = true
 	cell_center_y = true
 	cell_center_z = true
+	mesh_library = blocks
 	
 	if World.map_seed == 0:
 		if chunk_location.y == 0:
@@ -151,12 +154,13 @@ func generate_flat_terrain(): #################################################
 			for z in range(16):
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				if y == 0:
-					if y >= 15:
-						set_cell_item(x, y, z, 8, 0)
-					elif y > 10:
-						set_cell_item(x, y, z, 3, 0)
-					else:
-						set_cell_item(x, y, z, 2, 0)
+					set_cell_item(x, y, z, 2, 0)
+					#if y >= 15:
+						#set_cell_item(x, y, z, 8, 0)
+					#elif y > 10:
+						#set_cell_item(x, y, z, 3, 0)
+					#else:
+						#set_cell_item(x, y, z, 2, 0)
 
 
 func load_terrain(): ##########################################################
@@ -242,6 +246,7 @@ func generate_block_mesh(id, block_name, textures): ###########################
 	
 	for i in range(0, textures.size()):
 		var mat = SpatialMaterial.new()
+		#var mat = load("res://block.material").duplicate()
 		var tex = load("res://textures/" + textures[i] + ".png")
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(3, 3, 3)
@@ -251,7 +256,6 @@ func generate_block_mesh(id, block_name, textures): ###########################
 	blocks.set_item_mesh(id, item_mesh)
 	blocks.set_item_shapes(id, item_shapes)
 	blocks.set_item_name(id, block_name)
-	theme = blocks
 
 
 func single_sided_block(data): ################################################
@@ -272,16 +276,16 @@ func two_sided_block(side_tex, top_bot_tex): ##################################
 
 func break_block(x, y, z): ####################################################
 	var location = Vector3(x, y, z) - translation
-	Hud.msg("Removing block from chunk location " + str(location), "Info")
+	#Hud.msg("Removing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, -1, 0)
-	Hud.msg("Chunk was" + str(chunk_location))
+	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
 
 
 func place_block(id, x, y, z): ################################################
 	var location = Vector3(x, y, z) - translation
-	Hud.msg("Placing block from chunk location " + str(location), "Info")
+	#Hud.msg("Placing block from chunk location " + str(location), "Info")
 	set_cell_item(location.x, location.y, location.z, id, 0)
-	Hud.msg("Chunk was" + str(chunk_location))
+	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
 
 
 

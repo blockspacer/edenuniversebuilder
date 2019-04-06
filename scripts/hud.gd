@@ -29,10 +29,10 @@ func _process(delta): #########################################################
 		#chunk_position.set_text("XYZ: " + str(World.ChunkAddresses[Vector2(World.get_chunk(Player.translation).x, World.get_chunk(Player.translation).z)]))
 		
 		var looking_position = find_node("Looking XYZ")
-		looking_position.set_text("Looking at: XYZ: " + str(Player.get_looking_at()))
+		looking_position.set_text("Looking at: XYZ: " + str(Player.get_looking_at(OS.get_window_size() / 2)))
 		
 		var looking_chunk = find_node("Looking at Chunk")
-		looking_chunk.set_text("Looking at chunk: XYZ: " + str(World.get_chunk(Player.get_looking_at())))
+		looking_chunk.set_text("Looking at chunk: XYZ: " + str(World.get_chunk(Player.get_looking_at(OS.get_window_size() / 2))))
 		
 		var orentation = find_node("Orentation")
 		orentation.set_text("Orentation: " + Player.get_orientation())
@@ -43,8 +43,8 @@ func _process(delta): #########################################################
 		var entities = find_node("Entities")
 		entities.set_text("Entities: " + str(World.total_entities) + " | Players: " + str(World.total_players))
 		
-	var fps = find_node("FPS")
-	fps.set_text("FPS: " + str(Engine.get_frames_per_second()))
+		var fps = find_node("FPS")
+		fps.set_text("FPS: " + str(Engine.get_frames_per_second()))
 	
 	frames_passed+=1
 	if frames_passed > 100:
@@ -63,9 +63,29 @@ func _on_AnalogTop_released(): ################################################
 func _input(event): ###########################################################
 	if event is InputEventScreenDrag:
 		if analog_is_pressed:
-			var touch_position = event.position
 			msg("Touching the Analog stick", "Debug")
-			msg(touch_position, "Debug")
+			msg(str(event.position), "Debug")
+	if event is InputEventScreenTouch:
+		msg("Touched the screen at: " + str(event.position), "Debug")
+
+func _on_BurnButton_toggled(button_pressed): ##################################
+	msg("Changing action_mode to burn...", "Info")
+	get_node("/root/World/Player").action_mode = "burn"
+
+
+func _on_MineButton_toggled(button_pressed): ##################################
+	msg("Changing action_mode to mine...", "Info")
+	get_node("/root/World/Player").action_mode = "mine"
+
+
+func _on_BuildButton_toggled(button_pressed): #################################
+	msg("Changing action_mode to build...", "Info")
+	get_node("/root/World/Player").action_mode = "build"
+
+
+func _on_PaintButton_toggled(button_pressed): #################################
+	msg("Changing action_mode to paint...", "Info")
+	get_node("/root/World/Player").action_mode = "paint"
 
 
 

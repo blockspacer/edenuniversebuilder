@@ -15,9 +15,9 @@ var direction = Vector3()
 
 
 var build_range = 1000
-var building = 0
-
-
+#var building = 0
+var highlighted_block = Vector3(0, 0, 0)
+var highlighted_block_id = 8
 var move_mode = "walk"
 var action_mode = "nothing"
 
@@ -46,6 +46,7 @@ var jump_height = 15
 func _ready(): ################################################################
 	Hud = World.Hud
 	World.total_players += 1
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	#camera_width_center = OS.get_window_size().x / 2
 	#camera_height_center = OS.get_window_size().y / 2
 
@@ -55,13 +56,26 @@ func _physics_process(delta):
 	else:
 		walk(delta)
 	
-	#Hud.msg("Highlighting block...2", "Trace")
-	#cast_ray(false)
-	
-	if building > 0:
-		Hud.msg("building...", "Debug")
-		cast_ray(true)
-		building = 0
+	if false:
+		var location = World.get_chunk(translation)
+		var block_location = get_looking_at(OS.get_window_size() / 2)
+		var normal = get_looking_at_normal(OS.get_window_size() / 2)
+		
+		#Hud.msg("Normal: " + str(normal), "Debug")
+		normal = Vector3(int(round(normal.x)), int(round(normal.y)), int(round(normal.z)))
+		block_location = block_location - normal
+		
+		if Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z))) != highlighted_block:
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			Chunk.place_block(highlighted_block_id, highlighted_block.x, highlighted_block.y, highlighted_block.z)
+			highlighted_block = Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
+		
+		if World.chunk_index.has(location):
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			#Hud.msg("Breaking block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
+			Chunk.place_block(0, int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
+		else:
+			Hud.msg("Invalid chunk!", "Error")
 
 
 func _input(event): ###########################################################
@@ -73,31 +87,72 @@ func _input(event): ###########################################################
 			$Head/Camera.rotate_x(deg2rad(change))
 			camera_angle += change
 	
-	if Input.is_action_pressed("fly"):
+	if event.is_action_pressed("fly"):
 		if move_mode == "walk":
+			Hud.msg("Changing move_mode to fly...", "Info")
 			move_mode = "fly"
 		else:
+			Hud.msg("Changing move_mode to walk...", "Info")
 			move_mode = "walk"
 	
-	if Input.is_action_pressed("action"):
-		var camera = $Head/Camera
-		#build_origin = camera.project_ray_origin(Vector2(camera_width_center, camera_height_center))
-		#build_normal = camera.project_ray_normal(Vector2(camera_width_center, camera_height_center)) * build_range
-		building = 1
+	if event.is_action_pressed("action"):
+		action(OS.get_window_size() / 2)
 	
-	if Input.is_action_pressed("burn"):
+	if event is InputEventScreenTouch:
+		action(event.position)
+	
+	if event.is_action_pressed("burn"):
+		Hud.msg("Changing action_mode to burn...", "Info")
 		action_mode = "burn"
-	if Input.is_action_pressed("mine"):
+	if event.is_action_pressed("mine"):
+		Hud.msg("Changing action_mode to mine...", "Info")
 		action_mode = "mine"
-	if Input.is_action_pressed("build"):
+	if event.is_action_pressed("build"):
+		Hud.msg("Changing action_mode to build...", "Info")
 		action_mode = "build"
-	if Input.is_action_pressed("paint"):
+	if event.is_action_pressed("paint"):
+		Hud.msg("Changing action_mode to paint...", "Info")
 		action_mode = "paint"
 
 
 
 
 ################################## functions ##################################
+
+func action(position):
+	Hud.msg("Action event called", "Debug")
+	
+	if action_mode == "burn":
+		pass
+	elif action_mode == "mine":
+		var location = World.get_chunk(translation)
+		var block_location = get_looking_at(position)
+		var normal = get_looking_at_normal(position)
+		
+		normal = Vector3(int(round(normal.x)), int(round(normal.y)), int(round(normal.z)))
+		Hud.msg("Normal: " + str(normal), "Debug")
+		block_location = block_location - normal
+		
+		if World.chunk_index.has(location):
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			Hud.msg("Breaking block: " + str(Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))), "Info")
+			#highlighted_block = Vector3(0, 0, 0)
+			Chunk.break_block(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
+		else:
+			Hud.msg("Invalid chunk!", "Error")
+	elif action_mode == "build":
+		var location = World.get_chunk(translation)
+		var block_location = get_looking_at(position)
+		
+		if World.chunk_index.has(location):
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			Hud.msg("Placing block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
+			Chunk.place_block(6, block_location.x, block_location.y, block_location.z)
+		else:
+			Hud.msg("Invalid chunk!", "Error")
+	elif action_mode == "paint":
+		pass
+
 
 func get_orientation(): #######################################################
 	var camera = $Head/Camera
@@ -118,16 +173,32 @@ func get_orientation(): #######################################################
 	else:
 		return "invaild"
 
-
-func get_looking_at(): ########################################################
+func get_looking_at_normal(position):
 	#var camera = $Head/Camera
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
 	var camera = $Head/Camera
 	var space_state = get_world().direct_space_state
-	var build_origin = camera.project_ray_origin(OS.get_window_size() / 2)
-	var build_normal = camera.project_ray_normal(OS.get_window_size() / 2) * 1000
+	var build_origin = camera.project_ray_origin(position)
+	var build_normal = camera.project_ray_normal(position) * 1000
+	
+	var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
+	if result:
+		#Hud.msg(str(result.position), "Debug")
+		return result.normal
+	else:
+		return Vector3(0, 0, 0)
+
+func get_looking_at(position): ################################################
+	#var camera = $Head/Camera
+	#var from = camera.project_ray_origin(event.position)
+	#var to = from + camera.project_ray_normal(event.position) * 1000
+	
+	var camera = $Head/Camera
+	var space_state = get_world().direct_space_state
+	var build_origin = camera.project_ray_origin(position)
+	var build_normal = camera.project_ray_normal(position) * 1000
 	
 	var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
 	if result:

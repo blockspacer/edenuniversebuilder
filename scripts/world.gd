@@ -4,11 +4,12 @@ extends Spatial
 
 onready var chunk_template = preload("res://scenes/chunk.tscn")
 onready var player_template = preload("res://scenes/player.tscn")
+onready var hud_template = preload("res://scenes/hud.tscn")
 
 
 onready var Player = null
 onready var World = null
-onready var Hud = get_node("HUD")
+onready var Hud = null
 
 
 var version = "Eden: Universe Builder v3.0.0 beta4"
@@ -65,6 +66,8 @@ var my_info = { name = "Ari", color = Color8(255, 0, 255) }
 
 func _ready(): #################################################################
 	if map_seed != -1:
+		Hud = hud_template.instance()
+		add_child(Hud)
 		var EdenWorldDecoder = load("res://scripts/eden_world_decoder.gd").new()
 		World = get_node("/root/World")
 		EdenWorldDecoder.World = World
@@ -75,9 +78,14 @@ func _ready(): #################################################################
 		Player.World = World
 		add_child(Player)
 	else:
+		#get_node("/root/Main Menu/World/HUD/Right Stats").free()
+		#get_node("/root/Main Menu/World/HUD/Chat").free()
+		#get_node("/root/Main Menu/World/HUD/AnalogTop").free()
+		#get_node("/root/Main Menu/World/HUD/analog_bottom").free()
+		#get_node("/root/Main Menu/World/HUD").free()
+		Hud = get_node("/root/Main Menu")
 		World = get_node("/root/Main Menu/World")
 	
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	create_world(2, 1)
 	
 	# Networking
