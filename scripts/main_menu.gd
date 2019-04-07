@@ -7,6 +7,13 @@ onready var dot_template = preload("res://scenes/dot.tscn")
 var World
 var Hud
 
+var workspace = "home"
+onready var home = get_node("/root/Main Menu/UI/Home")
+onready var leaderboard = get_node("/root/Main Menu/UI/Leaderboard")
+onready var world_sharing = get_node("/root/Main Menu/UI/WorldSharing")
+onready var credits = get_node("/root/Main Menu/UI/Credits")
+onready var account_page = get_node("/root/Main Menu/UI/AccountPage")
+onready var options = get_node("/root/Main Menu/UI/Options")
 
 var loader
 var wait_frames
@@ -125,7 +132,59 @@ func _on_DirectCityButton_pressed(): ##########################################
 
 
 func _on_OptionsButton_pressed(): #############################################
-	pass # Replace with function body.
+	home.visible = false
+	options.visible = true
+	workspace = "options"
+
+
+func _on_TopButton_pressed(): #################################################
+	if workspace == "home":
+		home.visible = false
+		leaderboard.visible = true
+		workspace = "leaderboard"
+	elif workspace == "credits":
+		credits.visible = false
+		home.visible = true
+		workspace = "home"
+
+
+func _on_RightButton_pressed(): ###############################################
+	if workspace == "home":
+		home.visible = false
+		world_sharing.visible = true
+		workspace = "world_sharing"
+	if workspace == "account_page":
+		account_page.visible = false
+		home.visible = true
+		workspace = "home"
+
+
+func _on_BottomButton_pressed(): ##############################################
+	if workspace == "home":
+		home.visible = false
+		credits.visible = true
+		workspace = "credits"
+	elif workspace == "leaderboard":
+		leaderboard.visible = false
+		home.visible = true
+		workspace = "home"
+
+
+func _on_LeftButton_pressed(): ################################################
+	if workspace == "home":
+		home.visible = false
+		account_page.visible = true
+		workspace = "account_page"
+	if workspace == "world_sharing":
+		world_sharing.visible = false
+		home.visible = true
+		workspace = "home"
+
+
+func _on_OptionsBackButton_pressed(): #########################################
+	options.visible = false
+	home.visible = true
+	workspace = "home"
 
 
 
