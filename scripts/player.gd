@@ -12,6 +12,7 @@ var mouse_sensitivity = 0.3
 
 var velocity = Vector3()
 var direction = Vector3()
+var move_direction
 
 
 var build_range = 1000
@@ -54,7 +55,7 @@ func _physics_process(delta): #################################################
 	if move_mode == "fly":
 		fly(delta)
 	else:
-		walk(delta)
+		walk(delta)	
 	
 	if false:
 		var location = World.get_chunk(translation)
@@ -127,8 +128,13 @@ func _input(event): ###########################################################
 
 ################################## functions ##################################
 
+
+func move(position):
+	move_direction = position
+
+
 func action(position): ########################################################
-	Hud.msg("Action event called", "Debug")
+	#Hud.msg("Action event called", "Trace")
 	
 	if action_mode == "burn":
 		pass
@@ -220,21 +226,24 @@ func get_looking_at(position): ################################################
 
 
 func walk(delta): #############################################################
-	# reset the direction of  the player
+	# reset the direction of the player
 	direction = Vector3()
 	
-	# get the rotation of the camera
-	var aim = $Head/Camera.get_global_transform().basis
-	if Input.is_action_pressed("move_forward") or World.player_move_forward:
-		direction -= aim.z
-	if Input.is_action_pressed("move_backward"):
-		direction += aim.z
-		
-	if Input.is_action_pressed("move_left"):
-		direction -= aim.x
-	if Input.is_action_pressed("move_right"):
-		direction += aim.x
-		
+	if Hud.analog_is_pressed:
+		direction += Vector3(move_direction.x, 0,  move_direction.y)
+	else:
+		# get the rotation of the camera
+		var aim = $Head/Camera.get_global_transform().basis
+		if Input.is_action_pressed("move_forward") or World.player_move_forward:
+			direction -= aim.z
+		if Input.is_action_pressed("move_backward"):
+			direction += aim.z
+			
+		if Input.is_action_pressed("move_left"):
+			direction -= aim.x
+		if Input.is_action_pressed("move_right"):
+			direction += aim.x
+	
 	direction = direction.normalized()
 	
 	velocity.y += gravity * delta

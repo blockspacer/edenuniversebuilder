@@ -58,8 +58,8 @@ func _on_AnalogTop_button_down():
 
 func _on_AnalogTop_button_up():
 	analog_is_pressed = false
-	Input.action_release("move_forward")
-	Input.action_release("move_backward")
+	var Player = get_node("/root/World/Player")
+	get_node("HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop").rect_position = Vector2(50, 0)
 
 
 func _input(event): ###########################################################
@@ -70,52 +70,75 @@ func _input(event): ###########################################################
 			var analog_center = Vector2(200, 870)
 			var analog_bounds = Vector2(100, 100)
 			
-			if abs(abs(event.position) - abs(analog_center)) < analog_bounds:
-				get_node("HUD/HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop").position = event.position
-				if event.position > analog_center:
-					Input.action_press("move_forward")
-				else:
-					Input.action_press("move_backward")
+			var distance_from_center =  Vector2(abs(abs(analog_center.x) - abs(event.position.x)), abs(abs(analog_center.y) - abs(event.position.y)))
+			
+			msg("Distance from center: " + str(abs(abs(analog_center.x) - abs(event.position.x))), "Debug")
+			if distance_from_center.x < analog_bounds.x:
+				if distance_from_center.y < analog_bounds.y:
+					msg("In bounds!", "Debug")
+					get_node("HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop").rect_position = Vector2(event.position.x - 150, event.position.y - 870)
+					var Player = get_node("/root/World/Player")
+					Player.move(distance_from_center)
 	if event is InputEventScreenTouch:
 		msg("Touched the screen at: " + str(event.position), "Debug")
 
 func _on_BurnButton_toggled(button_pressed): ##################################
-	msg("Changing action_mode to burn...", "Info")
-	get_node("/root/World/Player").action_mode = "burn"
+	msg("Current workspace: " + workspace, "Info")
+	if button_pressed:
+		msg("Changing action_mode to burn...", "Info")
+		get_node("/root/World/Player").action_mode = "burn"
+		switch_mode("burn")
+	else:
+		msg("Changing action_mode to nothing...", "Info")
+		get_node("/root/World/Player").action_mode = "nothing"
+		switch_mode("nothing")
 	
-	switch_mode("burn")
+	switch_workspace("game")
 
 
 func _on_MineButton_toggled(button_pressed): ##################################
-	msg("Changing action_mode to mine...", "Info")
-	get_node("/root/World/Player").action_mode = "mine"
+	msg("Current workspace: " + workspace, "Info")
+	if button_pressed:
+		msg("Changing action_mode to mine...", "Info")
+		get_node("/root/World/Player").action_mode = "mine"
+		switch_mode("mine")
+	else:
+		msg("Changing action_mode to nothing...", "Info")
+		get_node("/root/World/Player").action_mode = "nothing"
+		switch_mode("nothing")
 	
-	switch_mode("mine")
+	switch_workspace("game")
 
 
 func _on_BuildButton_toggled(button_pressed): #################################
-	msg("Changing action_mode to build...", "Info")
-	get_node("/root/World/Player").action_mode = "build"
-	switch_mode("build")
+	msg("Current workspace: " + workspace, "Info")
+	if button_pressed:
+		msg("Changing action_mode to build...", "Info")
+		get_node("/root/World/Player").action_mode = "build"
+		switch_mode("build")
+		switch_workspace("build")
+	else:
+		switch_workspace("game")
 
 
 func _on_PaintButton_toggled(button_pressed): #################################
-	msg("Changing action_mode to paint...", "Info")
-	get_node("/root/World/Player").action_mode = "paint"
-	
-	switch_mode("paint")
+	msg("Current workspace: " + workspace, "Info")
+	if button_pressed:
+		msg("Changing action_mode to paint...", "Info")
+		get_node("/root/World/Player").action_mode = "paint"
+		switch_mode("paint")
+		switch_workspace("paint")
+	else:
+		switch_workspace("game")
 
 
 func _on_OptionsButton_toggled(button_pressed): ###############################
+	msg("Current workspace: " + workspace, "Info")
 	msg("Opening pause workspace...", "Info")
 	if button_pressed:
-		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = true
-		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
-		get_node("Chat").visible = false
+		switch_workspace("pause")
 	else:
-		get_node("PauseWindow").visible = false
-		get_node("HorizontalMain/VerticalMain/Navbox").visible = true
-		get_node("Chat").visible = true
+		switch_workspace("game")
 
 func _on_ExitButton_pressed():
 	msg("Loading main menu...", "Info")
@@ -125,27 +148,71 @@ func _on_ExitButton_pressed():
 
 ################################## functions ##################################
 
+func switch_workspace(new_workspace):
+	msg("Changing mode to " + new_workspace + " from " + workspace, "Debug")
+	
+	if new_workspace == "pause":
+		msg("Opening the pause menu...", "Info")
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = true
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = true
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
+	if new_workspace == "build":
+		msg("Opening the build menu...", "Info")
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow").visible = true
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = false
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
+	if new_workspace == "paint":
+		msg("Opening the paint menu...", "Info")
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PaintWindow").visible = true
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = false
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
+	if new_workspace == "game":
+		msg("Closing all windows...", "Info")
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = false
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow").visible = false
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PaintWindow").visible = false
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = true
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = true
+	
+	msg("HWIIUUIWUIWEYURYUWEY", "Info")
+	workspace = new_workspace
+
 func switch_mode(mode):
 	if mode == "burn":
 		if get_node("HorizontalMain/Toolbox/BurnButton").pressed:
 			get_node("HorizontalMain/Toolbox/BurnButton").pressed = true
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false
 		else:
 			get_node("HorizontalMain/Toolbox/BurnButton").pressed = false
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false
 		
 	elif mode == "mine":
 		if get_node("HorizontalMain/Toolbox/MineButton").pressed:
+			get_node("HorizontalMain/Toolbox/BurnButton").pressed = false
 			get_node("HorizontalMain/Toolbox/MineButton").pressed = true
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false
 		else:
 			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
 		
 	elif mode == "build":
 		if get_node("HorizontalMain/Toolbox/BuildButton").pressed:
+			get_node("HorizontalMain/Toolbox/BurnButton").pressed = false
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
 			get_node("HorizontalMain/Toolbox/BuildButton").pressed = true
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false
 		else:
 			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
 	
 	elif mode == "paint":
 		if get_node("HorizontalMain/Toolbox/PaintButton").pressed:
+			get_node("HorizontalMain/Toolbox/BurnButton").pressed = false
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
 			get_node("HorizontalMain/Toolbox/PaintButton").pressed = true
 		else:
 			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false

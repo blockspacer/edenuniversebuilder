@@ -155,6 +155,10 @@ func _input(event): ###########################################################
 		if get_node("TitleScreen").visible:
 			get_node("TitleScreen").visible = false
 			get_node("UI").visible = true
+	if event.is_action_pressed("action"):
+		if get_node("TitleScreen").visible:
+			get_node("TitleScreen").visible = false
+			get_node("UI").visible = true
 
 
 func _on_HTTPRequest_request_completed(result, response_code, headers, body): #
