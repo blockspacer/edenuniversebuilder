@@ -50,7 +50,7 @@ func _ready(): ################################################################
 	#camera_width_center = OS.get_window_size().x / 2
 	#camera_height_center = OS.get_window_size().y / 2
 
-func _physics_process(delta):
+func _physics_process(delta): #################################################
 	if move_mode == "fly":
 		fly(delta)
 	else:
@@ -80,12 +80,13 @@ func _physics_process(delta):
 
 func _input(event): ###########################################################
 	if event is InputEventMouseMotion:
-		$Head.rotate_y(deg2rad(-event.relative.x * mouse_sensitivity))
-		
-		var change = -event.relative.y * mouse_sensitivity
-		if change + camera_angle < 90 and change + camera_angle > -90:
-			$Head/Camera.rotate_x(deg2rad(change))
-			camera_angle += change
+		if Hud.analog_is_pressed == false:
+			$Head.rotate_y(deg2rad(-event.relative.x * mouse_sensitivity))
+			
+			var change = -event.relative.y * mouse_sensitivity
+			if change + camera_angle < 90 and change + camera_angle > -90:
+				$Head/Camera.rotate_x(deg2rad(change))
+				camera_angle += change
 	
 	if event.is_action_pressed("fly"):
 		if move_mode == "walk":
@@ -104,22 +105,29 @@ func _input(event): ###########################################################
 	if event.is_action_pressed("burn"):
 		Hud.msg("Changing action_mode to burn...", "Info")
 		action_mode = "burn"
+		Hud.switch_mode("burn")
+		
 	if event.is_action_pressed("mine"):
 		Hud.msg("Changing action_mode to mine...", "Info")
 		action_mode = "mine"
+		Hud.switch_mode("mine")
+		
 	if event.is_action_pressed("build"):
 		Hud.msg("Changing action_mode to build...", "Info")
 		action_mode = "build"
+		Hud.switch_mode("build")
+		
 	if event.is_action_pressed("paint"):
 		Hud.msg("Changing action_mode to paint...", "Info")
 		action_mode = "paint"
+		Hud.switch_mode("paint")
 
 
 
 
 ################################## functions ##################################
 
-func action(position):
+func action(position): ########################################################
 	Hud.msg("Action event called", "Debug")
 	
 	if action_mode == "burn":
@@ -148,6 +156,7 @@ func action(position):
 			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
 			Hud.msg("Placing block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
 			Chunk.place_block(6, block_location.x, block_location.y, block_location.z)
+			Chunk.compile()
 		else:
 			Hud.msg("Invalid chunk!", "Error")
 	elif action_mode == "paint":
@@ -173,7 +182,8 @@ func get_orientation(): #######################################################
 	else:
 		return "invaild"
 
-func get_looking_at_normal(position):
+
+func get_looking_at_normal(position): #########################################
 	#var camera = $Head/Camera
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
@@ -189,6 +199,7 @@ func get_looking_at_normal(position):
 		return result.normal
 	else:
 		return Vector3(0, 0, 0)
+
 
 func get_looking_at(position): ################################################
 	#var camera = $Head/Camera
@@ -206,113 +217,6 @@ func get_looking_at(position): ################################################
 		return result.position
 	else:
 		return Vector3(0, 0, 0)
-
-
-func cast_ray(click): #########################################################
-	pass
-#		var space_state = get_world().direct_space_state
-#		var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
-#		if result:
-#			Hud.msg("Hit: " + str(result.position), "Debug")
-#
-#			var x = int(round(result.position.x))
-#			var y = int(round(result.position.y))
-#			var z = int(round(result.position.z))
-#
-#			if x - result.position.x >= 0.4: 
-#				x -= 1
-#			if y - result.position.y >= 0.4: 
-#				y -= 1
-#			if z - result.position.z >= 0.4: 
-#				z -= 1
-#
-#			#Hud.msg("Removing block " + str(Vector3(x, y, z)) + "...", "Debug")
-#			Hud.msg("Normal: " + str(result.normal), "Debug")
-#
-#			var normal_x = int(round(result.normal.x))
-#			var normal_y = int(round(result.normal.y))
-#			var normal_z = int(round(result.normal.z))
-#
-#			if click == true:
-#				Hud.msg("click is true", "Debug")
-#				# ================================================================================================================
-#				if action_mode == "burn":
-#					pass
-#				# ================================================================================================================
-#				elif action_mode == "mine":
-#					if normal_x == 1 and normal_y == 0 and normal_z == 0:
-#						x -= 1
-#					elif normal_x == 0 and normal_y == 1 and normal_z == 0:
-#						y -= 1
-#					elif normal_x == 0 and normal_y == 0 and normal_z == 1:
-#						x -= 1
-#						y -= 1
-#						z -= 1
-#					elif normal_x == -1 and normal_y == 0 and normal_z == 0:
-#						z -= 1
-#					elif normal_x == 0 and normal_y == 0 and normal_z == -1:
-#						x -= 1
-#						y -= 1
-#
-#					var location = World.get_chunk(Vector3(x, y, z))
-#
-#					if World.chunk_index.has(location):
-#						var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-#						Chunk.break_block(x, y, z)
-#					else:
-#						Hud.msg("Invalid chunk!", "Error")
-#				# ==================================================================================================================
-#				elif action_mode == "build":
-#					if normal_x == 1 and normal_y == 0 and normal_z == 0:
-#						x -= 1
-#					elif normal_x == 0 and normal_y == 1 and normal_z == 0:
-#						y -= 1
-#					elif normal_x == 0 and normal_y == 0 and normal_z == 1:
-#						x -= 1
-#						y -= 1
-#						z -= 1
-#					elif normal_x == -1 and normal_y == 0 and normal_z == 0:
-#						z -= 1
-#					elif normal_x == 0 and normal_y == 0 and normal_z == -1:
-#						x -= 1
-#						y -= 1
-#
-#					var location = World.get_chunk(Vector3(x, y, z))
-#
-#					if World.chunk_index.has(location):
-#						var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-#						Chunk.place_block(3, x, y, z)
-#					else:
-#						Hud.msg("Invalid chunk!", "Error")
-#				# ==================================================================================================================
-#				elif action_mode == "paint":
-#					pass
-#			# ======================================================================================================================
-#			elif click == false:
-#				Hud.msg("click is false", "Debug")
-#				if normal_x == 1 and normal_y == 0 and normal_z == 0:
-#					x -= 1
-#				elif normal_x == 0 and normal_y == 1 and normal_z == 0:
-#					y -= 1
-#				elif normal_x == 0 and normal_y == 0 and normal_z == 1:
-#					x -= 1
-#					y -= 1
-#					z -= 1
-#				elif normal_x == -1 and normal_y == 0 and normal_z == 0:
-#					z -= 1
-#				elif normal_x == 0 and normal_y == 0 and normal_z == -1:
-#					x -= 1
-#					y -= 1
-#
-#				var location = World.get_chunk(Vector3(x, y, z))
-#
-#				if World.chunk_index.has(location):
-#					var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-#					Chunk.place_block(3, x, y, z)
-#				else:
-#					Hud.msg("Invalid chunk!", "Error")
-#			# ======================================================================================================================
-#
 
 
 func walk(delta): #############################################################

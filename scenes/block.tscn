@@ -14,13 +14,13 @@ albedo_color = Color( 0.070254, 0, 0.64, 1 )
 metallic = 0.5
 roughness = 0.0
 
-[sub_resource type="SpatialMaterial" id=4]
+[sub_resource type="SpatialMaterial" id=3]
 resource_name = "Bottom"
 albedo_color = Color( 0.64, 0.64, 0.64, 1 )
 metallic = 0.5
 roughness = 0.0
 
-[sub_resource type="ArrayMesh" id=5]
+[sub_resource type="ArrayMesh" id=4]
 surfaces/0 = {
 "aabb": AABB( 0.499999, -0.5, -0.5, 1.05202e-05, 1.00001, 1 ),
 "array_data": PoolByteArray( 0, 56, 0, 56, 0, 184, 0, 60, 127, 0, 0, 0, 0, 0, 129, 129, 84, 53, 86, 53, 0, 56, 0, 184, 0, 184, 0, 60, 127, 0, 0, 0, 0, 0, 129, 129, 84, 53, 84, 57, 255, 55, 0, 56, 0, 56, 0, 60, 127, 0, 0, 0, 0, 0, 129, 129, 141, 10, 86, 53, 0, 56, 0, 184, 0, 56, 0, 60, 127, 0, 0, 0, 0, 0, 129, 129, 141, 10, 84, 57 ),
@@ -91,20 +91,20 @@ surfaces/5 = {
 "blend_shape_data": [  ],
 "format": 98071,
 "index_count": 6,
-"material": SubResource( 4 ),
+"material": SubResource( 3 ),
 "name": "Bottom",
 "primitive": 4,
 "skeleton_aabb": [  ],
 "vertex_count": 4
 }
 
-[sub_resource type="ConvexPolygonShape" id=6]
+[sub_resource type="ConvexPolygonShape" id=5]
 points = PoolVector3Array( 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.499756, 0.5, 0.5, 0.5, -0.5, 0.5, 0.499756, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.499756, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.499756, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.499756, 0.499756, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5 )
 
 [node name="Block" type="Spatial"]
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
-mesh = SubResource( 5 )
+mesh = SubResource( 4 )
 material/0 = null
 material/1 = null
 material/2 = null
@@ -115,5 +115,5 @@ material/5 = null
 [node name="StaticBody" type="StaticBody" parent="MeshInstance"]
 
 [node name="CollisionShape" type="CollisionShape" parent="MeshInstance/StaticBody"]
-shape = SubResource( 6 )
+shape = SubResource( 5 )
 

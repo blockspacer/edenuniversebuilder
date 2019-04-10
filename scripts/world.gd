@@ -10,6 +10,7 @@ onready var hud_template = preload("res://scenes/hud.tscn")
 onready var Player = null
 onready var World = null
 onready var Hud = null
+onready var VoxelTerrain = null
 
 
 var version = "Eden: Universe Builder v3.0.0 beta4"
@@ -77,6 +78,20 @@ func _ready(): #################################################################
 		Player = player_template.instance()
 		Player.World = World
 		add_child(Player)
+		
+		#VoxelTerrain = load("res://scripts/voxel_terrain.gd").new()
+		#VoxelTerrain.World = World
+		#VoxelTerrain._camera = Player
+		#VoxelTerrain._ready()
+		#VoxelTerrain.Block.create_voxel_grid(20, 20, 20)
+		#VoxelTerrain.spawn_block(VoxelTerrain.generate_block(Vector3(0, 0, 0)))
+		#VoxelTerrain.generate_random(Array(), Vector3(0, 0, 0))
+		
+		#VoxelTerrain._precalculate_priority_positions()
+		#VoxelTerrain._precalculate_neighboring()
+		#VoxelTerrain._update_pending_blocks()
+	
+		#VoxelTerrain.set_voxel(Vector3(0, 0, 0), 1)
 	else:
 		#get_node("/root/Main Menu/World/HUD/Right Stats").free()
 		#get_node("/root/Main Menu/World/HUD/Chat").free()
@@ -100,6 +115,10 @@ func _ready(): #################################################################
 
 
 func _process(delta): #########################################################
+	
+	#if VoxelTerrain != null:
+		#VoxelTerrain._process(delta)
+	
 	if (Input.is_action_just_pressed("ui_cancel")):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		get_tree().quit()

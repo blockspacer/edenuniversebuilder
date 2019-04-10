@@ -1,19 +1,27 @@
 extends Spatial
 
+#################################### nodes ####################################
+
+onready var World
+
+onready var Home = get_node("/root/Main Menu/UI/Home")
+onready var Leaderboard = get_node("/root/Main Menu/UI/Leaderboard")
+onready var WorldSharing = get_node("/root/Main Menu/UI/WorldSharing")
+onready var Credits = get_node("/root/Main Menu/UI/Credits")
+onready var AccountPage = get_node("/root/Main Menu/UI/AccountPage")
+onready var Options = get_node("/root/Main Menu/UI/Options")
+
+onready var TitleScreenPlayer = get_node("TitleScreen/AnimationPlayer")
+
+
+
+
 ############################## public variables ###############################
 
 onready var world_template = preload("res://scenes/world.tscn")
 onready var dot_template = preload("res://scenes/dot.tscn")
-var World
-var Hud
 
 var workspace = "home"
-onready var home = get_node("/root/Main Menu/UI/Home")
-onready var leaderboard = get_node("/root/Main Menu/UI/Leaderboard")
-onready var world_sharing = get_node("/root/Main Menu/UI/WorldSharing")
-onready var credits = get_node("/root/Main Menu/UI/Credits")
-onready var account_page = get_node("/root/Main Menu/UI/AccountPage")
-onready var options = get_node("/root/Main Menu/UI/Options")
 
 var loader
 var wait_frames
@@ -28,41 +36,35 @@ var main_menu = true
 ################################### signals ###################################
 
 func _ready(): ################################################################
+	TitleScreenPlayer.play("TitleScreen")
+	
+	# get current scene for the scene loader
 	var root = get_tree().get_root()
 	current_scene = root.get_child(root.get_child_count() -1)
 	
-	#$UI/Menu/LoadButton.grab_focus()
+	# initialize the background scene
 	World = world_template.instance()
 	World.map_seed = -1
-	#Hud = get_node("/root/Main Menu")
-	#World.Hud = Hud
 	add_child(World)
 	draw_dots()
 	msg("Starting logs...", "Info")
-
-
-func _process(delta): #########################################################
-	if Input.is_action_just_pressed("load_world"):
-		pass
-	if Input.is_action_just_pressed("create_server"):
-		World.create_server("server")
-	if Input.is_action_just_pressed("join_server"):
-		World.join_server("player")
-	if Input.is_action_just_pressed("send_data"):
-		msg("Sending message...", "Info")
-		World.send_message("Hello!")
 	
+	# fetch data from the website for the main menu
+	fetch_data()
+
+
+func _process(delta): #########################################################	
 	if process:
 		if loader == null:
 			msg("Loader was null!", "Debug")
 			# no need to process anymore
 			process = false
 			return
-		
+			
 		if wait_frames > 0: # wait for frames to let the "loading" animation show up
 			wait_frames -= 1
 			return
-		
+			
 		var t = OS.get_ticks_msec()
 		while OS.get_ticks_msec() < t + time_max: # use "time_max" to control how much time we block this thread
 			
@@ -77,10 +79,6 @@ func _process(delta): #########################################################
 				current_scene.queue_free() # get rid of the old scene
 				msg("Setting new scene...", "Debug")
 				set_new_scene(resource)
-				#if main_menu:
-					#msg("Removing scene...", "Debug")
-					#current_scene.queue_free() # get rid of the old scene
-					#main_menu = false
 				break
 			elif err == OK:
 				update_progress()
@@ -88,6 +86,13 @@ func _process(delta): #########################################################
 				msg("Error during loading", "Error")
 				loader = null
 			break
+
+
+func _on_AnimationPlayer_animation_finished(anim_name): #######################
+	if anim_name == "TitleScreen":
+		get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
+	if anim_name == "TitleScreenFlashingText":
+		get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
 
 
 func _on_CreateServerButton_pressed(): ########################################
@@ -132,64 +137,41 @@ func _on_DirectCityButton_pressed(): ##########################################
 
 
 func _on_OptionsButton_pressed(): #############################################
-	home.visible = false
-	options.visible = true
+	Home.visible = false
+	Options.visible = true
 	workspace = "options"
 
 
-func _on_TopButton_pressed(): #################################################
-	if workspace == "home":
-		home.visible = false
-		leaderboard.visible = true
-		workspace = "leaderboard"
-	elif workspace == "credits":
-		credits.visible = false
-		home.visible = true
-		workspace = "home"
-
-
-func _on_RightButton_pressed(): ###############################################
-	if workspace == "home":
-		home.visible = false
-		world_sharing.visible = true
-		workspace = "world_sharing"
-	if workspace == "account_page":
-		account_page.visible = false
-		home.visible = true
-		workspace = "home"
-
-
-func _on_BottomButton_pressed(): ##############################################
-	if workspace == "home":
-		home.visible = false
-		credits.visible = true
-		workspace = "credits"
-	elif workspace == "leaderboard":
-		leaderboard.visible = false
-		home.visible = true
-		workspace = "home"
-
-
-func _on_LeftButton_pressed(): ################################################
-	if workspace == "home":
-		home.visible = false
-		account_page.visible = true
-		workspace = "account_page"
-	if workspace == "world_sharing":
-		world_sharing.visible = false
-		home.visible = true
-		workspace = "home"
-
-
 func _on_OptionsBackButton_pressed(): #########################################
-	options.visible = false
-	home.visible = true
+	Options.visible = false
+	Home.visible = true
 	workspace = "home"
+
+
+func _input(event): ###########################################################
+	if event is InputEventScreenDrag:
+		get_node("UI").rect_position += event.relative
+	if event is InputEventScreenTouch:
+		if get_node("TitleScreen").visible:
+			get_node("TitleScreen").visible = false
+			get_node("UI").visible = true
+
+
+func _on_HTTPRequest_request_completed(result, response_code, headers, body): #
+	msg(str(result), "Debug")
+	msg(str(response_code), "Debug")
+	msg(str(headers), "Debug")
+	msg(str(body), "Debug")
 
 
 
 
 ################################## functions ##################################
+
+func fetch_data(): ############################################################
+	get_node("HTTPRequest").download_file = "res://data/news.md"
+	get_node("HTTPRequest").request("http://josephtheengineer.ddns.net/eden/news.md")
+
 
 func draw_dots(): #############################################################
 	for x in range(OS.get_window_size().x / 10):
@@ -233,14 +215,10 @@ func load_world(): ############################################################
 	msg("Starting animation...", "Debug")
 	get_node("AnimationPlayer").play("Loading")
 	
-	wait_frames = 60
+	wait_frames = 10
 
 
 func show_msg(message, tag): ##################################################
-	#if get_tree().get_root().has_node("/root/Main Menu/World/HUD/Chat"):
-	#	var Chat = get_tree().get_root().get_node("/root/Main Menu/World/HUD/Chat")
-	#	Chat.add_text(tag + ": " + str(message) + '\n')
-	
 	if get_tree().get_root().has_node("/root/Main Menu/UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Chat"):
 		var Chat = get_tree().get_root().get_node("/root/Main Menu/UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Chat")
 		Chat.add_text(tag + ": " + str(message) + '\n')
@@ -253,6 +231,10 @@ func show_msg(message, tag): ##################################################
 func msg(message, tag): #######################################################
 	print(tag, ": ", message)
 	show_msg(message, tag)
+
+
+func _on_SwipeDetector_swiped(direction): #####################################
+	msg("Swipe signal received!", "Info")
 
 
 

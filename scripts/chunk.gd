@@ -1,11 +1,15 @@
-extends GridMap
+extends MeshInstance
 
 ############################## public variables ###############################
 
-onready var blocks = preload("res://block.meshlib").duplicate()
+#onready var blocks = preload("res://block.meshlib").duplicate()
 var World
 var Hud
 
+
+var block_data = Dictionary()
+var mesh_data = []
+var blocks_loaded = 0
 
 var chunk_location = Vector3(0, 0, 0)
 var chunk_address = 0
@@ -19,6 +23,9 @@ func _ready(): ################################################################
 	if chunk_location.y != 0:
 		return
 	Hud = World.Hud
+	Hud.msg("wow", "Debug")
+	
+	place_block(0, 0, 0, 0)
 	
 	# tex order = right, front, back, left, top, bottom
 	generate_block_mesh(1, "bedrock", single_sided_block("bedrock"))
@@ -126,11 +133,11 @@ func _ready(): ################################################################
 	generate_block_mesh(79, "pT portal top", single_sided_block("bedrock"))
 	
 	# assign mesh library to the chunk
-	cell_size = Vector3(1, 1, 1)
-	cell_center_x = true
-	cell_center_y = true
-	cell_center_z = true
-	mesh_library = blocks
+	#cell_size = Vector3(1, 1, 1)
+	#cell_center_x = true
+	#cell_center_y = true
+	#cell_center_z = true
+	#mesh_library = blocks
 	
 	if World.map_seed == 0:
 		if chunk_location.y == 0:
@@ -154,13 +161,16 @@ func generate_flat_terrain(): #################################################
 			for z in range(16):
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				if y == 0:
-					set_cell_item(x, y, z, 2, 0)
+					pass
+					place_block(2, x, y, z)
 					#if y >= 15:
-						#set_cell_item(x, y, z, 8, 0)
+						#place_block(8, x, y, z)
 					#elif y > 10:
-						#set_cell_item(x, y, z, 3, 0)
+						#place_block(3, x, y, z)
 					#else:
-						#set_cell_item(x, y, z, 2, 0)
+						#place_block(x, y, z, 2)
+	#place_block(2, 0, 0, 0)
+	compile()
 
 
 func load_terrain(): ##########################################################
@@ -192,7 +202,7 @@ func load_terrain(): ##########################################################
 		var z = ChunkData[Blocks].position.z
 		var id = ChunkData[Blocks].id
 		
-		set_cell_item(x, z, y, id, 0)
+		place_block(x, z, y, id)
 		
 		#Logger.Log("Checking block...", "Debug");
 		#Logger.LogFloat("X: ", X, "", "Debug");
@@ -214,15 +224,15 @@ func generate_random_terrain(): ###############################################
 			for z in range(16):
 				randomize()
 				if floor(rand_range(0, 3)) == 1:
-					set_cell_item(x, y, z, floor(rand_range(1, 80)), 0)
+					place_block(x, y, z, floor(rand_range(1, 80)))
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				#if x == 0 and y == 0 and z == 0:
 					#if y >= 15:
-						#set_cell_item(x, y, z, 8, 0)
+						#place_block(x, y, z, 8)
 					#elif y > 10:
-						#set_cell_item(x, y, z, 3, 0)
+						#place_block(x, y, z, 3)
 					#else:
-						#set_cell_item(x, y, z, 2, 0)
+						#place_block(x, y, z, 2)
 
 
 func generate_matrix_terrain(): ###############################################
@@ -232,30 +242,31 @@ func generate_matrix_terrain(): ###############################################
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				if x == 0 and y == 0 and z == 0:
 					if y >= 15:
-						set_cell_item(x, y, z, 8, 0)
+						place_block(x, y, z, 8)
 					elif y > 10:
-						set_cell_item(x, y, z, 3, 0)
+						place_block(x, y, z, 3)
 					else:
-						set_cell_item(x, y, z, 2, 0)
+						place_block(x, y, z, 2)
 
 
 func generate_block_mesh(id, block_name, textures): ###########################
-	var item_mesh = blocks.get_item_mesh(0).duplicate()
-	var item_shapes = blocks.get_item_shapes(0).duplicate()
-	blocks.create_item(id)
+	pass
+	#var item_mesh = blocks.get_item_mesh(0).duplicate()
+	#var item_shapes = blocks.get_item_shapes(0).duplicate()
+	#blocks.create_item(id)
 	
-	for i in range(0, textures.size()):
-		var mat = SpatialMaterial.new()
+	#for i in range(0, textures.size()):
+		#var mat = SpatialMaterial.new()
 		#var mat = load("res://block.material").duplicate()
-		var tex = load("res://textures/" + textures[i] + ".png")
-		mat.albedo_texture = tex
-		mat.uv1_scale = Vector3(3, 3, 3)
-		item_mesh.surface_set_material(i, mat)
+		#var tex = load("res://textures/" + textures[i] + ".png")
+		#mat.albedo_texture = tex
+		#mat.uv1_scale = Vector3(3, 3, 3)
+		#item_mesh.surface_set_material(i, mat)
 	
 	# create navmesh
-	blocks.set_item_mesh(id, item_mesh)
-	blocks.set_item_shapes(id, item_shapes)
-	blocks.set_item_name(id, block_name)
+	#blocks.set_item_mesh(id, item_mesh)
+	#blocks.set_item_shapes(id, item_shapes)
+	#blocks.set_item_name(id, block_name)
 
 
 func single_sided_block(data): ################################################
@@ -277,15 +288,235 @@ func two_sided_block(side_tex, top_bot_tex): ##################################
 func break_block(x, y, z): ####################################################
 	var location = Vector3(x, y, z) - translation
 	#Hud.msg("Removing block from chunk location " + str(location), "Info")
-	set_cell_item(location.x, location.y, location.z, -1, 0)
+	#set_cell_item(location.x, location.y, location.z, -1, 0)
 	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
 
 
 func place_block(id, x, y, z): ################################################
 	var location = Vector3(x, y, z) - translation
-	#Hud.msg("Placing block from chunk location " + str(location), "Info")
-	set_cell_item(location.x, location.y, location.z, id, 0)
+	Hud = World.Hud
+	Hud.msg("Placing block from chunk location " + str(location), "Info")
+	
+	block_data[Vector3(x, y, z)] = id
+	
+	#set_surface_material(0, "texture")
+	
+	#set_cell_item(location.x, location.y, location.z, id, 0)
 	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
 
+func compile():
+	Hud.msg("Compiling chunk...", "Info")
+	var st = SurfaceTool.new()
+	#st.create_from(mesh, 0)
+	#var mesh = Mesh.new()
+	
+	#mat.albedo_color = Color(1, 0, 0, 1)
+	#var mat = SpatialMaterial.new()
+	var mat = load("res://block.material").duplicate()
+	var tex = load("res://textures/bedrock.png")
+	mat.albedo_texture = tex
+	#mat.uv1_scale = Vector3(3, 3, 3)
+	
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_material(mat)
+	#st.add_color(Color(1, 0, 0))
+	
+	for position in block_data.keys():
+		create_horizontal_plane(st, position)
+		#create_cube(st, position)
+	
+	#create_vertical_plane(st, Vector3(0, 0, 0))
+	#create_vertical_plane(st, Vector3(1, 0, 0))
+	#create_vertical_plane(st, Vector3(2, 0, 0))
+	#create_vertical_plane(st, Vector3(4, 0, 0))
+	#create_horizontal_plane(st, Vector3(0, 0, 0))
+	
+	st.generate_normals(true)
+	st.index()
+	
+	mesh = st.commit()
+	
+	var shape = ConcavePolygonShape.new()
+	shape.set_faces(mesh_data)
+	
+	var collision_shape = get_node("StaticBody/CollisionShape")
+	collision_shape.shape = shape
+	
+	#collision_shape.shape = mesh.create_trimesh_shape() # Broken on Android!
+
+func create_vertical_plane(st, position):
+	# top-left
+	st.add_uv(Vector2(0, 1))
+	st.add_vertex(Vector3(0, 0, 0) + position)
+	
+	# top-right
+	st.add_uv(Vector2(1, 1))
+	st.add_vertex(Vector3(1, 0, 0) + position)
+	
+	# bottom-left
+	st.add_uv(Vector2(0, 0))
+	st.add_vertex(Vector3(0, -1, 0) + position)
+	
+	
+	
+	# bottom-right
+	st.add_uv(Vector2(1, 0))
+	st.add_vertex(Vector3(1, -1, 0) + position)
+	
+	# bottom-left
+	st.add_uv(Vector2(0, 0))
+	st.add_vertex(Vector3(0, -1, 0) + position)
+	
+	# top-right
+	st.add_uv(Vector2(1, 1))
+	st.add_vertex(Vector3(1, 0, 0) + position)
 
 
+func create_horizontal_plane(st, position):
+	# top-left
+	st.add_uv(Vector2(0, 0))
+	st.add_vertex(Vector3(0, 0, 0) + position)
+	mesh_data.append(Vector3(0, 0, 0) + position)
+	
+	# top-right
+	st.add_uv(Vector2(1, 0))
+	st.add_vertex(Vector3(1, 0, 0) + position)
+	mesh_data.append(Vector3(1, 0, 0) + position)
+	
+	# bottom-left
+	st.add_uv(Vector2(0, 1))
+	st.add_vertex(Vector3(0, 0, 1) + position)
+	mesh_data.append(Vector3(0, 0, 1) + position)
+	
+	
+	# bottom-right
+	st.add_uv(Vector2(1, 1))
+	st.add_vertex(Vector3(1, 0, 1) + position)
+	mesh_data.append(Vector3(1, 0, 1) + position)
+	
+	# bottom-left
+	st.add_uv(Vector2(0, 1))
+	st.add_vertex(Vector3(0, 0, 1) + position)
+	mesh_data.append(Vector3(0, 0, 1) + position)
+	
+	# top-right
+	st.add_uv(Vector2(1, 0))
+	st.add_vertex(Vector3(1, 0, 0) + position)
+	mesh_data.append(Vector3(1, 0, 0) + position)
+
+func create_cube(st, position):
+	st.add_uv(Vector2(0, 0.66))
+	st.add_vertex(Vector3(0, 1, 0) + position)
+	mesh_data.append(Vector3(0, 1, 0) + position)
+	
+	st.add_uv(Vector2(0.25, 0.66))
+	st.add_vertex(Vector3(0, 0, 0) + position)
+	mesh_data.append(Vector3(0, 0, 0) + position)
+	
+	st.add_uv(Vector2(0, 0.33))
+	st.add_vertex(Vector3(1, 1, 0) + position)
+	mesh_data.append(Vector3(0, 1, 0) + position)
+	
+	st.add_uv(Vector2(0.25, 0.33))
+	st.add_vertex(Vector3(1, 0, 0) + position)
+	mesh_data.append(Vector3(1, 0, 0) + position)
+	
+	
+	st.add_uv(Vector2(0.5, 0.66))
+	st.add_vertex(Vector3(0, 0, 1) + position)
+	mesh_data.append(Vector3(0, 0, 1) + position)
+	
+	st.add_uv(Vector2(0.5, 0.33))
+	st.add_vertex(Vector3(1, 0, 1) + position)
+	mesh_data.append(Vector3(1, 0, 1) + position)
+	
+	st.add_uv(Vector2(0.75, 0.66))
+	st.add_vertex(Vector3(0, 1, 1) + position)
+	mesh_data.append(Vector3(0, 1, 1) + position)
+	
+	st.add_uv(Vector2(0.75, 0.33))
+	st.add_vertex(Vector3(1, 1, 1) + position)
+	mesh_data.append(Vector3(1, 1, 1) + position)
+	
+	
+	st.add_uv(Vector2(1, 0.66))
+	st.add_vertex(Vector3(0, 1, 0) + position)
+	mesh_data.append(Vector3(0, 1, 0) + position)
+	
+	st.add_uv(Vector2(1, 0.33))
+	st.add_vertex(Vector3(1, 1, 0) + position)
+	mesh_data.append(Vector3(1, 1, 0) + position)
+	
+	
+	st.add_uv(Vector2(0.25, 1))
+	st.add_vertex(Vector3(0, 1, 0) + position)
+	mesh_data.append(Vector3(0, 1, 0) + position)
+	
+	st.add_uv(Vector2(0.5, 1))
+	st.add_vertex(Vector3(0, 1, 1) + position)
+	mesh_data.append(Vector3(0, 1, 1) + position)
+	
+	
+	st.add_uv(Vector2(0.25, 0))
+	st.add_vertex(Vector3(1, 1, 0) + position)
+	mesh_data.append(Vector3(1, 1, 0) + position)
+	
+	st.add_uv(Vector2(0.5, 0))
+	st.add_vertex(Vector3(1, 1, 1) + position)
+	mesh_data.append(Vector3(1, 1, 1) + position)
+	
+	# front
+	st.add_index(0 + 14 * blocks_loaded)
+	st.add_index(2 + 14 * blocks_loaded)
+	st.add_index(1 + 14 * blocks_loaded)
+	
+	st.add_index(1 + 14 * blocks_loaded)
+	st.add_index(2 + 14 * blocks_loaded)
+	st.add_index(3 + 14 * blocks_loaded)
+	
+	# back
+	st.add_index(4 + 14 * blocks_loaded)
+	st.add_index(5 + 14 * blocks_loaded)
+	st.add_index(6 + 14 * blocks_loaded)
+	
+	st.add_index(5 + 14 * blocks_loaded)
+	st.add_index(7 + 14 * blocks_loaded)
+	st.add_index(6 + 14 * blocks_loaded)
+	
+	# top
+	st.add_index(6 + 14 * blocks_loaded)
+	st.add_index(7 + 14 * blocks_loaded)
+	st.add_index(8 + 14 * blocks_loaded)
+	
+	st.add_index(7 + 14 * blocks_loaded)
+	st.add_index(9 + 14 * blocks_loaded)
+	st.add_index(8 + 14 * blocks_loaded)
+	
+	# bottom
+	st.add_index(1 + 14 * blocks_loaded)
+	st.add_index(3 + 14 * blocks_loaded)
+	st.add_index(4 + 14 * blocks_loaded)
+	
+	st.add_index(3 + 14 * blocks_loaded)
+	st.add_index(5 + 14 * blocks_loaded)
+	st.add_index(4 + 14 * blocks_loaded)
+	
+	# left
+	st.add_index(1 + 14 * blocks_loaded)
+	st.add_index(11 + 14 * blocks_loaded)
+	st.add_index(10 + 14 * blocks_loaded)
+	
+	st.add_index(1 + 14 * blocks_loaded)
+	st.add_index(4 + 14 * blocks_loaded)
+	st.add_index(11 + 14 * blocks_loaded)
+	
+	# right
+	st.add_index(3 + 14 * blocks_loaded)
+	st.add_index(12 + 14 * blocks_loaded)
+	st.add_index(5 + 14 * blocks_loaded)
+	
+	st.add_index(5 + 14 * blocks_loaded)
+	st.add_index(12 + 14 * blocks_loaded)
+	st.add_index(13 + 14 * blocks_loaded)
+	
+	blocks_loaded+= 1

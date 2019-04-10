@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://scripts/main_menu.gd" type="Script" id=1]
 [ext_resource path="res://scenes/environment.tres" type="Environment" id=2]
@@ -10,6 +10,10 @@
 [ext_resource path="res://ui/ui_text/ipad~menu_options.png" type="Texture" id=8]
 [ext_resource path="res://ui/edenlogo.png" type="Texture" id=9]
 [ext_resource path="res://fantasque-sans-mono-regular.otf" type="DynamicFontData" id=10]
+[ext_resource path="res://scripts/swipe_detector.gd" type="Script" id=11]
+[ext_resource path="res://icons/splash2.png" type="Texture" id=12]
+[ext_resource path="res://icons/josephtheengineer/JosephTheEngineer Logo 2018 Engineer Edition v2 Transparent Round.png" type="Texture" id=13]
+[ext_resource path="res://fonts/orbitron/Orbitron Medium.otf" type="DynamicFontData" id=14]
 
 [sub_resource type="DynamicFont" id=1]
 size = 80
@@ -21,8 +25,56 @@ size = 20
 use_filter = true
 font_data = ExtResource( 10 )
 
-[sub_resource type="Animation" id=3]
-resource_name = "Loading"
+[sub_resource type="DynamicFont" id=3]
+size = 25
+font_data = ExtResource( 14 )
+
+[sub_resource type="Animation" id=4]
+resource_name = "TitleScreen"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("StartButtonCover:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("JosephTheEngineerCover:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1.3, 4.9 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "TitleScreenFlashingText"
+length = 6.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("StartButtonCover:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 4, 5.9 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 0 ), Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=6]
 length = 6.0
 loop = true
 tracks/0/type = "value"
@@ -47,6 +99,7 @@ environment = ExtResource( 2 )
 current = true
 
 [node name="UI" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 
@@ -57,22 +110,26 @@ anchor_bottom = 1.0
 color = Color( 0.230469, 0.230469, 0.230469, 0.353569 )
 
 [node name="TopButton" type="Button" parent="UI"]
+visible = false
 anchor_right = 1.0
 margin_bottom = 20.0
 
 [node name="RightButton" type="Button" parent="UI"]
+visible = false
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -12.0
 
 [node name="BottomButton" type="Button" parent="UI"]
+visible = false
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -20.0
 
 [node name="LeftButton" type="Button" parent="UI"]
+visible = false
 anchor_bottom = 1.0
 margin_right = 25.0
 rect_min_size = Vector2( 25, 0 )
@@ -81,25 +138,20 @@ rect_min_size = Vector2( 25, 0 )
 editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 20.0
-margin_right = -20.0
-margin_bottom = -20.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/Home"]
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 
 [node name="TopContainer" type="HBoxContainer" parent="UI/Home/VBoxContainer"]
-editor/display_folded = true
-margin_right = 1880.0
-margin_bottom = 912.0
+margin_right = 1920.0
+margin_bottom = 952.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="News" type="Control" parent="UI/Home/VBoxContainer/TopContainer"]
-margin_right = 608.0
-margin_bottom = 912.0
+margin_right = 621.0
+margin_bottom = 952.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -117,7 +169,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="News" type="Label" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "News"
@@ -125,56 +177,45 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 437.0
+margin_right = 601.0
+margin_bottom = 457.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 4 )
-text = "Reddit: https://www.reddit.com/r/edengame
-Official Website: https://edengame.net/
-Online World Search: https://app.edengame.net/search.html
-Popular List: http://edengame.net/popularlist.txt **(Outdated)**
-World Download: http://files.edengame.net/
-Wiki: http://edenworldbuilder.wikia.com/
-**==== Devoloper Links ====**
-Repository for version 2.1.0 (last update by Ari): https://github.com/JosephTheEngineer/Eden
-Repository for version 2.1.1 (last 2.x.x version): https://github.com/ryankontos/EdenWorldBuilder
-Repository for old pre3.0.0 (last UE4 version): https://gitlab.com/josephtheengineer/edenuniversebuilder-ue4
-Repository for version 3.0.0 (latest 3.x.x version): https://git.sr.ht/~josephtheengineer/edenuniversebuilder
-JosephTheEngineer's Twitter: https://twitter.com/JosephTheEngi"
+text = "Woah!"
 selection_enabled = true
 
 [node name="HSeparator4" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
-margin_top = 441.0
-margin_right = 588.0
-margin_bottom = 451.0
+margin_top = 461.0
+margin_right = 601.0
+margin_bottom = 471.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="Changelog" type="Label" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
-margin_top = 455.0
-margin_right = 588.0
-margin_bottom = 486.0
+margin_top = 475.0
+margin_right = 601.0
+margin_bottom = 506.0
 custom_fonts/font = ExtResource( 3 )
 text = "Changelog"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
-margin_top = 490.0
-margin_right = 588.0
-margin_bottom = 500.0
+margin_top = 510.0
+margin_right = 601.0
+margin_bottom = 520.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel3" type="RichTextLabel" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
-margin_top = 504.0
-margin_right = 588.0
-margin_bottom = 892.0
+margin_top = 524.0
+margin_right = 601.0
+margin_bottom = 932.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -193,15 +234,15 @@ text = "# EdenUniverseBuilder v3.0.0 beta3.3 || 29-01-2018
 selection_enabled = true
 
 [node name="VSeparator" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer"]
-margin_left = 612.0
-margin_right = 632.0
-margin_bottom = 912.0
+margin_left = 625.0
+margin_right = 645.0
+margin_bottom = 952.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Chat" type="Control" parent="UI/Home/VBoxContainer/TopContainer"]
-margin_left = 636.0
-margin_right = 1244.0
-margin_bottom = 912.0
+margin_left = 649.0
+margin_right = 1270.0
+margin_bottom = 952.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -219,7 +260,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Chat"
@@ -227,14 +268,14 @@ uppercase = true
 
 [node name="HSeparator" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="Chat" type="RichTextLabel" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 584.0
+margin_right = 601.0
+margin_bottom = 624.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -243,13 +284,13 @@ scroll_following = true
 selection_enabled = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
-margin_top = 588.0
-margin_right = 588.0
-margin_bottom = 638.0
+margin_top = 628.0
+margin_right = 601.0
+margin_bottom = 678.0
 rect_min_size = Vector2( 0, 50 )
 
 [node name="TextEdit" type="TextEdit" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2"]
-margin_right = 484.0
+margin_right = 497.0
 margin_bottom = 50.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 4 )
@@ -257,20 +298,20 @@ text = "Edit message"
 caret_blink = true
 
 [node name="SendButton" type="Button" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/HBoxContainer2"]
-margin_left = 488.0
-margin_right = 588.0
+margin_left = 501.0
+margin_right = 601.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 100, 0 )
 custom_fonts/font = ExtResource( 4 )
 text = "Send"
 
 [node name="Row1" type="VBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
-margin_top = 642.0
-margin_right = 588.0
-margin_bottom = 892.0
+margin_top = 682.0
+margin_right = 601.0
+margin_bottom = 932.0
 
 [node name="Column1" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1"]
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 250.0
 rect_min_size = Vector2( 0, 250 )
 
@@ -290,15 +331,15 @@ custom_fonts/font = ExtResource( 4 )
 text = "Create Server"
 
 [node name="VSeparator2" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer"]
-margin_left = 1248.0
-margin_right = 1268.0
-margin_bottom = 912.0
+margin_left = 1274.0
+margin_right = 1294.0
+margin_bottom = 952.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Planets" type="Control" parent="UI/Home/VBoxContainer/TopContainer"]
-margin_left = 1272.0
-margin_right = 1880.0
-margin_bottom = 912.0
+margin_left = 1298.0
+margin_right = 1920.0
+margin_bottom = 952.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -316,7 +357,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Planets"
@@ -324,13 +365,13 @@ uppercase = true
 
 [node name="HSeparator" type="HSeparator" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="NewFlatWorld" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 174.0
 rect_min_size = Vector2( 0, 125 )
 
@@ -361,7 +402,7 @@ text = "New Flat World"
 
 [node name="NewNaturalTerrain" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
 margin_top = 178.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 303.0
 rect_min_size = Vector2( 0, 125 )
 
@@ -392,7 +433,7 @@ text = "New Natural Terrain"
 
 [node name="TestWorld" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
 margin_top = 307.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 432.0
 rect_min_size = Vector2( 0, 125 )
 
@@ -423,7 +464,7 @@ text = "Test World"
 
 [node name="DirectCity" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer"]
 margin_top = 436.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 561.0
 rect_min_size = Vector2( 0, 125 )
 
@@ -453,15 +494,15 @@ custom_fonts/font = ExtResource( 3 )
 text = "Direct City"
 
 [node name="VSplitContainer" type="VSplitContainer" parent="UI/Home/VBoxContainer"]
-margin_top = 916.0
-margin_right = 1880.0
-margin_bottom = 936.0
+margin_top = 956.0
+margin_right = 1920.0
+margin_bottom = 976.0
 rect_min_size = Vector2( 0, 20 )
 
 [node name="BottomContainer" type="HBoxContainer" parent="UI/Home/VBoxContainer"]
-margin_top = 940.0
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_top = 980.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 rect_min_size = Vector2( 0, 100 )
 
 [node name="OptionsButton" type="TextureButton" parent="UI/Home/VBoxContainer/BottomContainer"]
@@ -477,14 +518,14 @@ stretch_mode = 5
 
 [node name="CenterContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/BottomContainer"]
 margin_left = 504.0
-margin_right = 1576.0
+margin_right = 1616.0
 margin_bottom = 100.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Logo" type="TextureRect" parent="UI/Home/VBoxContainer/BottomContainer"]
-margin_left = 1580.0
-margin_right = 1880.0
+margin_left = 1620.0
+margin_right = 1920.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 300, 0 )
 texture = ExtResource( 9 )
@@ -499,24 +540,19 @@ color = Color( 0.230469, 0.230469, 0.230469, 1 )
 
 [node name="Leaderboard" type="MarginContainer" parent="UI"]
 editor/display_folded = true
-visible = false
 anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 18.0
-margin_right = -20.0
-margin_bottom = -22.0
+margin_top = -983.0
+margin_bottom = -20.0
 
 [node name="TopContainer" type="HBoxContainer" parent="UI/Leaderboard"]
-editor/display_folded = true
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_right = 1920.0
+margin_bottom = 963.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Users" type="Control" parent="UI/Leaderboard/TopContainer"]
-margin_right = 608.0
-margin_bottom = 1040.0
+margin_right = 621.0
+margin_bottom = 963.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -534,7 +570,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="TopUsers" type="Label" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Top Users"
@@ -542,14 +578,14 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 501.0
+margin_right = 601.0
+margin_bottom = 462.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -559,29 +595,29 @@ JosephTheEngineer : 5127 blocks"
 selection_enabled = true
 
 [node name="HSeparator4" type="HSeparator" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
-margin_top = 505.0
-margin_right = 588.0
-margin_bottom = 515.0
+margin_top = 466.0
+margin_right = 601.0
+margin_bottom = 476.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="TopWorlds" type="Label" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
-margin_top = 519.0
-margin_right = 588.0
-margin_bottom = 550.0
+margin_top = 480.0
+margin_right = 601.0
+margin_bottom = 511.0
 custom_fonts/font = ExtResource( 3 )
 text = "Top Worlds"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
-margin_top = 554.0
-margin_right = 588.0
-margin_bottom = 564.0
+margin_top = 515.0
+margin_right = 601.0
+margin_bottom = 525.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel3" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
-margin_top = 568.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_top = 529.0
+margin_right = 601.0
+margin_bottom = 943.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -593,15 +629,15 @@ JTE's beta2 test world"
 selection_enabled = true
 
 [node name="VSeparator" type="VSeparator" parent="UI/Leaderboard/TopContainer"]
-margin_left = 612.0
-margin_right = 632.0
-margin_bottom = 1040.0
+margin_left = 625.0
+margin_right = 645.0
+margin_bottom = 963.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Stats" type="Control" parent="UI/Leaderboard/TopContainer"]
-margin_left = 636.0
-margin_right = 1244.0
-margin_bottom = 1040.0
+margin_left = 649.0
+margin_right = 1270.0
+margin_bottom = 963.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -619,7 +655,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="UserStats" type="Label" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "User stats"
@@ -627,14 +663,14 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 601.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 501.0
+margin_right = 601.0
+margin_bottom = 462.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -646,29 +682,29 @@ Join date: 2019-04-06"
 selection_enabled = true
 
 [node name="HSeparator4" type="HSeparator" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
-margin_top = 505.0
-margin_right = 588.0
-margin_bottom = 515.0
+margin_top = 466.0
+margin_right = 601.0
+margin_bottom = 476.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="GameStats" type="Label" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
-margin_top = 519.0
-margin_right = 588.0
-margin_bottom = 550.0
+margin_top = 480.0
+margin_right = 601.0
+margin_bottom = 511.0
 custom_fonts/font = ExtResource( 3 )
 text = "Game stats"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
-margin_top = 554.0
-margin_right = 588.0
-margin_bottom = 564.0
+margin_top = 515.0
+margin_right = 601.0
+margin_bottom = 525.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel3" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
-margin_top = 568.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_top = 529.0
+margin_right = 601.0
+margin_bottom = 943.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -681,15 +717,15 @@ Total users: null"
 selection_enabled = true
 
 [node name="VSeparator2" type="VSeparator" parent="UI/Leaderboard/TopContainer"]
-margin_left = 1248.0
-margin_right = 1268.0
-margin_bottom = 1040.0
+margin_left = 1274.0
+margin_right = 1294.0
+margin_bottom = 963.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Featured" type="Control" parent="UI/Leaderboard/TopContainer"]
-margin_left = 1272.0
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_left = 1298.0
+margin_right = 1920.0
+margin_bottom = 963.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -707,7 +743,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="FeaturedWorlds" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Featured Worlds"
@@ -715,162 +751,239 @@ uppercase = true
 
 [node name="HSeparator" type="HSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 602.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="NewFlatWorld" type="HBoxContainer" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-editor/display_folded = true
+[node name="RichTextLabel2" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 174.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="NewFlatWorldButton" type="TextureButton" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewFlatWorld"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewFlatWorld"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewFlatWorld"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 408.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "New Flat World"
-
-[node name="NewNaturalTerrain" type="HBoxContainer" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-editor/display_folded = true
-margin_top = 178.0
-margin_right = 588.0
-margin_bottom = 303.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="NewNaturalTerrainButton" type="TextureButton" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewNaturalTerrain"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewNaturalTerrain"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewNaturalTerrain"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 490.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "New Natural Terrain"
-
-[node name="TestWorld" type="HBoxContainer" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-editor/display_folded = true
-margin_top = 307.0
-margin_right = 588.0
-margin_bottom = 432.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="TestWorldButton" type="TextureButton" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/TestWorld"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/TestWorld"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/TestWorld"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 334.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "Test World"
-
-[node name="DirectCity" type="HBoxContainer" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-editor/display_folded = true
-margin_top = 436.0
-margin_right = 588.0
-margin_bottom = 561.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="DirectCityButton" type="TextureButton" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/DirectCity"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/DirectCity"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer/DirectCity"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 321.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "Direct City"
+margin_right = 602.0
+margin_bottom = 462.0
+focus_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/normal_font = ExtResource( 4 )
+text = "1541108087.eden
+Olympic Metropolis T1.name
+1541191877.eden
+Frabanta by Santiago Hidalgo V4'7.name
+1540275171.eden
+DC EMPIRE 11'8.name
+1541266382.eden
+Eden City v10'0 by Dblcut3.name
+1537559802.eden
+Palaisia .name
+1517704807.eden
+Two Titans V90 The Island of Giants.name
+1540835436.eden
+MB City V5.name
+1541188243.eden
+Garden of Eden 1'9'1.name
+1522430571.eden
+SPK ilsafgar V8.name
+1540943313.eden
+Ocean Shores V1'7.name
+1539386344.eden
+Edgest City 1'4.name
+1538526919.eden
+MASSIVE CITY v28.name
+1528534899.eden
+Video Game Museum .name
+1514383735.eden
+35 Great Star Wars Ships Tanive IV.name
+1528655662.eden
+Elysian City by AJ v6 Venture II.name
+1541184326.eden
+Lake Cottage 34'2 by FJSP.name
+1541246619.eden
+Santa Ines by Santiago and Sam v1'3.name
+1540319877.eden
+Fracai 2.name
+1540943313.eden
+Aperture Puzzles.name
+1541192104.eden
+HUNDERBY BY CM .name
+1512349178.eden
+Retro II v0'5 by Bnm.name
+1533311603.eden
+Huge Castle by m0p3 v13.name
+1541194080.eden
+Rampycoaster 2.name
+1541195397.eden
+Snowboard.name
+1541186072.eden
+Beverly Hills 5 star hotel estate.name
+1541214154.eden
+Kantrava City v1'1.name
+1541247827.eden
+shibuya japan town by SantiagoH v1.name
+1539910019.eden
+Tokyo Unified Ishida 27118279'59.name
+1541336428.eden
+Matteo world mb.name
+1422789721.eden
+RhinoCAMEL.name
+1533085627.eden
+The Hidden Galaxy v3??1.name
+1532863013.eden
+Salt Lake City v12'1.name
+1542600711.eden
+VENTURE and UTOPIA v10 by AJ '87119'.name
+1542895846.eden
+The Octagon power core.name
+1535365153.eden
+Dark Island.name
+1539417351.eden
+Grand Kingdom.name
+1542245246.eden
+DEBONAIRE NIGHTS.name
+1542299346.eden
+The Jewel of the seas by AHT.name
+1539599220.eden
+The Jewel of the seas by AHT.name
+1513859108.eden
+Island of the Giant Glacier Breeze.name
+1518561424.eden
+Yuunagi.name
+1498033854.eden
+Wrestlemania 33 by dylan.name
+1523102817.eden
+Mount Olympus.name
+1538943425.eden
+Lake Side Mansion.name
+1542450823.eden
+Village With Fort V19 Dblcut3.name
+1519218149.eden
+Greenland v1'0 Dblcut3.name
+1513440337.eden
+grand villa jp v3.name
+1542936348.eden
+The Emerald Temple.name
+1541186072.eden
+Beverly Hills 5 star hotel estate.name
+1424540210.eden
+adventure map of eden sirgooey.name
+1515341323.eden
+OceanPillars V2'2 32P.name
+1541869316.eden
+Stantwan Metropolis V31.name
+1542928828.eden
+The Giants House Under Construction.name
+1541866372.eden
+The Vastness V3'1 BETA by Boa49.name
+1468245936.eden
+Lands of Eldryan 18.name
+1532384365.eden
+lancashire city.name
+1538932771.eden
+Eden Springs XIV Natural History v2.name
+1542437216.eden
+Eden ELITE Builder World V 0'4'1.name
+1537834308.eden
+Luxury Villas Grand Finale.name
+1535213939.eden
+Mv18 airport by matias.name
+1541457711.eden
+Koning Willem II Stadion v2 WJ.name
+1540441067.eden
+SWISS V 3'1 alpin.name
+1537803364.eden
+iLLuSioN World by Boa49 V51.name
+1537024543.eden
+Massive Walled Town.name
+1541953846.eden
+Biggest freeway system in eden V653.name
+1508959301.eden
+Colored Crystal Islands V1.name
+1535492328.eden
+Best Cathedral in Eden V1.name
+1509706868.eden
+Green Garden V8 Wellness Park.name
+1522021856.eden
+MEGA SUBMARINE SHIPYARD V1'1.name
+1541185838.eden
+flup v25 anniversary edition.name
+1483675181.eden
+US Navy Base by Nick V3.name
+1520870516.eden
+Kanto Region 0'1'4.name
+1541273635.eden
+Magic City V22 By Kiri.name
+1542449766.eden
+Sc1 beta by matias.name
+1517692451.eden
+ANCIENT CASTLE 6 spk.name
+1453141219.eden
+royal opera MH vertias.name
+1534716435.eden
+Pirate Hideout V13.name
+1424140669.eden
+Vuenccoaster 34min.name
+1450703038.eden
+olympic grand hotel by k05 the best.name
+1420149062.eden
+ALPIN TOWN by Munta V1.name
+1421522354.eden
+Atlantis v16'1 Sunset City by Yates.name
+1421024176.eden
+ASHMAZE V9E.name
+1542819892.eden
+Atlantis Paradise Island By RafiQui.name
+1536730519.eden
+Apocalypse V2 by RZO.name
+1542872688.eden
+Big City by AM V1'3.name
+1532878058.eden
+The Statue Of Liberty V7 By Kiri.name
+1521961986.eden
+World of Zara.name
+1479900941.eden
+Queen Mary 2.name
+1507768749.eden
+This is sparta XIX by vasiliy 213.name
+1438784786.eden
+Citadel Uru'baen.name
+1528994123.eden
+METLIFE STADIUM by Tzekoo.name
+1500274772.eden
+Chinese Palace by Steven V19.name
+1469699541.eden
+Four USA Cities V16 by BrixXx.name
+1542200183.eden
+better than the others vatican.name
+1540488880.eden
+Super Mario 64 Castle V11.name
+1472714828.eden
+Legend Of The Deep Oak Mansion V4'5.name
+1542963979.eden
+Stadt des 18 Jahrhunderts 1fede.name
+"
+selection_enabled = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-margin_top = 565.0
-margin_right = 588.0
-margin_bottom = 575.0
+margin_top = 466.0
+margin_right = 602.0
+margin_bottom = 476.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="New Worlds" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-margin_top = 579.0
-margin_right = 588.0
-margin_bottom = 610.0
+margin_top = 480.0
+margin_right = 602.0
+margin_bottom = 511.0
 custom_fonts/font = ExtResource( 3 )
 text = "New Worlds"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-margin_top = 614.0
-margin_right = 588.0
-margin_bottom = 624.0
+margin_top = 515.0
+margin_right = 602.0
+margin_bottom = 525.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
-margin_top = 628.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_top = 529.0
+margin_right = 602.0
+margin_bottom = 943.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -882,24 +995,21 @@ selection_enabled = true
 
 [node name="WorldSharing" type="MarginContainer" parent="UI"]
 editor/display_folded = true
-visible = false
+anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 20.0
-margin_top = 18.0
-margin_right = -20.0
-margin_bottom = -22.0
+margin_right = 1923.0
 
 [node name="TopContainer2" type="HBoxContainer" parent="UI/WorldSharing"]
-editor/display_folded = true
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_right = 1903.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="YourWorlds" type="Control" parent="UI/WorldSharing/TopContainer2"]
-margin_right = 608.0
-margin_bottom = 1040.0
+margin_right = 615.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -917,7 +1027,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="YourWorlds" type="Label" parent="UI/WorldSharing/TopContainer2/YourWorlds/VBoxContainer"]
-margin_right = 588.0
+margin_right = 595.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Your Worlds"
@@ -925,14 +1035,14 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/WorldSharing/TopContainer2/YourWorlds/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 595.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/WorldSharing/TopContainer2/YourWorlds/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_right = 595.0
+margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -942,15 +1052,15 @@ JosephTheEngineer : 5127 blocks"
 selection_enabled = true
 
 [node name="VSeparator" type="VSeparator" parent="UI/WorldSharing/TopContainer2"]
-margin_left = 612.0
-margin_right = 632.0
-margin_bottom = 1040.0
+margin_left = 619.0
+margin_right = 639.0
+margin_bottom = 1080.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Search" type="Control" parent="UI/WorldSharing/TopContainer2"]
-margin_left = 636.0
-margin_right = 1244.0
-margin_bottom = 1040.0
+margin_left = 643.0
+margin_right = 1258.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -968,7 +1078,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="Search" type="Label" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
-margin_right = 588.0
+margin_right = 595.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Search"
@@ -976,46 +1086,44 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 595.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 501.0
+margin_right = 595.0
+margin_bottom = 521.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 4 )
-text = "Direct City
-Weird City"
 selection_enabled = true
 
 [node name="HSeparator4" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
-margin_top = 505.0
-margin_right = 588.0
-margin_bottom = 515.0
+margin_top = 525.0
+margin_right = 595.0
+margin_bottom = 535.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="GameStats" type="Label" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
-margin_top = 519.0
-margin_right = 588.0
-margin_bottom = 550.0
+margin_top = 539.0
+margin_right = 595.0
+margin_bottom = 570.0
 custom_fonts/font = ExtResource( 3 )
 text = "World Info"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
-margin_top = 554.0
-margin_right = 588.0
-margin_bottom = 564.0
+margin_top = 574.0
+margin_right = 595.0
+margin_bottom = 584.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel3" type="RichTextLabel" parent="UI/WorldSharing/TopContainer2/Search/VBoxContainer"]
-margin_top = 568.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_top = 588.0
+margin_right = 595.0
+margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1025,15 +1133,15 @@ Blocks: 99999"
 selection_enabled = true
 
 [node name="VSeparator2" type="VSeparator" parent="UI/WorldSharing/TopContainer2"]
-margin_left = 1248.0
-margin_right = 1268.0
-margin_bottom = 1040.0
+margin_left = 1262.0
+margin_right = 1282.0
+margin_bottom = 1080.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="Share" type="Control" parent="UI/WorldSharing/TopContainer2"]
-margin_left = 1272.0
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_left = 1286.0
+margin_right = 1903.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -1051,7 +1159,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="FeaturedWorlds" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-margin_right = 588.0
+margin_right = 597.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Share Worlds"
@@ -1059,162 +1167,44 @@ uppercase = true
 
 [node name="HSeparator" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
 margin_top = 35.0
-margin_right = 588.0
+margin_right = 597.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="NewFlatWorld" type="HBoxContainer" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-editor/display_folded = true
+[node name="RichTextLabel2" type="RichTextLabel" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
 margin_top = 49.0
-margin_right = 588.0
-margin_bottom = 174.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="NewFlatWorldButton" type="TextureButton" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewFlatWorld"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewFlatWorld"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewFlatWorld"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 408.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "New Flat World"
-
-[node name="NewNaturalTerrain" type="HBoxContainer" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-editor/display_folded = true
-margin_top = 178.0
-margin_right = 588.0
-margin_bottom = 303.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="NewNaturalTerrainButton" type="TextureButton" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewNaturalTerrain"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewNaturalTerrain"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewNaturalTerrain"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 490.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "New Natural Terrain"
-
-[node name="TestWorld" type="HBoxContainer" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-editor/display_folded = true
-margin_top = 307.0
-margin_right = 588.0
-margin_bottom = 432.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="TestWorldButton" type="TextureButton" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/TestWorld"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/TestWorld"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/TestWorld"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 334.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "Test World"
-
-[node name="DirectCity" type="HBoxContainer" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-editor/display_folded = true
-margin_top = 436.0
-margin_right = 588.0
-margin_bottom = 561.0
-rect_min_size = Vector2( 0, 125 )
-
-[node name="DirectCityButton" type="TextureButton" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/DirectCity"]
-margin_right = 120.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 120, 120 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 6 )
-texture_hover = ExtResource( 7 )
-texture_focused = ExtResource( 7 )
-expand = true
-stretch_mode = 5
-
-[node name="VSeparator" type="VSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/DirectCity"]
-margin_left = 124.0
-margin_right = 144.0
-margin_bottom = 125.0
-rect_min_size = Vector2( 20, 0 )
-
-[node name="Label" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer/DirectCity"]
-margin_left = 148.0
-margin_top = 47.0
-margin_right = 321.0
-margin_bottom = 78.0
-custom_fonts/font = ExtResource( 3 )
-text = "Direct City"
+margin_right = 597.0
+margin_bottom = 521.0
+focus_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/normal_font = ExtResource( 4 )
+selection_enabled = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-margin_top = 565.0
-margin_right = 588.0
-margin_bottom = 575.0
+margin_top = 525.0
+margin_right = 597.0
+margin_bottom = 535.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="Info" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-margin_top = 579.0
-margin_right = 588.0
-margin_bottom = 610.0
+margin_top = 539.0
+margin_right = 597.0
+margin_bottom = 570.0
 custom_fonts/font = ExtResource( 3 )
 text = "Info"
 uppercase = true
 
 [node name="HSeparator3" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-margin_top = 614.0
-margin_right = 588.0
-margin_bottom = 624.0
+margin_top = 574.0
+margin_right = 597.0
+margin_bottom = 584.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
-margin_top = 628.0
-margin_right = 588.0
-margin_bottom = 1020.0
+margin_top = 588.0
+margin_right = 597.0
+margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1226,32 +1216,30 @@ selection_enabled = true
 
 [node name="Credits" type="MarginContainer" parent="UI"]
 editor/display_folded = true
-visible = false
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 18.0
-margin_right = -20.0
-margin_bottom = -22.0
+margin_top = 20.0
+margin_bottom = 917.0
 
 [node name="TopContainer3" type="HBoxContainer" parent="UI/Credits"]
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_right = 1920.0
+margin_bottom = 897.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="YourWorlds" type="Control" parent="UI/Credits/TopContainer3"]
-margin_right = 1832.0
-margin_bottom = 1040.0
+[node name="Credits" type="Control" parent="UI/Credits/TopContainer3"]
+margin_right = 946.0
+margin_bottom = 897.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Background" type="ColorRect" parent="UI/Credits/TopContainer3/YourWorlds"]
+[node name="Background" type="ColorRect" parent="UI/Credits/TopContainer3/Credits"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/Credits/TopContainer3/YourWorlds"]
+[node name="Content" type="VBoxContainer" parent="UI/Credits/TopContainer3/Credits"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
@@ -1259,23 +1247,23 @@ margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
 
-[node name="Credits" type="Label" parent="UI/Credits/TopContainer3/YourWorlds/VBoxContainer"]
-margin_right = 1812.0
+[node name="Title" type="Label" parent="UI/Credits/TopContainer3/Credits/Content"]
+margin_right = 926.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Credits"
 uppercase = true
 
-[node name="HSeparator2" type="HSeparator" parent="UI/Credits/TopContainer3/YourWorlds/VBoxContainer"]
+[node name="Separator" type="HSeparator" parent="UI/Credits/TopContainer3/Credits/Content"]
 margin_top = 35.0
-margin_right = 1812.0
+margin_right = 926.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="RichTextLabel" type="RichTextLabel" parent="UI/Credits/TopContainer3/YourWorlds/VBoxContainer"]
+[node name="Text" type="RichTextLabel" parent="UI/Credits/TopContainer3/Credits/Content"]
 margin_top = 49.0
-margin_right = 1812.0
-margin_bottom = 1020.0
+margin_right = 926.0
+margin_bottom = 877.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1296,36 +1284,81 @@ Special Thanks
 selection_enabled = true
 
 [node name="VSeparator" type="VSeparator" parent="UI/Credits/TopContainer3"]
-margin_left = 1836.0
-margin_right = 1856.0
-margin_bottom = 1040.0
+margin_left = 950.0
+margin_right = 970.0
+margin_bottom = 897.0
 rect_min_size = Vector2( 20, 0 )
 
-[node name="VSeparator2" type="VSeparator" parent="UI/Credits/TopContainer3"]
-margin_left = 1860.0
-margin_right = 1880.0
-margin_bottom = 1040.0
-rect_min_size = Vector2( 20, 0 )
+[node name="Info" type="Control" parent="UI/Credits/TopContainer3"]
+margin_left = 974.0
+margin_right = 1920.0
+margin_bottom = 897.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Background" type="ColorRect" parent="UI/Credits/TopContainer3/Info"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
+
+[node name="Content" type="VBoxContainer" parent="UI/Credits/TopContainer3/Info"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+
+[node name="Title" type="Label" parent="UI/Credits/TopContainer3/Info/Content"]
+margin_right = 926.0
+margin_bottom = 31.0
+custom_fonts/font = ExtResource( 3 )
+text = "Info"
+uppercase = true
+
+[node name="Separator" type="HSeparator" parent="UI/Credits/TopContainer3/Info/Content"]
+margin_top = 35.0
+margin_right = 926.0
+margin_bottom = 45.0
+rect_min_size = Vector2( 0, 10 )
+
+[node name="Text" type="RichTextLabel" parent="UI/Credits/TopContainer3/Info/Content"]
+margin_top = 49.0
+margin_right = 926.0
+margin_bottom = 877.0
+focus_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/normal_font = ExtResource( 4 )
+text = "Reddit: https://www.reddit.com/r/edengame
+Official Website: https://edengame.net/
+Online World Search: https://app.edengame.net/search.html
+Popular List: http://edengame.net/popularlist.txt **(Outdated)**
+World Download: http://files.edengame.net/
+Wiki: http://edenworldbuilder.wikia.com/
+**==== Devoloper Links ====**
+Repository for version 2.1.0 (last update by Ari): https://github.com/JosephTheEngineer/Eden
+Repository for version 2.1.1 (last 2.x.x version): https://github.com/ryankontos/EdenWorldBuilder
+Repository for old pre3.0.0 (last UE4 version): https://gitlab.com/josephtheengineer/edenuniversebuilder-ue4
+Repository for version 3.0.0 (latest 3.x.x version): https://git.sr.ht/~josephtheengineer/edenuniversebuilder
+JosephTheEngineer's Twitter: https://twitter.com/JosephTheEngi"
+selection_enabled = true
 
 [node name="AccountPage" type="MarginContainer" parent="UI"]
 editor/display_folded = true
-visible = false
-anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 20.0
-margin_top = 18.0
+margin_left = -1788.0
 margin_right = -20.0
-margin_bottom = -22.0
 
 [node name="TopContainer2" type="HBoxContainer" parent="UI/AccountPage"]
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_right = 1768.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="AccountInfo" type="Control" parent="UI/AccountPage/TopContainer2"]
-margin_right = 926.0
-margin_bottom = 1040.0
+margin_right = 870.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -1343,7 +1376,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="AccountInfo" type="Label" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
-margin_right = 906.0
+margin_right = 850.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Account Info"
@@ -1351,14 +1384,14 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
 margin_top = 35.0
-margin_right = 906.0
+margin_right = 850.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
 margin_top = 49.0
-margin_right = 906.0
-margin_bottom = 1006.0
+margin_right = 850.0
+margin_bottom = 1046.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1367,21 +1400,21 @@ text = "Username: JosephTheEngineer"
 selection_enabled = true
 
 [node name="HSeparator4" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
-margin_top = 1010.0
-margin_right = 906.0
-margin_bottom = 1020.0
+margin_top = 1050.0
+margin_right = 850.0
+margin_bottom = 1060.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="VSeparator" type="VSeparator" parent="UI/AccountPage/TopContainer2"]
-margin_left = 930.0
-margin_right = 950.0
-margin_bottom = 1040.0
+margin_left = 874.0
+margin_right = 894.0
+margin_bottom = 1080.0
 rect_min_size = Vector2( 20, 0 )
 
 [node name="AccountSettings" type="Control" parent="UI/AccountPage/TopContainer2"]
-margin_left = 954.0
-margin_right = 1880.0
-margin_bottom = 1040.0
+margin_left = 898.0
+margin_right = 1768.0
+margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -1399,7 +1432,7 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="AccountSettings" type="Label" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
-margin_right = 906.0
+margin_right = 850.0
 margin_bottom = 31.0
 custom_fonts/font = ExtResource( 3 )
 text = "Account Settings"
@@ -1407,14 +1440,14 @@ uppercase = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
 margin_top = 35.0
-margin_right = 906.0
+margin_right = 850.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
 margin_top = 49.0
-margin_right = 906.0
-margin_bottom = 1020.0
+margin_right = 850.0
+margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1560,8 +1593,127 @@ margin_right = 1920.0
 margin_bottom = 1080.0
 size_flags_vertical = 3
 
+[node name="SwipeDetector" type="Node" parent="."]
+script = ExtResource( 11 )
+
+[node name="Timer" type="Timer" parent="SwipeDetector"]
+wait_time = 0.15
+one_shot = true
+
+[node name="TitleScreen" type="Control" parent="."]
+editor/display_folded = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="TitleScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="TextureRect" type="TextureRect" parent="TitleScreen"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -960.0
+margin_top = -540.0
+margin_right = 960.0
+margin_bottom = 540.0
+texture = ExtResource( 12 )
+
+[node name="Label" type="Label" parent="TitleScreen"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_top = 260.0
+margin_bottom = 297.0
+focus_mode = 2
+mouse_filter = 0
+size_flags_vertical = 1
+custom_fonts/font = ExtResource( 3 )
+text = "TAP THE SCREEN TO START"
+align = 1
+
+[node name="StartButtonCover" type="ColorRect" parent="TitleScreen"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_top = 240.0
+margin_bottom = 310.0
+color = Color( 0, 0, 0, 0.169583 )
+
+[node name="JosephTheEngineer" type="VBoxContainer" parent="TitleScreen"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -118.0
+
+[node name="MarginTop" type="Control" parent="TitleScreen/JosephTheEngineer"]
+margin_right = 1920.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 0, 20 )
+
+[node name="CenterContainer" type="CenterContainer" parent="TitleScreen/JosephTheEngineer"]
+margin_top = 24.0
+margin_right = 1920.0
+margin_bottom = 94.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TitleScreen/JosephTheEngineer/CenterContainer"]
+margin_left = 758.0
+margin_right = 1162.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 0, 70 )
+
+[node name="TextureRect2" type="TextureRect" parent="TitleScreen/JosephTheEngineer/CenterContainer/HBoxContainer"]
+margin_right = 120.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 120, 0 )
+texture = ExtResource( 13 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="TitleScreen/JosephTheEngineer/CenterContainer/HBoxContainer"]
+margin_left = 124.0
+margin_top = 22.0
+margin_right = 404.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+size_flags_vertical = 6
+custom_fonts/font = SubResource( 3 )
+text = "JosephTheEngineer"
+
+[node name="Label2" type="Label" parent="TitleScreen/JosephTheEngineer/CenterContainer"]
+visible = false
+margin_left = 778.0
+margin_top = 20.0
+margin_right = 1142.0
+margin_bottom = 49.0
+custom_fonts/font = ExtResource( 4 )
+text = "josephtheengineer.ddns.net"
+align = 1
+valign = 1
+
+[node name="MarginBottom" type="Control" parent="TitleScreen/JosephTheEngineer"]
+margin_top = 98.0
+margin_right = 1920.0
+margin_bottom = 118.0
+rect_min_size = Vector2( 0, 20 )
+
+[node name="JosephTheEngineerCover" type="ColorRect" parent="TitleScreen"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -143.0
+color = Color( 0, 0, 0, 0 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TitleScreen"]
+anims/TitleScreen = SubResource( 4 )
+anims/TitleScreenFlashingText = SubResource( 5 )
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Loading = SubResource( 3 )
+anims/Loading = SubResource( 6 )
 
 [connection signal="pressed" from="UI/TopButton" to="." method="_on_TopButton_pressed"]
 [connection signal="pressed" from="UI/RightButton" to="." method="_on_RightButton_pressed"]
@@ -1575,12 +1727,8 @@ anims/Loading = SubResource( 3 )
 [connection signal="pressed" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/TestWorld/TestWorldButton" to="." method="_on_TestWorldButton_pressed"]
 [connection signal="pressed" from="UI/Home/VBoxContainer/TopContainer/Planets/VBoxContainer/DirectCity/DirectCityButton" to="." method="_on_DirectCityButton_pressed"]
 [connection signal="pressed" from="UI/Home/VBoxContainer/BottomContainer/OptionsButton" to="." method="_on_OptionsButton_pressed"]
-[connection signal="pressed" from="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewFlatWorld/NewFlatWorldButton" to="." method="_on_NewFlatWorldButton_pressed"]
-[connection signal="pressed" from="UI/Leaderboard/TopContainer/Featured/VBoxContainer/NewNaturalTerrain/NewNaturalTerrainButton" to="." method="_on_NewNaturalTerrainButton_pressed"]
-[connection signal="pressed" from="UI/Leaderboard/TopContainer/Featured/VBoxContainer/TestWorld/TestWorldButton" to="." method="_on_TestWorldButton_pressed"]
-[connection signal="pressed" from="UI/Leaderboard/TopContainer/Featured/VBoxContainer/DirectCity/DirectCityButton" to="." method="_on_DirectCityButton_pressed"]
-[connection signal="pressed" from="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewFlatWorld/NewFlatWorldButton" to="." method="_on_NewFlatWorldButton_pressed"]
-[connection signal="pressed" from="UI/WorldSharing/TopContainer2/Share/VBoxContainer/NewNaturalTerrain/NewNaturalTerrainButton" to="." method="_on_NewNaturalTerrainButton_pressed"]
-[connection signal="pressed" from="UI/WorldSharing/TopContainer2/Share/VBoxContainer/TestWorld/TestWorldButton" to="." method="_on_TestWorldButton_pressed"]
-[connection signal="pressed" from="UI/WorldSharing/TopContainer2/Share/VBoxContainer/DirectCity/DirectCityButton" to="." method="_on_DirectCityButton_pressed"]
 [connection signal="pressed" from="UI/Options/TopContainer3/Options/OptionsBackButton" to="." method="_on_OptionsBackButton_pressed"]
+[connection signal="swiped" from="SwipeDetector" to="." method="_on_SwipeDetector_swiped"]
+[connection signal="timeout" from="SwipeDetector/Timer" to="." method="_on_Timer_timeout"]
+[connection signal="animation_finished" from="TitleScreen/AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]

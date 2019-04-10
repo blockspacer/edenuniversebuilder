@@ -4,6 +4,7 @@ extends Control
 
 var analog_is_pressed = false
 var frames_passed = 0
+var workspace = "game"
 
 
 
@@ -51,13 +52,14 @@ func _process(delta): #########################################################
 		load_debug_screen()
 		frames_passed = 0
 
-
-func _on_AnalogTop_pressed(): #################################################
+func _on_AnalogTop_button_down():
 	analog_is_pressed = true
 
 
-func _on_AnalogTop_released(): ################################################
+func _on_AnalogTop_button_up():
 	analog_is_pressed = false
+	Input.action_release("move_forward")
+	Input.action_release("move_backward")
 
 
 func _input(event): ###########################################################
@@ -65,32 +67,88 @@ func _input(event): ###########################################################
 		if analog_is_pressed:
 			msg("Touching the Analog stick", "Debug")
 			msg(str(event.position), "Debug")
+			var analog_center = Vector2(200, 870)
+			var analog_bounds = Vector2(100, 100)
+			
+			if abs(abs(event.position) - abs(analog_center)) < analog_bounds:
+				get_node("HUD/HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop").position = event.position
+				if event.position > analog_center:
+					Input.action_press("move_forward")
+				else:
+					Input.action_press("move_backward")
 	if event is InputEventScreenTouch:
 		msg("Touched the screen at: " + str(event.position), "Debug")
 
 func _on_BurnButton_toggled(button_pressed): ##################################
 	msg("Changing action_mode to burn...", "Info")
 	get_node("/root/World/Player").action_mode = "burn"
+	
+	switch_mode("burn")
 
 
 func _on_MineButton_toggled(button_pressed): ##################################
 	msg("Changing action_mode to mine...", "Info")
 	get_node("/root/World/Player").action_mode = "mine"
+	
+	switch_mode("mine")
 
 
 func _on_BuildButton_toggled(button_pressed): #################################
 	msg("Changing action_mode to build...", "Info")
 	get_node("/root/World/Player").action_mode = "build"
+	switch_mode("build")
 
 
 func _on_PaintButton_toggled(button_pressed): #################################
 	msg("Changing action_mode to paint...", "Info")
 	get_node("/root/World/Player").action_mode = "paint"
+	
+	switch_mode("paint")
 
+
+func _on_OptionsButton_toggled(button_pressed): ###############################
+	msg("Opening pause workspace...", "Info")
+	if button_pressed:
+		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = true
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
+		get_node("Chat").visible = false
+	else:
+		get_node("PauseWindow").visible = false
+		get_node("HorizontalMain/VerticalMain/Navbox").visible = true
+		get_node("Chat").visible = true
+
+func _on_ExitButton_pressed():
+	msg("Loading main menu...", "Info")
+	get_tree().change_scene("res://scene/main_menu.tscn")
 
 
 
 ################################## functions ##################################
+
+func switch_mode(mode):
+	if mode == "burn":
+		if get_node("HorizontalMain/Toolbox/BurnButton").pressed:
+			get_node("HorizontalMain/Toolbox/BurnButton").pressed = true
+		else:
+			get_node("HorizontalMain/Toolbox/BurnButton").pressed = false
+		
+	elif mode == "mine":
+		if get_node("HorizontalMain/Toolbox/MineButton").pressed:
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = true
+		else:
+			get_node("HorizontalMain/Toolbox/MineButton").pressed = false
+		
+	elif mode == "build":
+		if get_node("HorizontalMain/Toolbox/BuildButton").pressed:
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = true
+		else:
+			get_node("HorizontalMain/Toolbox/BuildButton").pressed = false
+	
+	elif mode == "paint":
+		if get_node("HorizontalMain/Toolbox/PaintButton").pressed:
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = true
+		else:
+			get_node("HorizontalMain/Toolbox/PaintButton").pressed = false
 
 func round_vector3(vector, places): ###########################################
 	#var x = round(vector.x * pow(10.0, places)) / pow(10.0, places)
@@ -147,12 +205,8 @@ func show_msg(message, tag): ##################################################
 	#	var Chat = get_tree().get_root().get_node("/root/Main Menu/World/HUD/Chat")
 	#	Chat.add_text(tag + ": " + str(message) + '\n')
 	
-	if get_tree().get_root().has_node("/root/Main Menu/UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Chat"):
-		var Chat = get_tree().get_root().get_node("/root/Main Menu/UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Chat")
-		Chat.add_text(tag + ": " + str(message) + '\n')
-		
-	elif get_tree().get_root().has_node("/root/World/HUD/Chat"):
-		var Chat = get_tree().get_root().get_node("/root/World/HUD/Chat")
+	if has_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat"):
+		var Chat = get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat")
 		Chat.add_text(tag + ": " + str(message) + '\n')
 
 
