@@ -5,6 +5,7 @@ extends Control
 var analog_is_pressed = false
 var frames_passed = 0
 var workspace = "game"
+var chat_items = Dictionary()
 
 
 
@@ -13,9 +14,16 @@ var workspace = "game"
 
 func _ready(): ################################################################
 	load_debug_screen()
+	create_block_menu()
 
 
 func _process(delta): #########################################################
+	for node in chat_items.keys():
+		var time = chat_items[node]
+		if OS.get_unix_time() - time > 5:
+			node.queue_free()
+			chat_items.erase(node)
+	
 	if has_node("/root/World/Player"):
 		var Player = get_node("/root/World/Player")
 		var World = get_node("/root/World")
@@ -79,8 +87,8 @@ func _input(event): ###########################################################
 					get_node("HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop").rect_position = Vector2(event.position.x - 150, event.position.y - 870)
 					var Player = get_node("/root/World/Player")
 					Player.move(distance_from_center)
-	if event is InputEventScreenTouch:
-		msg("Touched the screen at: " + str(event.position), "Debug")
+	#if event is InputEventScreenTouch:
+		#msg("Touched the screen at: " + str(event.position), "Debug")
 
 func _on_BurnButton_toggled(button_pressed): ##################################
 	msg("Current workspace: " + workspace, "Info")
@@ -145,6 +153,11 @@ func _on_ExitButton_pressed():
 	get_tree().change_scene("res://scene/main_menu.tscn")
 
 
+func _on_JumpButton_pressed():
+	Input.action_press("jump")
+
+
+
 
 ################################## functions ##################################
 
@@ -153,20 +166,24 @@ func switch_workspace(new_workspace):
 	
 	if new_workspace == "pause":
 		msg("Opening the pause menu...", "Info")
+		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = true
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = true
 		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
 	if new_workspace == "build":
+		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 		msg("Opening the build menu...", "Info")
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow").visible = true
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = false
 		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
 	if new_workspace == "paint":
+		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 		msg("Opening the paint menu...", "Info")
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PaintWindow").visible = true
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat").visible = false
 		get_node("HorizontalMain/VerticalMain/Navbox").visible = false
 	if new_workspace == "game":
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		msg("Closing all windows...", "Info")
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow").visible = false
 		get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow").visible = false
@@ -256,6 +273,17 @@ func load_debug_screen(): ####################################################
 		var map_seed = find_node("Seed")
 		map_seed.set_text("Seed: " + str(World.map_seed))
 
+func create_block_menu():
+	var parent = get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow/MarginContainer/GridContainer")
+	var block_data = Array()
+	for i in range(35):
+		var button = TextureButton.new()
+		button.texture_normal = load("res://textures/brick.png")
+		button.expand = true
+		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		button.rect_min_size = Vector2(100, 100)
+		parent.add_child(button)
+
 
 func fetch_client_version(): ##################################################
 	#var file = File.new()
@@ -267,14 +295,20 @@ func fetch_client_version(): ##################################################
 	return World.version
 
 
-func show_msg(message, tag): ##################################################
-	#if get_tree().get_root().has_node("/root/Main Menu/World/HUD/Chat"):
-	#	var Chat = get_tree().get_root().get_node("/root/Main Menu/World/HUD/Chat")
-	#	Chat.add_text(tag + ": " + str(message) + '\n')
-	
+func show_msg(message, tag): ##################################################	
 	if has_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat"):
-		var Chat = get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat")
-		Chat.add_text(tag + ": " + str(message) + '\n')
+		var Chat = get_node("HorizontalMain/VerticalMain/VerticalCenterContent/Chat/Content")
+		var ChatItem = load("res://scenes/chat_item.tscn").instance()
+		ChatItem.add_text(tag + ": " + str(message) + '\n')
+		Chat.add_child(ChatItem)
+		Chat.move_child(ChatItem, 0)
+		chat_items[ChatItem] = OS.get_unix_time()
+		
+		var i = 0
+		while chat_items.size() > 10:
+			chat_items.keys()[i].queue_free()
+			chat_items.erase(chat_items.keys()[i])
+			i += 1
 
 
 func msg(message, tag): #######################################################

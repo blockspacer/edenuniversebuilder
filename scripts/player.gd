@@ -68,13 +68,13 @@ func _physics_process(delta): #################################################
 		
 		if Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z))) != highlighted_block:
 			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-			Chunk.place_block(highlighted_block_id, highlighted_block.x, highlighted_block.y, highlighted_block.z)
+			Chunk.place_block(highlighted_block_id, highlighted_block)
 			highlighted_block = Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
 		
 		if World.chunk_index.has(location):
 			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
 			#Hud.msg("Breaking block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
-			Chunk.place_block(0, int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
+			Chunk.place_block(0, Vector3(int(floor(block_location)), int(floor(block_location.y)), int(floor(block_location.z))))
 		else:
 			Hud.msg("Invalid chunk!", "Error")
 
@@ -89,13 +89,18 @@ func _input(event): ###########################################################
 				$Head/Camera.rotate_x(deg2rad(change))
 				camera_angle += change
 	
+	if event.is_action_pressed("detach"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+	
 	if event.is_action_pressed("fly"):
 		if move_mode == "walk":
 			Hud.msg("Changing move_mode to fly...", "Info")
 			move_mode = "fly"
+			get_node("Capsule").disabled = true
 		else:
 			Hud.msg("Changing move_mode to walk...", "Info")
 			move_mode = "walk"
+			get_node("Capsule").disabled = false
 	
 	if event.is_action_pressed("action"):
 		action(OS.get_window_size() / 2)
@@ -134,34 +139,54 @@ func move(position):
 
 
 func action(position): ########################################################
-	#Hud.msg("Action event called", "Trace")
+	#Hud.msg("Modifing block in position: " + position, "Debug")
 	
 	if action_mode == "burn":
 		pass
 	elif action_mode == "mine":
-		var location = World.get_chunk(translation)
-		var block_location = get_looking_at(position)
 		var normal = get_looking_at_normal(position)
+		var block_location = get_looking_at(position)# - normal
+		var location = World.get_chunk(block_location)
 		
-		normal = Vector3(int(round(normal.x)), int(round(normal.y)), int(round(normal.z)))
-		Hud.msg("Normal: " + str(normal), "Debug")
-		block_location = block_location - normal
+		if normal == Vector3(0, 0, -1):
+			block_location += Vector3(0, 1, 0)
+		elif normal == Vector3(0, 0, 1):
+			block_location += Vector3(0, 1, -1)
+		elif normal == Vector3(-1, 0, 0):
+			block_location += Vector3(0, 1, 0)
+		elif normal == Vector3(1, 0, 0):
+			block_location += Vector3(-1, 1, 0)
+		elif normal == Vector3(0, -1, 0):
+			block_location += Vector3(0, 1, 0)
 		
 		if World.chunk_index.has(location):
 			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-			Hud.msg("Breaking block: " + str(Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))), "Info")
-			#highlighted_block = Vector3(0, 0, 0)
-			Chunk.break_block(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
+			Hud.msg("Breaking block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
+			Chunk.break_block(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
+			Chunk.compile()
 		else:
 			Hud.msg("Invalid chunk!", "Error")
 	elif action_mode == "build":
-		var location = World.get_chunk(translation)
-		var block_location = get_looking_at(position)
+		var normal = get_looking_at_normal(position)
+		var block_location = get_looking_at(position) + normal
+		Hud.msg("Normal is " + str(get_looking_at_normal(position)), "Debug")
+		var location = World.get_chunk(block_location)
+		
+		if normal == Vector3(0, 0, -1):
+			block_location += Vector3(0, 1, 0)
+		elif normal == Vector3(0, 0, 1):
+			block_location += Vector3(0, 1, -1)
+		elif normal == Vector3(-1, 0, 0):
+			block_location += Vector3(0, 1, 0)
+		elif normal == Vector3(1, 0, 0):
+			block_location += Vector3(-1, 1, 0)
+		elif normal == Vector3(0, -1, 0):
+			block_location += Vector3(0, 1, 0)
 		
 		if World.chunk_index.has(location):
 			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-			Hud.msg("Placing block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
-			Chunk.place_block(6, block_location.x, block_location.y, block_location.z)
+			Hud.msg("Placing block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
+			Chunk.place_block(6, Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
 			Chunk.compile()
 		else:
 			Hud.msg("Invalid chunk!", "Error")
@@ -230,7 +255,8 @@ func walk(delta): #############################################################
 	direction = Vector3()
 	
 	if Hud.analog_is_pressed:
-		direction += Vector3(move_direction.x, 0,  move_direction.y)
+		# Half the speed
+		direction += Vector3(move_direction.x / 2, 0,  move_direction.y / 2)
 	else:
 		# get the rotation of the camera
 		var aim = $Head/Camera.get_global_transform().basis

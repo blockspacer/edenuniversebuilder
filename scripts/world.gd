@@ -13,7 +13,7 @@ onready var Hud = null
 onready var VoxelTerrain = null
 
 
-var version = "Eden: Universe Builder v3.0.0 beta4"
+var version = "EdenUniverseBuilder v3.0.0 beta4"
 var map_seed = 0
 var map_path = "res://worlds/direct_city.eden2"
 var map_name = "direct_city.eden2"
@@ -50,7 +50,8 @@ var player_move_forward = false
 
 
 var local_data = {}
-const DEFAULT_IP = "josephtheengineer.ddns.net";
+const DEFAULT_HOST = "josephtheengineer.ddns.net"
+const DEFAULT_IP = "101.183.54.6"
 const DEFAULT_PORT = 8888
 const DEFAULT_MAX_PLAYERS = 100
 
@@ -67,6 +68,7 @@ var my_info = { name = "Ari", color = Color8(255, 0, 255) }
 
 func _ready(): #################################################################
 	if map_seed != -1:
+		var t = OS.get_unix_time()
 		Hud = hud_template.instance()
 		add_child(Hud)
 		var EdenWorldDecoder = load("res://scripts/eden_world_decoder.gd").new()
@@ -78,6 +80,8 @@ func _ready(): #################################################################
 		Player = player_template.instance()
 		Player.World = World
 		add_child(Player)
+		
+		Hud.msg("Init took " + str(OS.get_unix_time()-t), "Info")
 		
 		#VoxelTerrain = load("res://scripts/voxel_terrain.gd").new()
 		#VoxelTerrain.World = World
@@ -262,12 +266,25 @@ func create_server(username): #################################################
 	get_tree().set_meta("network_peer", network)
 
 
-func join_server(username): ###################################################
+func join_server(username, address): ###################################################
 	Hud.msg("Joining server...", "Info")
+	var host = address.rsplit(":")[0]
+	var port = null
+	if address.rsplit(":").size() > 1:
+		port = address.rsplit(":")[1]
+	
+	if host == null or host == "":
+		host = DEFAULT_HOST
+	if port == null or host == "":
+		port = DEFAULT_PORT
+	
 	var network = NetworkedMultiplayerENet.new()
-	network.create_client("101.183.54.6", 8888)
+	Hud.msg("Connecting to host " + str(host) + ":" + str(port), "Info")
+	Hud.msg("Client status: " + str(network.create_client(host, port)), "Debug")
+	
 	get_tree().set_network_peer(network)
 	network.connect("connection_failed", self, "_on_connection_failed")
+	
 	get_tree().multiplayer.connect("network_peer_packet", self, "_on_packet_received")
 	get_tree().set_meta("network_peer", network)
 

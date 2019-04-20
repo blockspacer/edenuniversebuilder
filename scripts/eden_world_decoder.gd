@@ -42,30 +42,42 @@ func set_vars(): ##############################################################
 func init_world(): ############################################################
 	Hud.msg("We are online. Starting world convertion...", "Info")
 	if World.map_path == null:
-		Hud.msg("InitializeWorld: WorldPath is null", "Error");
+		Hud.msg("InitializeWorld: WorldPath is null", "Error")
 		return false;
 	
-	Hud.msg("WorldPath is: " + World.map_path, "Info");
+	Hud.msg("WorldPath is: " + World.map_path, "Info")
 	
 	var file = File.new()
 	if not file.file_exists(World.map_path):
-		Hud.msg("Creating file " + World.map_path, "Info");
+		Hud.msg("Creating file " + World.map_path, "Info")
 		World.create_chunk(Vector3(0, 0, 0))
-		#create_metadata();
+		#create_metadata()
+		return false
 	
-	Hud.msg("Geting world metadata...", "Info");
-	return get_metadata();
+	Hud.msg("Geting world metadata...", "Info")
+	
+	if map_file.open_compressed(World.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
+		Hud.msg("Error opening file", "Error")
+		Hud.msg("File length was " + str(map_file.get_len()), "Debug")
+		Hud.msg("File path was " + map_file.get_path(), "Debug")
+	
+	var compressed = map_file.get_buffer(map_file.get_len())
+	
+	return get_metadata()
 
 
 func read_int(position): ######################################################
 	map_file.seek(position)
-	return map_file.get_buffer(1)[0]
+	var buffer = map_file.get_buffer(1)
+	return buffer[0]
 
 
 func get_metadata(): ##########################################################
 	# Open existing file
-	if map_file.open(World.map_path, File.READ) != 0:
+	if map_file.open_compressed(World.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
 		Hud.msg("Error opening file", "Error")
+		Hud.msg("File length was " + str(map_file.get_len()), "Debug")
+		Hud.msg("File path was " + map_file.get_path(), "Debug")
 	
 	#while !file.eof_reached():
 		#Hud.msg("Loading map_data...", "Trace")
@@ -139,8 +151,11 @@ func get_metadata(): ##########################################################
 
 
 func get_chunk_data(location): ################################################
+	if ChunkAddresses.size() < 0:
+		Hud.msg("Invaild world data!", "Error");
+		return false
 	if !ChunkAddresses.has(location):
-		Hud.msg("Chunk data does not exist!", "Error");
+		Hud.msg("Chunk data does not exist!", "Warn");
 		return false
 	
 	var ChunkData = Array()

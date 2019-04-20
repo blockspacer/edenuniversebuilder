@@ -8,7 +8,8 @@ var Hud
 
 
 var block_data = Dictionary()
-var mesh_data = []
+var mesh_data = Array()
+var block_materials = Dictionary()
 var blocks_loaded = 0
 
 var chunk_location = Vector3(0, 0, 0)
@@ -23,9 +24,9 @@ func _ready(): ################################################################
 	if chunk_location.y != 0:
 		return
 	Hud = World.Hud
-	Hud.msg("wow", "Debug")
+	Hud.msg("I'm here", "Debug")
 	
-	place_block(0, 0, 0, 0)
+	place_block(0, Vector3(0, 0, 0))
 	
 	# tex order = right, front, back, left, top, bottom
 	generate_block_mesh(1, "bedrock", single_sided_block("bedrock"))
@@ -139,16 +140,11 @@ func _ready(): ################################################################
 	#cell_center_z = true
 	#mesh_library = blocks
 	
-	if World.map_seed == 0:
+	if World.map_seed == -1:
 		if chunk_location.y == 0:
-			Hud.msg("translation is equal to " + str(chunk_location), "Info")
-			generate_flat_terrain()
-			#load_terrain()
-	
-	elif World.map_seed == -1:
-		pass
-		#if chunk_location.y == 0:
-			#generate_random_terrain()
+			generate_random_terrain()
+	else:
+		load_terrain()
 
 
 
@@ -160,10 +156,10 @@ func generate_flat_terrain(): #################################################
 		for y in range(16):
 			for z in range(16):
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
-				if y == 0:
-					pass
-					place_block(2, x, y, z)
-					#if y >= 15:
+				if y == 0 && x != 15 && z != 15:
+					place_block(2, Vector3(x, y, z))
+				elif y == 0:
+					place_block(4, Vector3(x, y, z))
 						#place_block(8, x, y, z)
 					#elif y > 10:
 						#place_block(3, x, y, z)
@@ -181,7 +177,7 @@ func load_terrain(): ##########################################################
 	EdenWorldDecoder.set_vars()
 	var ChunkData = EdenWorldDecoder.get_chunk_data(Vector2(chunk_location.x, chunk_location.z))
 	World.loaded = true
-	if typeof(ChunkData) == 1:
+	if typeof(ChunkData) == TYPE_BOOL:
 		generate_flat_terrain()
 		return false
 	
@@ -202,7 +198,8 @@ func load_terrain(): ##########################################################
 		var z = ChunkData[Blocks].position.z
 		var id = ChunkData[Blocks].id
 		
-		place_block(x, z, y, id)
+		if x < 4:
+			place_block(id, Vector3(x, z, y))
 		
 		#Logger.Log("Checking block...", "Debug");
 		#Logger.LogFloat("X: ", X, "", "Debug");
@@ -214,6 +211,7 @@ func load_terrain(): ##########################################################
 			#CreateBlock(ChunkData[Blocks].Id, ChunkMetadata[i].Address, X, Y, Z);
 			#LoadedBlocks++;
 	# ==============================================================================
+	compile()
 	#Status+=1
 	#LoadedChunks+=1
 
@@ -224,7 +222,7 @@ func generate_random_terrain(): ###############################################
 			for z in range(16):
 				randomize()
 				if floor(rand_range(0, 3)) == 1:
-					place_block(x, y, z, floor(rand_range(1, 80)))
+					place_block(floor(rand_range(1, 80)), Vector3(x, y, z))
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				#if x == 0 and y == 0 and z == 0:
 					#if y >= 15:
@@ -242,31 +240,19 @@ func generate_matrix_terrain(): ###############################################
 				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
 				if x == 0 and y == 0 and z == 0:
 					if y >= 15:
-						place_block(x, y, z, 8)
+						place_block(8, Vector3(x, y, z))
 					elif y > 10:
-						place_block(x, y, z, 3)
+						place_block(3, Vector3(x, y, z))
 					else:
-						place_block(x, y, z, 2)
+						place_block(2, Vector3(x, y, z))
 
 
 func generate_block_mesh(id, block_name, textures): ###########################
-	pass
-	#var item_mesh = blocks.get_item_mesh(0).duplicate()
-	#var item_shapes = blocks.get_item_shapes(0).duplicate()
-	#blocks.create_item(id)
+	var mat = SpatialMaterial.new()
+	var tex = load("res://textures/" + textures[0] + ".png")
+	mat.albedo_texture = tex
 	
-	#for i in range(0, textures.size()):
-		#var mat = SpatialMaterial.new()
-		#var mat = load("res://block.material").duplicate()
-		#var tex = load("res://textures/" + textures[i] + ".png")
-		#mat.albedo_texture = tex
-		#mat.uv1_scale = Vector3(3, 3, 3)
-		#item_mesh.surface_set_material(i, mat)
-	
-	# create navmesh
-	#blocks.set_item_mesh(id, item_mesh)
-	#blocks.set_item_shapes(id, item_shapes)
-	#blocks.set_item_name(id, block_name)
+	block_materials[id] = mat
 
 
 func single_sided_block(data): ################################################
@@ -285,238 +271,145 @@ func two_sided_block(side_tex, top_bot_tex): ##################################
 	return arr
 
 
-func break_block(x, y, z): ####################################################
-	var location = Vector3(x, y, z) - translation
-	#Hud.msg("Removing block from chunk location " + str(location), "Info")
-	#set_cell_item(location.x, location.y, location.z, -1, 0)
-	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
+func break_block(location): ####################################################
+	#Hud.msg("Chunk translation: " + str(translation), "Debug")
+	#Hud.msg("Removing block from chunk location " + str(location - translation), "Info")
+	block_data.erase(location - translation)
 
 
-func place_block(id, x, y, z): ################################################
-	var location = Vector3(x, y, z) - translation
-	Hud = World.Hud
-	Hud.msg("Placing block from chunk location " + str(location), "Info")
-	
-	block_data[Vector3(x, y, z)] = id
+func place_block(id, location): ################################################
+	#Hud.msg("Chunk translation: " + str(translation), "Debug")
+	#Hud.msg("Placing block from chunk location " + str(location - translation), "Info")
+	block_data[location - translation] = id
 	
 	#set_surface_material(0, "texture")
-	
-	#set_cell_item(location.x, location.y, location.z, id, 0)
-	#Hud.msg("Chunk was" + str(chunk_location), "Debug")
 
 func compile():
 	Hud.msg("Compiling chunk...", "Info")
 	var st = SurfaceTool.new()
-	#st.create_from(mesh, 0)
-	#var mesh = Mesh.new()
 	
 	#mat.albedo_color = Color(1, 0, 0, 1)
-	#var mat = SpatialMaterial.new()
-	var mat = load("res://block.material").duplicate()
-	var tex = load("res://textures/bedrock.png")
+	var mat = SpatialMaterial.new()
+	var tex = load("res://sprite_sheet.png")
 	mat.albedo_texture = tex
-	#mat.uv1_scale = Vector3(3, 3, 3)
 	
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_material(mat)
-	#st.add_color(Color(1, 0, 0))
 	
 	for position in block_data.keys():
-		create_horizontal_plane(st, position)
-		#create_cube(st, position)
+		if can_be_seen(position):
+			create_cube(position, block_data[position])
+			blocks_loaded += 1
 	
-	#create_vertical_plane(st, Vector3(0, 0, 0))
-	#create_vertical_plane(st, Vector3(1, 0, 0))
-	#create_vertical_plane(st, Vector3(2, 0, 0))
-	#create_vertical_plane(st, Vector3(4, 0, 0))
-	#create_horizontal_plane(st, Vector3(0, 0, 0))
-	
-	st.generate_normals(true)
-	st.index()
-	
-	mesh = st.commit()
+	#st.generate_normals(false)
+	#st.index()
+	#mesh = st.commit()
 	
 	var shape = ConcavePolygonShape.new()
 	shape.set_faces(mesh_data)
 	
 	var collision_shape = get_node("StaticBody/CollisionShape")
 	collision_shape.shape = shape
-	
-	#collision_shape.shape = mesh.create_trimesh_shape() # Broken on Android!
-
-func create_vertical_plane(st, position):
-	# top-left
-	st.add_uv(Vector2(0, 1))
-	st.add_vertex(Vector3(0, 0, 0) + position)
-	
-	# top-right
-	st.add_uv(Vector2(1, 1))
-	st.add_vertex(Vector3(1, 0, 0) + position)
-	
-	# bottom-left
-	st.add_uv(Vector2(0, 0))
-	st.add_vertex(Vector3(0, -1, 0) + position)
-	
-	
-	
-	# bottom-right
-	st.add_uv(Vector2(1, 0))
-	st.add_vertex(Vector3(1, -1, 0) + position)
-	
-	# bottom-left
-	st.add_uv(Vector2(0, 0))
-	st.add_vertex(Vector3(0, -1, 0) + position)
-	
-	# top-right
-	st.add_uv(Vector2(1, 1))
-	st.add_vertex(Vector3(1, 0, 0) + position)
 
 
-func create_horizontal_plane(st, position):
-	# top-left
-	st.add_uv(Vector2(0, 0))
-	st.add_vertex(Vector3(0, 0, 0) + position)
-	mesh_data.append(Vector3(0, 0, 0) + position)
+func can_be_seen(position):
+	var surrounding_blocks = [ Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0), Vector3(-1, 0, 0) ]
+	var num_surrounding_blocks = 0
 	
-	# top-right
-	st.add_uv(Vector2(1, 0))
-	st.add_vertex(Vector3(1, 0, 0) + position)
-	mesh_data.append(Vector3(1, 0, 0) + position)
-	
-	# bottom-left
-	st.add_uv(Vector2(0, 1))
-	st.add_vertex(Vector3(0, 0, 1) + position)
-	mesh_data.append(Vector3(0, 0, 1) + position)
-	
-	
-	# bottom-right
-	st.add_uv(Vector2(1, 1))
-	st.add_vertex(Vector3(1, 0, 1) + position)
-	mesh_data.append(Vector3(1, 0, 1) + position)
-	
-	# bottom-left
-	st.add_uv(Vector2(0, 1))
-	st.add_vertex(Vector3(0, 0, 1) + position)
-	mesh_data.append(Vector3(0, 0, 1) + position)
-	
-	# top-right
-	st.add_uv(Vector2(1, 0))
-	st.add_vertex(Vector3(1, 0, 0) + position)
-	mesh_data.append(Vector3(1, 0, 0) + position)
+	for surrounding_position in surrounding_blocks:
+		if block_data.has(position + surrounding_position):
+			num_surrounding_blocks += 1
+	Hud.msg("what?", "Debug")
+	if num_surrounding_blocks == surrounding_blocks.size():
+		Hud.msg("found", "Debug")
+		return true
+	else:
+		Hud.msg("false", "Debug")
+		return true
 
-func create_cube(st, position):
-	st.add_uv(Vector2(0, 0.66))
-	st.add_vertex(Vector3(0, 1, 0) + position)
-	mesh_data.append(Vector3(0, 1, 0) + position)
+
+func create_cube(position, id):
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_material(block_materials[id])
 	
-	st.add_uv(Vector2(0.25, 0.66))
-	st.add_vertex(Vector3(0, 0, 0) + position)
-	mesh_data.append(Vector3(0, 0, 0) + position)
+	create_horizontal_plane(st, position + Vector3(0, -1, 0), "down")
 	
-	st.add_uv(Vector2(0, 0.33))
-	st.add_vertex(Vector3(1, 1, 0) + position)
-	mesh_data.append(Vector3(0, 1, 0) + position)
+	create_horizontal_plane(st, position + Vector3(0, 0, 0), "up")
 	
-	st.add_uv(Vector2(0.25, 0.33))
-	st.add_vertex(Vector3(1, 0, 0) + position)
-	mesh_data.append(Vector3(1, 0, 0) + position)
+	create_vertical_plane(st, position + Vector3(0, 0, 1), "west")
 	
+	create_vertical_plane(st, position + Vector3(0, 0, 0), "east")
 	
-	st.add_uv(Vector2(0.5, 0.66))
-	st.add_vertex(Vector3(0, 0, 1) + position)
-	mesh_data.append(Vector3(0, 0, 1) + position)
+	create_vertical_plane(st, position + Vector3(0, 0, 0), "north")
 	
-	st.add_uv(Vector2(0.5, 0.33))
-	st.add_vertex(Vector3(1, 0, 1) + position)
-	mesh_data.append(Vector3(1, 0, 1) + position)
+	create_vertical_plane(st, position + Vector3(1, 0, 0), "south")
 	
-	st.add_uv(Vector2(0.75, 0.66))
-	st.add_vertex(Vector3(0, 1, 1) + position)
-	mesh_data.append(Vector3(0, 1, 1) + position)
-	
-	st.add_uv(Vector2(0.75, 0.33))
-	st.add_vertex(Vector3(1, 1, 1) + position)
-	mesh_data.append(Vector3(1, 1, 1) + position)
-	
-	
-	st.add_uv(Vector2(1, 0.66))
-	st.add_vertex(Vector3(0, 1, 0) + position)
-	mesh_data.append(Vector3(0, 1, 0) + position)
-	
-	st.add_uv(Vector2(1, 0.33))
-	st.add_vertex(Vector3(1, 1, 0) + position)
-	mesh_data.append(Vector3(1, 1, 0) + position)
-	
-	
-	st.add_uv(Vector2(0.25, 1))
-	st.add_vertex(Vector3(0, 1, 0) + position)
-	mesh_data.append(Vector3(0, 1, 0) + position)
-	
-	st.add_uv(Vector2(0.5, 1))
-	st.add_vertex(Vector3(0, 1, 1) + position)
-	mesh_data.append(Vector3(0, 1, 1) + position)
+	mesh = st.commit(mesh)
+
+const vertical_plane_uvs = [ Vector2(0, 1), Vector2(1, 1), Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(1, 1) ]
+const vertical_plane_vertices = [ Vector3(0, 0, 0), Vector3(1, 0, 0), Vector3(0, -1, 0), Vector3(1, -1, 0), Vector3(0, -1, 0), Vector3(1, 0, 0) ]
+
+const vertical_plane_uvs2 = [ Vector2(0, 1), Vector2(1, 1), Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(1, 1) ]
+const vertical_plane_vertices2 = [ Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, -1, 0), Vector3(0, -1, 1), Vector3(0, -1, 0), Vector3(0, 0, 1) ]
+
+func create_vertical_plane(st, position, direction):
+	if direction == "west":
+		for i in range(vertical_plane_vertices.size()):
+			st.add_uv(vertical_plane_uvs[i])
+			st.add_vertex(vertical_plane_vertices[i] + position)
+			mesh_data.append(vertical_plane_vertices[i] + position)
+		
+	elif direction == "east":
+		vertical_plane_vertices.invert()
+		vertical_plane_uvs.invert()
+		for i in range(vertical_plane_vertices.size()):
+			st.add_uv(vertical_plane_uvs[i])
+			st.add_vertex(vertical_plane_vertices[i] + position)
+			mesh_data.append(vertical_plane_vertices[i] + position)
+		
+		vertical_plane_vertices.invert()
+		vertical_plane_uvs.invert()
 	
 	
-	st.add_uv(Vector2(0.25, 0))
-	st.add_vertex(Vector3(1, 1, 0) + position)
-	mesh_data.append(Vector3(1, 1, 0) + position)
 	
-	st.add_uv(Vector2(0.5, 0))
-	st.add_vertex(Vector3(1, 1, 1) + position)
-	mesh_data.append(Vector3(1, 1, 1) + position)
+	elif direction == "north":
+		for i in range(vertical_plane_vertices2.size()):
+			st.add_uv(vertical_plane_uvs2[i])
+			st.add_vertex(vertical_plane_vertices2[i] + position)
+			mesh_data.append(vertical_plane_vertices2[i] + position)
 	
-	# front
-	st.add_index(0 + 14 * blocks_loaded)
-	st.add_index(2 + 14 * blocks_loaded)
-	st.add_index(1 + 14 * blocks_loaded)
-	
-	st.add_index(1 + 14 * blocks_loaded)
-	st.add_index(2 + 14 * blocks_loaded)
-	st.add_index(3 + 14 * blocks_loaded)
-	
-	# back
-	st.add_index(4 + 14 * blocks_loaded)
-	st.add_index(5 + 14 * blocks_loaded)
-	st.add_index(6 + 14 * blocks_loaded)
-	
-	st.add_index(5 + 14 * blocks_loaded)
-	st.add_index(7 + 14 * blocks_loaded)
-	st.add_index(6 + 14 * blocks_loaded)
-	
-	# top
-	st.add_index(6 + 14 * blocks_loaded)
-	st.add_index(7 + 14 * blocks_loaded)
-	st.add_index(8 + 14 * blocks_loaded)
-	
-	st.add_index(7 + 14 * blocks_loaded)
-	st.add_index(9 + 14 * blocks_loaded)
-	st.add_index(8 + 14 * blocks_loaded)
-	
-	# bottom
-	st.add_index(1 + 14 * blocks_loaded)
-	st.add_index(3 + 14 * blocks_loaded)
-	st.add_index(4 + 14 * blocks_loaded)
-	
-	st.add_index(3 + 14 * blocks_loaded)
-	st.add_index(5 + 14 * blocks_loaded)
-	st.add_index(4 + 14 * blocks_loaded)
-	
-	# left
-	st.add_index(1 + 14 * blocks_loaded)
-	st.add_index(11 + 14 * blocks_loaded)
-	st.add_index(10 + 14 * blocks_loaded)
-	
-	st.add_index(1 + 14 * blocks_loaded)
-	st.add_index(4 + 14 * blocks_loaded)
-	st.add_index(11 + 14 * blocks_loaded)
-	
-	# right
-	st.add_index(3 + 14 * blocks_loaded)
-	st.add_index(12 + 14 * blocks_loaded)
-	st.add_index(5 + 14 * blocks_loaded)
-	
-	st.add_index(5 + 14 * blocks_loaded)
-	st.add_index(12 + 14 * blocks_loaded)
-	st.add_index(13 + 14 * blocks_loaded)
-	
-	blocks_loaded+= 1
+	elif direction == "south":
+		vertical_plane_vertices2.invert()
+		vertical_plane_uvs2.invert()
+		for i in range(vertical_plane_vertices2.size()):
+			st.add_uv(vertical_plane_uvs2[i])
+			st.add_vertex(vertical_plane_vertices2[i] + position)
+			mesh_data.append(vertical_plane_vertices2[i] + position)
+		
+		vertical_plane_vertices2.invert()
+		vertical_plane_uvs2.invert()
+
+const horizontal_plane_uvs = [ Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 0) ]
+const horizontal_plane_vertices = [ Vector3(0, 0, 0), Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(1, 0, 1), Vector3(0, 0, 1), Vector3(1, 0, 0) ]
+
+func create_horizontal_plane(st, position, direction):
+	if direction == "up":
+		for i in range(horizontal_plane_vertices.size()):
+			st.add_uv(horizontal_plane_uvs[i])
+			st.add_vertex(horizontal_plane_vertices[i] + position)
+			mesh_data.append(horizontal_plane_vertices[i] + position)
+		
+	elif direction == "down":
+		horizontal_plane_vertices.invert()
+		horizontal_plane_uvs.invert()
+		for i in range(horizontal_plane_vertices.size()):
+			st.add_uv(horizontal_plane_uvs[i])
+			st.add_vertex(horizontal_plane_vertices[i] + position)
+			mesh_data.append(horizontal_plane_vertices[i] + position)
+		
+		horizontal_plane_vertices.invert()
+		horizontal_plane_uvs.invert()
+
+
+

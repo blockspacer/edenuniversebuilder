@@ -21,7 +21,19 @@ onready var TitleScreenPlayer = get_node("TitleScreen/AnimationPlayer")
 onready var world_template = preload("res://scenes/world.tscn")
 onready var dot_template = preload("res://scenes/dot.tscn")
 
+const info = [ "changelog.md", "featured-worlds.md", "game-stats.md", "info.md", "news.md", "new-worlds.md", "top-users.md", "top-worlds.md" ]
+
 var workspace = "home"
+var positions = Dictionary()
+var ui_snaped = true
+var snaped_position = Vector2(0, 0)
+var ui_just_moved = false
+var ui_snaping = false
+var distance_to_move = Vector2(0, 0)
+var distance_moved = Vector2(0, 0)
+
+var fetch_data_request = HTTPRequest.new()
+var file_progress = 0
 
 var loader
 var wait_frames
@@ -29,6 +41,23 @@ var time_max = 100 # msec
 var current_scene
 var process = false
 var main_menu = true
+var background_pressed = false
+var search_is_focused = false
+
+var downloading = false
+var downloading_wait = 0
+var download_world_client
+var downloaded_world_path
+var last_downloaded_bytes
+var search_client
+var past_frames = 0
+
+var map_seed = 0
+var map_path = "res://worlds/direct_city.eden2"
+var map_name = "direct_city.eden2"
+
+const EDEN2_SEARCH = "http://app.edengame.net/list2.php?search="
+const EDEN2_DOWNLOAD = "http://files.edengame.net/"
 
 
 
@@ -36,6 +65,12 @@ var main_menu = true
 ################################### signals ###################################
 
 func _ready(): ################################################################
+	var music_player = AudioStreamPlayer3D.new()
+	music_player.stream = load("res://sounds/music/Eden0.wav")
+	add_child(music_player)
+	music_player.play()
+	
+	
 	TitleScreenPlayer.play("TitleScreen")
 	
 	# get current scene for the scene loader
@@ -51,9 +86,75 @@ func _ready(): ################################################################
 	
 	# fetch data from the website for the main menu
 	fetch_data()
+	
+	var world_data = Dictionary()
+	world_data[1] = "New World"
+	world_data[2] = "Test World"
+	world_data[3] = "Direct City"
+	
+	var parent = get_node("UI/Home/VBoxContainer/TopContainer/Planets/Foreground")
+	show_world_list(parent, world_data, true)
 
 
-func _process(delta): #########################################################	
+func _process(delta): #########################################################
+	update_positions()
+	if Input.is_action_just_pressed("action"):
+		background_pressed = true
+	if Input.is_action_just_released("action"):
+		background_pressed = false
+		if ui_just_moved:
+			ui_snaped = false
+	
+	if ui_snaped == false:
+		var closest_position = Vector2(0, 0)
+		for position in positions.values():
+			if abs(position.x - get_node("UI").rect_position.x) <= abs(closest_position.x - get_node("UI").rect_position.x):
+				if abs(position.y - get_node("UI").rect_position.y) <= abs(closest_position.y - get_node("UI").rect_position.y):
+					closest_position = position
+		msg("Snap position is " + str(closest_position), "Debug")
+		snaped_position = closest_position
+		ui_snaped = true
+	
+	if get_node("UI").rect_position != snaped_position and ui_snaped and background_pressed == false:
+		distance_to_move.x = abs(get_node("UI").rect_position.x - snaped_position.x)
+		distance_to_move.y = abs(get_node("UI").rect_position.y - snaped_position.y)
+		#msg("Position is now " + str(get_node("UI").rect_position), "Debug")
+		distance_moved = Vector2(0, 0)
+	
+	if distance_moved < distance_to_move:
+		var distance_to_move_sub = Vector2(0, 0)
+		distance_to_move_sub.x = round(distance_to_move.x / 4)
+		distance_to_move_sub.y = round(distance_to_move.y / 4)
+		if distance_to_move_sub < Vector2(1, 1):
+			distance_to_move_sub = Vector2(1, 1)
+		
+		if get_node("UI").rect_position.x < snaped_position.x:
+			get_node("UI").rect_position.x += distance_to_move_sub.x
+			distance_moved.x += distance_to_move_sub.x
+		else:
+			get_node("UI").rect_position.x -= distance_to_move_sub.x
+			distance_moved.x -= distance_to_move_sub.x
+		
+		if get_node("UI").rect_position.y < snaped_position.y:
+			get_node("UI").rect_position.y += distance_to_move_sub.y
+			distance_moved.y += distance_to_move_sub.y
+		else:
+			get_node("UI").rect_position.y -= distance_to_move_sub.y
+			distance_moved.y -= distance_to_move_sub.y
+	
+	if downloading:
+		if OS.get_unix_time() - downloading_wait > 2:
+			msg("KB downloaded: " + str(download_world_client.get_downloaded_bytes() * 0.001), "Info")
+			downloading_wait = OS.get_unix_time()
+			
+			if last_downloaded_bytes == download_world_client.get_downloaded_bytes() and last_downloaded_bytes != 0:
+				_on_world_download_completed(downloaded_world_path)
+		
+		if past_frames > 2000:
+			last_downloaded_bytes = download_world_client.get_downloaded_bytes()
+	
+	past_frames += 1
+	
 	if process:
 		if loader == null:
 			msg("Loader was null!", "Debug")
@@ -100,7 +201,8 @@ func _on_CreateServerButton_pressed(): ########################################
 
 
 func _on_JoinServerButton_pressed(): ##########################################
-	World.join_server("player")
+	var address = get_node("UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column1/Input").text
+	World.join_server("player", address)
 
 
 func _on_SendButton_pressed(): ################################################
@@ -111,29 +213,6 @@ func _on_SendButton_pressed(): ################################################
 func _on_SharedWorlds_released(): #############################################
 	msg("Shared worlds are not implemented yet!", "Warn")
 	
-
-func _on_NewFlatWorldButton_pressed(): ########################################
-	msg("Loading a new flat terrain world...", "Info")
-	#World.map_path = ""
-	#World.map_name = "New Flat Terrain World"
-	#World.map_seed = 0
-	load_world()
-
-
-func _on_NewNaturalTerrainButton_pressed(): ###################################
-	msg("Loading a new natural terrain world...", "Info")
-	#World.map_path = ""
-	#World.map_name = "New Natural Terrain World"
-	#World.map_seed = 8901627346
-	load_world()
-
-
-func _on_TestWorldButton_pressed(): ###########################################
-	pass # replace with function body
-
-
-func _on_DirectCityButton_pressed(): ##########################################
-	pass # replace with function body
 
 
 func _on_OptionsButton_pressed(): #############################################
@@ -151,6 +230,10 @@ func _on_OptionsBackButton_pressed(): #########################################
 func _input(event): ###########################################################
 	if event is InputEventScreenDrag:
 		get_node("UI").rect_position += event.relative
+	if event is InputEventMouseMotion:
+		if background_pressed:
+			get_node("UI").rect_position += event.relative
+			ui_just_moved = true
 	if event is InputEventScreenTouch:
 		if get_node("TitleScreen").visible:
 			get_node("TitleScreen").visible = false
@@ -159,23 +242,129 @@ func _input(event): ###########################################################
 		if get_node("TitleScreen").visible:
 			get_node("TitleScreen").visible = false
 			get_node("UI").visible = true
+	if event.is_action_pressed("ui_accept"):
+		if search_is_focused:
+			msg("Searching eden2 world database...", "Info")
+			#get_node("UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Content").text = "Searching..."
+			Directory.new().make_dir("user://tmp")
+			
+			var text = get_node("UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Input").text
+			
+			var http = HTTPRequest.new()
+			http.set_download_file("user://tmp/search.list")
+			http.connect("request_completed", self, "_on_search_request_completed")
+			add_child(http)
+			msg("Search string is: " + str(EDEN2_SEARCH + text), "Debug")
+			http.request(EDEN2_SEARCH + text, Array(), false)
+			search_client = http
 
 
-func _on_HTTPRequest_request_completed(result, response_code, headers, body): #
-	msg(str(result), "Debug")
-	msg(str(response_code), "Debug")
-	msg(str(headers), "Debug")
-	msg(str(body), "Debug")
-
+func _on_fetch_data_request_completed(result, response_code, headers, body):
+	msg("Result: " + str(result), "Debug")
+	var filename = fetch_data_request.get_download_file()
+	var file = File.new()
+	
+	if file.open(filename, File.READ) != 0:
+		msg("Error opening file", "Error")
+	
+	if filename == "user://info/changelog.md":
+		get_node("UI/Home/VBoxContainer/TopContainer/News/VBoxContainer/Content2").text = file.get_as_text()
+		
+	elif filename == "user://info/featured-worlds.md":
+		get_node("UI/Leaderboard/TopContainer/Featured/VBoxContainer/Content").text = file.get_as_text()
+		
+	elif filename == "user://info/game-stats.md":
+		get_node("UI/Leaderboard/TopContainer/Stats/VBoxContainer/Content2").text = file.get_as_text()
+		
+	elif filename == "user://info/info.md":
+		get_node("UI/Credits/TopContainer3/Info/Content/Text").text = file.get_as_text()
+		
+	elif filename == "user://info/news.md":
+		get_node("UI/Home/VBoxContainer/TopContainer/News/VBoxContainer/Content").text = file.get_as_text()
+		
+	elif filename == "user://info/new-worlds.md":
+		get_node("UI/Leaderboard/TopContainer/Featured/VBoxContainer/Content2").text = file.get_as_text()
+		
+	elif filename == "user://info/top-users.md":
+		get_node("UI/Leaderboard/TopContainer/Users/VBoxContainer/Content").text = file.get_as_text()
+		
+	elif filename == "user://info/top-worlds.md":
+		get_node("UI/Leaderboard/TopContainer/Users/VBoxContainer/Content2").text = file.get_as_text()
+	
+	if file.get_as_text() != null:
+		msg("Data fetch " + str(file_progress) + " of " + str(info.size()) + " successful", "Debug")
+	
+	if file_progress < info.size():
+		fetch_data_request.set_download_file("user://info/" + info[file_progress])
+		str(fetch_data_request.request("http://josephtheengineer.ddns.net/eden/info/" + info[file_progress], Array(), false))
+		file_progress += 1
 
 
 
 ################################## functions ##################################
 
 func fetch_data(): ############################################################
-	get_node("HTTPRequest").download_file = "res://data/news.md"
-	get_node("HTTPRequest").request("http://josephtheengineer.ddns.net/eden/news.md")
+	var dir = Directory.new()
+	#if dir.dir_exists("user://info"):
+	dir.make_dir("user://info")
+	
+	if file_progress < info.size():
+		fetch_data_request.set_download_file("user://info/" + info[file_progress])
+		fetch_data_request.connect("request_completed", self, "_on_fetch_data_request_completed")
+		add_child(fetch_data_request)
+		fetch_data_request.request("http://josephtheengineer.ddns.net/eden/info/" + info[file_progress], Array(), false)
+		file_progress += 1
 
+func update_positions():
+	var screen_size = get_node("UI").rect_size
+	positions["home"] = Vector2(0, 0)
+	positions["leaderboard"] = Vector2(0, screen_size.y)
+	positions["world_sharing"] = Vector2(-screen_size.x, 0)
+	positions["credits"] = Vector2(0, -screen_size.y)
+	positions["account_page"] = Vector2(+screen_size.x, 0)
+
+func show_world_list(parent, world_data, is_downloaded):
+	for path in world_data.keys():
+		var content = HBoxContainer.new()
+		content.rect_min_size = Vector2(0, 125)
+		parent.add_child(content)
+		
+		var button = TextureButton.new()
+		button.texture_normal = load("res://textures/tnt_side.png")
+		button.texture_hover = load("res://textures/fireworks_side.png")
+		button.texture_pressed = load("res://textures/steel.png")
+		button.rect_min_size = Vector2(120, 0)
+		button.expand = true
+		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		content.add_child(button)
+		if is_downloaded:
+			button.connect("pressed", self, "world_button", [path])
+		else:
+			button.connect("pressed", self, "download_world_button", [path])
+		
+		var seperator = VSeparator.new()
+		seperator.rect_min_size = Vector2(20, 0)
+		content.add_child(seperator)
+		
+		var label = Label.new()
+		label.size_flags_horizontal = Control.SIZE_FILL
+		label.text = world_data[path]
+		label.set("custom_fonts/font", load("res://fonts/header.tres"))
+		content.add_child(label)
+
+func world_button(world):
+	if world == null:
+		msg("Loading a new flat terrain world...", "Info")
+		map_path = ""
+		map_name = "New Flat Terrain World"
+		map_seed = 0
+		load_world()
+	else:
+		msg("Loading a new natural terrain world...", "Info")
+		map_path = ""
+		map_name = "New Natural Terrain World"
+		map_seed = floor(rand_range(0, 9999999))
+		load_world()
 
 func draw_dots(): #############################################################
 	for x in range(OS.get_window_size().x / 10):
@@ -200,6 +389,9 @@ func update_progress(): #######################################################
 
 func set_new_scene(scene_resource): ###########################################
 	current_scene = scene_resource.instance()
+	current_scene.map_seed = map_seed
+	current_scene.map_path = map_path
+	current_scene.map_name = map_name
 	get_node("/root").add_child(current_scene)
 
 
@@ -241,4 +433,61 @@ func _on_SwipeDetector_swiped(direction): #####################################
 	msg("Swipe signal received!", "Info")
 
 
+func _on_search_request_completed(result, response_code, headers, body):
+	var file = File.new()
+	if file.open("user://tmp/search.list", File.READ) != 0:
+		msg("Error opening file", "Error")
+	
+	var text = file.get_as_text().rsplit("\n")
+	
+	var world_data = Dictionary()
+	
+	var name
+	for i in range(text.size() / 2):
+		if i % 2:
+			# odd
+			world_data[name] = text[i]
+		else:
+			# even
+			name = text[i]
+	
+	msg("World list: " + str(world_data), "Debug")
+	var parent = get_node("UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Content/VBoxContainer")
+	show_world_list(parent, world_data, false)
+	
+	msg("Search complete!", "Info")
+	search_client.queue_free()
 
+func _on_search_focus_entered():
+	search_is_focused = true
+
+
+func _on_search_focus_exited():
+	search_is_focused = false
+
+func download_world_button(path):
+	msg("Searching eden2 world database...", "Info")
+	#get_node("UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Content").text = "Downloading..."
+	Directory.new().make_dir("user://worlds/")
+	
+	var http = HTTPRequest.new()
+	http.set_download_file("user://worlds/" + path)
+	http.connect("request_completed", self, "_on_world_download_completed", ["user://worlds/" + path])
+	add_child(http)
+	msg("Downloading world " + EDEN2_DOWNLOAD + path, "Debug")
+	http.request(EDEN2_DOWNLOAD + path, Array(), false)
+	download_world_client = http
+	downloading = true
+	
+	downloaded_world_path = "user://worlds/" + path
+	
+	msg("Body size: " + str(http.get_body_size()), "Debug")
+
+func _on_world_download_completed(path):
+	downloading = false
+	msg("Loading downloaded world...", "Info")
+	map_path = path
+	map_name = "WIP"
+	map_seed = 0
+	download_world_client.queue_free()
+	load_world()
