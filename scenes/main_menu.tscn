@@ -1,34 +1,28 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=17 format=2]
 
-[ext_resource path="res://scripts/main_menu.gd" type="Script" id=1]
-[ext_resource path="res://scenes/environment.tres" type="Environment" id=2]
-[ext_resource path="res://fonts/header.tres" type="DynamicFont" id=3]
-[ext_resource path="res://fonts/body.tres" type="DynamicFont" id=4]
-[ext_resource path="res://textures/ui/ui_text/ipad~menu_options.png" type="Texture" id=5]
+[ext_resource path="res://scenes/environment.tres" type="Environment" id=1]
+[ext_resource path="res://fonts/header.tres" type="DynamicFont" id=2]
+[ext_resource path="res://fonts/body.tres" type="DynamicFont" id=3]
+[ext_resource path="res://textures/ui/ui_text/ipad~menu_options.png" type="Texture" id=4]
+[ext_resource path="res://fonts/league-mono/LeagueMono-Thin.otf" type="DynamicFontData" id=5]
 [ext_resource path="res://textures/ui/edenlogo.png" type="Texture" id=6]
-[ext_resource path="res://scripts/swipe_detector.gd" type="Script" id=7]
+[ext_resource path="res://fonts/orbitron/Orbitron Medium.otf" type="DynamicFontData" id=7]
 [ext_resource path="res://icons/splash2.png" type="Texture" id=8]
 [ext_resource path="res://icons/josephtheengineer/JosephTheEngineer Logo 2018 Engineer Edition v2 Transparent Round.png" type="Texture" id=9]
-[ext_resource path="res://fonts/orbitron/Orbitron Medium.otf" type="DynamicFontData" id=10]
+[ext_resource path="res://sounds/music/eden1.ogg" type="AudioStream" id=10]
 
-[sub_resource type="DynamicFontData" id=1]
-font_path = "res://fantasque-sans-mono-regular.otf"
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 5 )
 
 [sub_resource type="DynamicFont" id=2]
-size = 80
-use_filter = true
-font_data = SubResource( 1 )
+size = 56
+font_data = ExtResource( 7 )
 
 [sub_resource type="DynamicFont" id=3]
-size = 20
-use_filter = true
-font_data = SubResource( 1 )
-
-[sub_resource type="DynamicFont" id=4]
 size = 25
-font_data = ExtResource( 10 )
+font_data = ExtResource( 7 )
 
-[sub_resource type="Animation" id=5]
+[sub_resource type="Animation" id=4]
 length = 5.0
 tracks/0/type = "value"
 tracks/0/path = NodePath("StartButtonCover:color")
@@ -55,7 +49,7 @@ tracks/1/keys = {
 "values": [ Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
 }
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id=5]
 length = 6.0
 loop = true
 tracks/0/type = "value"
@@ -71,11 +65,11 @@ tracks/0/keys = {
 "values": [ Color( 0, 0, 0, 0 ), Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
 }
 
-[sub_resource type="Animation" id=7]
+[sub_resource type="Animation" id=6]
 length = 6.0
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("UI/LoadingContainer/Container/CenterContainer/VBoxContainer/Label:text")
+tracks/0/path = NodePath("UI/LoadingContainer/Content/CenterContainer/VBoxContainer/Label:text")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -87,12 +81,11 @@ tracks/0/keys = {
 "values": [ "Loading", "Loading.", "Loading..", "Loading..." ]
 }
 
-[node name="Main Menu" type="Spatial"]
-script = ExtResource( 1 )
+[node name="MainMenu" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( -1.62921e-07, 0, -1, 0, 1, 0, 1, 0, -1.62921e-07, -18.1531, 7.86944, 17.6959 )
-environment = ExtResource( 2 )
+transform = Transform( -1.62921e-07, 0, -1, 0, 1, 0, 1, 0, -1.62921e-07, -2.61218, 4.39944, 4.77057 )
+environment = ExtResource( 1 )
 current = true
 
 [node name="UI" type="Control" parent="."]
@@ -151,7 +144,7 @@ margin_bottom = -10.0
 [node name="News" type="Label" parent="UI/Home/VBoxContainer/TopContainer/News/VBoxContainer"]
 margin_right = 588.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "News"
 uppercase = true
 
@@ -168,7 +161,7 @@ margin_bottom = 437.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -182,7 +175,7 @@ rect_min_size = Vector2( 0, 10 )
 margin_top = 455.0
 margin_right = 588.0
 margin_bottom = 486.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Changelog"
 uppercase = true
 
@@ -199,7 +192,7 @@ margin_bottom = 892.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -232,7 +225,7 @@ margin_bottom = -10.0
 [node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
 margin_right = 588.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Chat"
 uppercase = true
 
@@ -249,7 +242,7 @@ margin_bottom = 540.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 scroll_following = true
 selection_enabled = true
 
@@ -263,7 +256,7 @@ rect_min_size = Vector2( 0, 50 )
 margin_right = 484.0
 margin_bottom = 50.0
 size_flags_horizontal = 3
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "Edit message"
 caret_blink = true
 
@@ -272,7 +265,7 @@ margin_left = 488.0
 margin_right = 588.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 100, 0 )
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "Send"
 
 [node name="Row1" type="VBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer"]
@@ -289,7 +282,7 @@ rect_min_size = Vector2( 0, 40 )
 margin_right = 166.0
 margin_bottom = 35.0
 size_flags_vertical = 0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "Join Server"
 
 [node name="Input" type="TextEdit" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column1"]
@@ -299,7 +292,7 @@ margin_bottom = 35.0
 rect_min_size = Vector2( 0, 35 )
 size_flags_horizontal = 3
 size_flags_vertical = 0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 
 [node name="Column2" type="HBoxContainer" parent="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1"]
 margin_top = 44.0
@@ -311,7 +304,7 @@ rect_min_size = Vector2( 0, 250 )
 margin_right = 194.0
 margin_bottom = 35.0
 size_flags_vertical = 0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "Create Server"
 
 [node name="VSeparator2" type="VSeparator" parent="UI/Home/VBoxContainer/TopContainer"]
@@ -336,14 +329,14 @@ color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
-margin_top = 10.0
+margin_top = 8.89197
 margin_right = -10.0
-margin_bottom = -10.0
+margin_bottom = -11.108
 
 [node name="Title" type="Label" parent="UI/Home/VBoxContainer/TopContainer/Planets/Foreground"]
 margin_right = 588.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Planets"
 uppercase = true
 
@@ -369,19 +362,57 @@ rect_min_size = Vector2( 0, 100 )
 margin_right = 500.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 500, 0 )
-texture_normal = ExtResource( 5 )
-texture_pressed = ExtResource( 5 )
-texture_hover = ExtResource( 5 )
-texture_focused = ExtResource( 5 )
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
 expand = true
 stretch_mode = 5
 
 [node name="CenterContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/BottomContainer"]
 margin_left = 504.0
-margin_right = 1576.0
+margin_right = 1272.0
 margin_bottom = 100.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Home/VBoxContainer/BottomContainer"]
+margin_left = 1276.0
+margin_right = 1576.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 300, 0 )
+
+[node name="Label" type="Label" parent="UI/Home/VBoxContainer/BottomContainer/VBoxContainer"]
+margin_right = 300.0
+margin_bottom = 31.0
+custom_fonts/font = ExtResource( 2 )
+text = "Now Playing"
+align = 2
+valign = 1
+
+[node name="Button" type="Button" parent="UI/Home/VBoxContainer/BottomContainer/VBoxContainer"]
+margin_top = 35.0
+margin_right = 300.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 0, 30 )
+flat = true
+
+[node name="Song" type="Label" parent="UI/Home/VBoxContainer/BottomContainer/VBoxContainer/Button"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_fonts/font = ExtResource( 3 )
+text = "Eden2"
+align = 2
+valign = 1
+
+[node name="Label3" type="Label" parent="UI/Home/VBoxContainer/BottomContainer/VBoxContainer"]
+margin_top = 69.0
+margin_right = 300.0
+margin_bottom = 89.0
+custom_fonts/font = SubResource( 1 )
+text = "Playlist: Eden"
+align = 2
+valign = 1
 
 [node name="Logo" type="TextureRect" parent="UI/Home/VBoxContainer/BottomContainer"]
 margin_left = 1580.0
@@ -393,6 +424,7 @@ expand = true
 stretch_mode = 6
 
 [node name="ColorRect" type="ColorRect" parent="UI/Home/VBoxContainer/BottomContainer/Logo"]
+visible = false
 show_behind_parent = true
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -432,7 +464,7 @@ margin_bottom = -10.0
 [node name="TopUsers" type="Label" parent="UI/Leaderboard/TopContainer/Users/VBoxContainer"]
 margin_right = 601.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Top Users"
 uppercase = true
 
@@ -449,7 +481,7 @@ margin_bottom = 511.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -463,7 +495,7 @@ rect_min_size = Vector2( 0, 10 )
 margin_top = 529.0
 margin_right = 601.0
 margin_bottom = 560.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Top Worlds"
 uppercase = true
 
@@ -480,7 +512,7 @@ margin_bottom = 1040.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -513,7 +545,7 @@ margin_bottom = -10.0
 [node name="UserStats" type="Label" parent="UI/Leaderboard/TopContainer/Stats/VBoxContainer"]
 margin_right = 601.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "User stats"
 uppercase = true
 
@@ -530,7 +562,7 @@ margin_bottom = 511.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -544,7 +576,7 @@ rect_min_size = Vector2( 0, 10 )
 margin_top = 529.0
 margin_right = 601.0
 margin_bottom = 560.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Game stats"
 uppercase = true
 
@@ -561,7 +593,7 @@ margin_bottom = 1040.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -594,7 +626,7 @@ margin_bottom = -10.0
 [node name="FeaturedWorlds" type="Label" parent="UI/Leaderboard/TopContainer/Featured/VBoxContainer"]
 margin_right = 602.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Featured Worlds"
 uppercase = true
 
@@ -611,7 +643,7 @@ margin_bottom = 511.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -625,7 +657,7 @@ rect_min_size = Vector2( 0, 10 )
 margin_top = 529.0
 margin_right = 602.0
 margin_bottom = 560.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "New Worlds"
 uppercase = true
 
@@ -642,7 +674,7 @@ margin_bottom = 1040.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
@@ -674,15 +706,15 @@ color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/WorldSharing/TopContainer2/YourWorlds"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 10.0
-margin_right = -10.0
-margin_bottom = -10.0
+margin_left = 7.21069
+margin_top = 7.21051
+margin_right = -12.7893
+margin_bottom = -12.7896
 
 [node name="YourWorlds" type="Label" parent="UI/WorldSharing/TopContainer2/YourWorlds/VBoxContainer"]
 margin_right = 594.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Your Worlds"
 uppercase = true
 
@@ -727,7 +759,7 @@ size_flags_vertical = 3
 [node name="Title" type="Label" parent="UI/WorldSharing/TopContainer2/Search/Search/SearchResults"]
 margin_right = 594.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Search"
 uppercase = true
 
@@ -742,7 +774,7 @@ margin_top = 49.0
 margin_right = 594.0
 margin_bottom = 99.0
 rect_min_size = Vector2( 0, 50 )
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "World"
 
 [node name="Content" type="Control" parent="UI/WorldSharing/TopContainer2/Search/Search/SearchResults"]
@@ -778,7 +810,7 @@ size_flags_vertical = 3
 [node name="Title" type="Label" parent="UI/WorldSharing/TopContainer2/Search/Search/WorldInfo"]
 margin_right = 594.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "World Info"
 uppercase = true
 
@@ -801,7 +833,7 @@ margin_right = 594.0
 margin_bottom = 521.0
 rect_min_size = Vector2( 0, 100 )
 focus_mode = 2
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Builder: epic
 Blocks: 99999"
 selection_enabled = true
@@ -835,7 +867,7 @@ margin_bottom = -10.0
 [node name="FeaturedWorlds" type="Label" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
 margin_right = 596.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Share Worlds"
 uppercase = true
 
@@ -852,7 +884,7 @@ margin_bottom = 521.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 selection_enabled = true
 
 [node name="HSeparator2" type="HSeparator" parent="UI/WorldSharing/TopContainer2/Share/VBoxContainer"]
@@ -865,7 +897,7 @@ rect_min_size = Vector2( 0, 10 )
 margin_top = 539.0
 margin_right = 596.0
 margin_bottom = 570.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Info"
 uppercase = true
 
@@ -882,7 +914,7 @@ margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "World 3 : 500 blocks : avg rating 5/10 : 2 points : User 777master
 
 Lost City : 10900 blocks : avg rating 8/10 : 8 points : User builder88"
@@ -924,7 +956,7 @@ margin_bottom = -10.0
 [node name="Title" type="Label" parent="UI/Credits/TopContainer3/Credits/Content"]
 margin_right = 926.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Credits"
 uppercase = true
 
@@ -941,7 +973,7 @@ margin_bottom = 1040.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Production and Programming
     Joseph Iuzzolino
     Ari Ronen
@@ -986,7 +1018,7 @@ margin_bottom = -10.0
 [node name="Title" type="Label" parent="UI/Credits/TopContainer3/Info/Content"]
 margin_right = 926.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Info"
 uppercase = true
 
@@ -1003,34 +1035,34 @@ margin_bottom = 1040.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Fetching data..."
 selection_enabled = true
 
-[node name="AccountPage" type="MarginContainer" parent="UI"]
+[node name="Account" type="MarginContainer" parent="UI"]
 editor/display_folded = true
 anchor_bottom = 1.0
 margin_left = -1920.0
 margin_right = -20.0
 
-[node name="TopContainer2" type="HBoxContainer" parent="UI/AccountPage"]
+[node name="TopContainer2" type="HBoxContainer" parent="UI/Account"]
 margin_right = 1900.0
 margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AccountInfo" type="Control" parent="UI/AccountPage/TopContainer2"]
+[node name="AccountInfo" type="Control" parent="UI/Account/TopContainer2"]
 margin_right = 936.0
 margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Background" type="ColorRect" parent="UI/AccountPage/TopContainer2/AccountInfo"]
+[node name="Background" type="ColorRect" parent="UI/Account/TopContainer2/AccountInfo"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/AccountPage/TopContainer2/AccountInfo"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Account/TopContainer2/AccountInfo"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
@@ -1038,55 +1070,55 @@ margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
 
-[node name="AccountInfo" type="Label" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
+[node name="AccountInfo" type="Label" parent="UI/Account/TopContainer2/AccountInfo/VBoxContainer"]
 margin_right = 916.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Account Info"
 uppercase = true
 
-[node name="HSeparator2" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="UI/Account/TopContainer2/AccountInfo/VBoxContainer"]
 margin_top = 35.0
 margin_right = 916.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="RichTextLabel" type="RichTextLabel" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/Account/TopContainer2/AccountInfo/VBoxContainer"]
 margin_top = 49.0
 margin_right = 916.0
 margin_bottom = 1046.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Username: JosephTheEngineer"
 selection_enabled = true
 
-[node name="HSeparator4" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountInfo/VBoxContainer"]
+[node name="HSeparator4" type="HSeparator" parent="UI/Account/TopContainer2/AccountInfo/VBoxContainer"]
 margin_top = 1050.0
 margin_right = 916.0
 margin_bottom = 1060.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="VSeparator" type="VSeparator" parent="UI/AccountPage/TopContainer2"]
+[node name="VSeparator" type="VSeparator" parent="UI/Account/TopContainer2"]
 margin_left = 940.0
 margin_right = 960.0
 margin_bottom = 1080.0
 rect_min_size = Vector2( 20, 0 )
 
-[node name="AccountSettings" type="Control" parent="UI/AccountPage/TopContainer2"]
+[node name="AccountSettings" type="Control" parent="UI/Account/TopContainer2"]
 margin_left = 964.0
 margin_right = 1900.0
 margin_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Background" type="ColorRect" parent="UI/AccountPage/TopContainer2/AccountSettings"]
+[node name="Background" type="ColorRect" parent="UI/Account/TopContainer2/AccountSettings"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.0588235, 0.0666667, 0.0627451, 1 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/AccountPage/TopContainer2/AccountSettings"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Account/TopContainer2/AccountSettings"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
@@ -1094,27 +1126,27 @@ margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
 
-[node name="AccountSettings" type="Label" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
+[node name="AccountSettings" type="Label" parent="UI/Account/TopContainer2/AccountSettings/VBoxContainer"]
 margin_right = 916.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Account Settings"
 uppercase = true
 
-[node name="HSeparator2" type="HSeparator" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="UI/Account/TopContainer2/AccountSettings/VBoxContainer"]
 margin_top = 35.0
 margin_right = 916.0
 margin_bottom = 45.0
 rect_min_size = Vector2( 0, 10 )
 
-[node name="RichTextLabel" type="RichTextLabel" parent="UI/AccountPage/TopContainer2/AccountSettings/VBoxContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/Account/TopContainer2/AccountSettings/VBoxContainer"]
 margin_top = 49.0
 margin_right = 916.0
 margin_bottom = 1060.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Show name: true"
 selection_enabled = true
 
@@ -1157,7 +1189,7 @@ margin_bottom = -10.0
 [node name="Options" type="Label" parent="UI/Options/TopContainer3/Options/VBoxContainer"]
 margin_right = 1860.0
 margin_bottom = 31.0
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "Options"
 uppercase = true
 
@@ -1174,7 +1206,7 @@ margin_bottom = 1006.0
 focus_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_fonts/normal_font = ExtResource( 4 )
+custom_fonts/normal_font = ExtResource( 3 )
 text = "Music: true
 Sound Effects: true
 Health: true
@@ -1196,7 +1228,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -100.0
 margin_top = -100.0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "Back"
 
 [node name="LoadingContainer" type="VBoxContainer" parent="UI"]
@@ -1205,63 +1237,58 @@ visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="HSeparator" type="HSeparator" parent="UI/LoadingContainer"]
+[node name="SpacerTop" type="HSeparator" parent="UI/LoadingContainer"]
 margin_right = 1920.0
 margin_bottom = 436.0
 size_flags_vertical = 3
 
-[node name="Container" type="Container" parent="UI/LoadingContainer"]
-margin_top = 440.0
+[node name="Content" type="Control" parent="UI/LoadingContainer"]
+margin_top = 442.0
 margin_right = 1920.0
-margin_bottom = 640.0
+margin_bottom = 642.0
 rect_min_size = Vector2( 0, 200 )
 
-[node name="Background" type="ColorRect" parent="UI/LoadingContainer/Container"]
+[node name="Background" type="ColorRect" parent="UI/LoadingContainer/Content"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = 4.0
+margin_bottom = 4.0
 color = Color( 0, 0, 0, 0.911608 )
 
-[node name="CenterContainer" type="CenterContainer" parent="UI/LoadingContainer/Container"]
+[node name="CenterContainer" type="CenterContainer" parent="UI/LoadingContainer/Content"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/LoadingContainer/Container/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/LoadingContainer/Content/CenterContainer"]
 margin_left = 710.0
-margin_top = 48.0
+margin_top = 45.0
 margin_right = 1210.0
-margin_bottom = 152.0
+margin_bottom = 155.0
 
-[node name="Label" type="Label" parent="UI/LoadingContainer/Container/CenterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="UI/LoadingContainer/Content/CenterContainer/VBoxContainer"]
 margin_right = 500.0
-margin_bottom = 83.0
+margin_bottom = 72.0
 rect_min_size = Vector2( 500, 50 )
 custom_fonts/font = SubResource( 2 )
 text = "Loading"
 align = 1
 clip_text = true
 
-[node name="Label2" type="Label" parent="UI/LoadingContainer/Container/CenterContainer/VBoxContainer"]
-margin_top = 87.0
+[node name="Label2" type="Label" parent="UI/LoadingContainer/Content/CenterContainer/VBoxContainer"]
+margin_top = 76.0
 margin_right = 500.0
-margin_bottom = 137.0
+margin_bottom = 126.0
 rect_min_size = Vector2( 0, 50 )
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = ExtResource( 3 )
 text = "Setting up world..."
 align = 1
 valign = 1
 
-[node name="HSeparator2" type="HSeparator" parent="UI/LoadingContainer"]
+[node name="SpacerBottom" type="HSeparator" parent="UI/LoadingContainer"]
 margin_top = 644.0
 margin_right = 1920.0
 margin_bottom = 1080.0
 size_flags_vertical = 3
-
-[node name="SwipeDetector" type="Node" parent="."]
-script = ExtResource( 7 )
-
-[node name="Timer" type="Timer" parent="SwipeDetector"]
-wait_time = 0.15
-one_shot = true
 
 [node name="TitleScreen" type="Control" parent="."]
 editor/display_folded = true
@@ -1294,7 +1321,7 @@ margin_bottom = 297.0
 focus_mode = 2
 mouse_filter = 0
 size_flags_vertical = 1
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 2 )
 text = "TAP THE SCREEN TO START"
 align = 1
 
@@ -1307,6 +1334,7 @@ margin_bottom = 310.0
 color = Color( 0, 0, 0, 0.169583 )
 
 [node name="JosephTheEngineer" type="VBoxContainer" parent="TitleScreen"]
+editor/display_folded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -1343,7 +1371,7 @@ margin_right = 404.0
 margin_bottom = 48.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 3 )
 text = "JosephTheEngineer"
 
 [node name="Label2" type="Label" parent="TitleScreen/JosephTheEngineer/CenterContainer"]
@@ -1352,7 +1380,7 @@ margin_left = 778.0
 margin_top = 20.0
 margin_right = 1142.0
 margin_bottom = 49.0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 3 )
 text = "josephtheengineer.ddns.net"
 align = 1
 valign = 1
@@ -1371,11 +1399,14 @@ margin_top = -143.0
 color = Color( 0, 0, 0, 0 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TitleScreen"]
-anims/TitleScreen = SubResource( 5 )
-anims/TitleScreenFlashingText = SubResource( 6 )
+anims/TitleScreen = SubResource( 4 )
+anims/TitleScreenFlashingText = SubResource( 5 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Loading = SubResource( 7 )
+anims/Loading = SubResource( 6 )
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource( 10 )
 
 [connection signal="button_down" from="UI/BackgroundButton" to="." method="_on_BackgroundButton_button_down"]
 [connection signal="button_up" from="UI/BackgroundButton" to="." method="_on_BackgroundButton_button_up"]
@@ -1383,9 +1414,8 @@ anims/Loading = SubResource( 7 )
 [connection signal="pressed" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column1/JoinServerButton" to="." method="_on_JoinServerButton_pressed"]
 [connection signal="pressed" from="UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column2/CreateServerButton" to="." method="_on_CreateServerButton_pressed"]
 [connection signal="pressed" from="UI/Home/VBoxContainer/BottomContainer/OptionsButton" to="." method="_on_OptionsButton_pressed"]
+[connection signal="pressed" from="UI/Home/VBoxContainer/BottomContainer/VBoxContainer/Button" to="." method="_skip_song"]
 [connection signal="focus_entered" from="UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Input" to="." method="_on_search_focus_entered"]
 [connection signal="focus_exited" from="UI/WorldSharing/TopContainer2/Search/Search/SearchResults/Input" to="." method="_on_search_focus_exited"]
 [connection signal="pressed" from="UI/Options/TopContainer3/Options/OptionsBackButton" to="." method="_on_OptionsBackButton_pressed"]
-[connection signal="swiped" from="SwipeDetector" to="." method="_on_SwipeDetector_swiped"]
-[connection signal="timeout" from="SwipeDetector/Timer" to="." method="_on_Timer_timeout"]
 [connection signal="animation_finished" from="TitleScreen/AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

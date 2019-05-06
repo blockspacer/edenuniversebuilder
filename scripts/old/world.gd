@@ -61,8 +61,29 @@ var player_info = {}
 # Info we send to other players
 var my_info = { name = "Ari", color = Color8(255, 0, 255) }
 
+var eden2_block_data = []
+
+#func generate_eden2_block_data():
+	# tex order = right, front, back, left, top, bottom
+#	var block = Dictionary()
+#	block["id"] = 1
+#	block["name"] = "bedrock"
+#	block["texture"] = single_sided_block("bedrock")
+
+func single_sided_block(data): ################################################
+	var arr = Array()
+	for i in range(6):
+		arr.append(data)
+	return arr
 
 
+func two_sided_block(side_tex, top_bot_tex): ##################################
+	var arr = Array()
+	for i in range(4):
+		arr.append(side_tex)
+	for i in range(2):
+		arr.append(top_bot_tex)
+	return arr
 
 ################################### signals ###################################
 
@@ -104,8 +125,9 @@ func _ready(): #################################################################
 		#get_node("/root/Main Menu/World/HUD").free()
 		Hud = get_node("/root/Main Menu")
 		World = get_node("/root/Main Menu/World")
+		create_chunk(Vector3(0, 0, 0))
 	
-	create_world(2, 1)
+	#create_world(2, 1)
 	
 	# Networking
 	get_tree().connect("network_peer_connected", self, "_player_connected")
@@ -138,12 +160,13 @@ func _process(delta): #########################################################
 		if player_chunk != temp_player_chunk:
 			print(player_chunk)
 			temp_player_chunk = player_chunk
-	
+		
 		#if !(chunk_index.has(get_chunk(Player.translation))):
 		#create_surrounding_chunks(get_chunk(Player.translation))
 		create_surrounding_chunks(get_chunk(Player.translation))
 	else:
-		create_surrounding_chunks(get_chunk(Vector3(0, 0, 0)))
+		pass
+		#create_surrounding_chunks(get_chunk(Vector3(0, 0, 0)))
 
 
 func _player_connected(id): ###################################################
@@ -243,12 +266,21 @@ func get_chunk(location): #####################################################
 
 
 func create_surrounding_chunks(center_chunk): #################################
+	var created_chunks = []
 	for x in range(3):
 		for y in range(3):
 			for z in range(3):
 				if !(chunk_index.has(Vector3(x + center_chunk.x - 1, y + center_chunk.y - 1, z + center_chunk.z - 1))):
 					#print("Creating chunk... ")
 					create_chunk(Vector3(x + center_chunk.x - 1, y + center_chunk.y - 1, z + center_chunk.z - 1))
+				created_chunks.append(Vector3(x + center_chunk.x - 1, y + center_chunk.y - 1, z + center_chunk.z - 1))
+	
+	for chunk in chunk_index:
+		if created_chunks.has(chunk) == false and map_seed != -1:
+			var node = get_node("/root/World/" + str(chunk.x) + ", " + str(chunk.y) + ", " + str(chunk.z))
+			if node != null:
+				node.queue_free()
+				chunk_index.erase(chunk)
 
 
 

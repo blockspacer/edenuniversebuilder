@@ -48,34 +48,35 @@ func _process(delta):
 
 
 func _input(event):
-	if event.type == InputEvent.MOUSE_BUTTON:
-		if event.pressed and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
-			if capture_mouse:
+	pass
+	#if event.type == InputEvent.MOUSE_BUTTON:
+		#if event.pressed and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
+			#if capture_mouse:
 				# Capture the mouse
-				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+				#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-	elif event.type == InputEvent.MOUSE_MOTION:
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED || not capture_mouse:
+	#elif event.type == InputEvent.MOUSE_MOTION:
+		#if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED || not capture_mouse:
 			# Get mouse delta
-			var motion = event.relative_pos
+			#var motion = event.relative_pos
 			
 			# Add to rotations
-			_yaw -= motion.x * sensitivity
-			_pitch += motion.y * sensitivity
+			#_yaw -= motion.x * sensitivity
+			#_pitch += motion.y * sensitivity
 			
 			# Clamp pitch
-			var e = 0.001
-			if _pitch > max_angle-e:
-				_pitch = max_angle-e
-			elif _pitch < min_angle+e:
-				_pitch = min_angle+e
+			#var e = 0.001
+			#if _pitch > max_angle-e:
+			#	_pitch = max_angle-e
+			#elif _pitch < min_angle+e:
+			#	_pitch = min_angle+e
 			
 			# Apply rotations
-			set_rotation(Vector3(0, deg2rad(_yaw), 0))
-			rotate_x(deg2rad(_pitch))
+			#set_rotation(Vector3(0, deg2rad(_yaw), 0))
+			#rotate_x(deg2rad(_pitch))
 	
-	elif event.type == InputEvent.KEY:
-		if event.pressed and event.scancode == KEY_ESCAPE:
+	#elif event.type == InputEvent.KEY:
+		#if event.pressed and event.scancode == KEY_ESCAPE:
 			# Get the mouse back
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			#Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 

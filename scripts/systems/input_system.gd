@@ -1,4 +1,23 @@
-extends KinematicBody
+# just routes input signals to other systems
+extends Node
+
+func _ready():
+	pass
+
+func _process(delta):
+	if Input.is_action_pressed("ui_cancel"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		get_tree().quit()
+	if Input.is_action_just_pressed("restart"):
+		get_tree().reload_current_scene()
+
+
+
+
+
+
+
+#extends KinematicBody
 
 ############################## public variables ###############################
 
@@ -44,7 +63,7 @@ var jump_height = 15
 
 ################################### signals ###################################
 
-func _ready(): ################################################################
+func ready(): ################################################################
 	Hud = World.Hud
 	World.total_players += 1
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -55,42 +74,21 @@ func _physics_process(delta): #################################################
 	if move_mode == "fly":
 		fly(delta)
 	else:
-		walk(delta)	
-	
-	if false:
-		var location = World.get_chunk(translation)
-		var block_location = get_looking_at(OS.get_window_size() / 2)
-		var normal = get_looking_at_normal(OS.get_window_size() / 2)
-		
-		#Hud.msg("Normal: " + str(normal), "Debug")
-		normal = Vector3(int(round(normal.x)), int(round(normal.y)), int(round(normal.z)))
-		block_location = block_location - normal
-		
-		if Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z))) != highlighted_block:
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-			Chunk.place_block(highlighted_block_id, highlighted_block)
-			highlighted_block = Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
-		
-		if World.chunk_index.has(location):
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-			#Hud.msg("Breaking block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
-			Chunk.place_block(0, Vector3(int(floor(block_location)), int(floor(block_location.y)), int(floor(block_location.z))))
-		else:
-			Hud.msg("Invalid chunk!", "Error")
+		walk(delta)
 
 
 func _input(event): ###########################################################
-	if event is InputEventMouseMotion:
-		if Hud.analog_is_pressed == false:
-			$Head.rotate_y(deg2rad(-event.relative.x * mouse_sensitivity))
+	#if event is InputEventMouseMotion:
+		#if Hud.analog_is_pressed == false:
+			#$Head.rotate_y(deg2rad(-event.relative.x * mouse_sensitivity))
 			
-			var change = -event.relative.y * mouse_sensitivity
-			if change + camera_angle < 90 and change + camera_angle > -90:
-				$Head/Camera.rotate_x(deg2rad(change))
-				camera_angle += change
+			#var change = -event.relative.y * mouse_sensitivity
+			#if change + camera_angle < 90 and change + camera_angle > -90:
+				#$Head/Camera.rotate_x(deg2rad(change))
+				#camera_angle += change
 	
-	if event.is_action_pressed("detach"):
-		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+	#if event.is_action_pressed("detach"):
+		#Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	
 	if event.is_action_pressed("fly"):
 		if move_mode == "walk":
@@ -160,8 +158,17 @@ func action(position): ########################################################
 			block_location += Vector3(0, 1, 0)
 		
 		if World.chunk_index.has(location):
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(0) + ", " + str(location.z))
 			Hud.msg("Breaking block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
+			
+			var music_player = AudioStreamPlayer3D.new()
+			var audio = load("res://sounds/game/block_break_generic_1_v2.ogg")
+			audio.loop = false
+			music_player.stream = audio
+			music_player.connect("finished", self, "_stop_player", [music_player])
+			add_child(music_player)
+			music_player.play()
+			
 			Chunk.break_block(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
 			Chunk.compile()
 		else:
@@ -184,14 +191,28 @@ func action(position): ########################################################
 			block_location += Vector3(0, 1, 0)
 		
 		if World.chunk_index.has(location):
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
+			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(0) + ", " + str(location.z))
 			Hud.msg("Placing block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
+			
+			var music_player = AudioStreamPlayer3D.new()
+			var audio = load("res://sounds/game/block_build_generic_1.ogg")
+			audio.loop = false
+			music_player.stream = audio
+			music_player.connect("finished", self, "_stop_player", [music_player])
+			add_child(music_player)
+			music_player.play()
+			
 			Chunk.place_block(6, Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
 			Chunk.compile()
 		else:
 			Hud.msg("Invalid chunk!", "Error")
 	elif action_mode == "paint":
 		pass
+
+
+func _stop_player(player):
+	player.stop()
+	player.queue_free()
 
 
 func get_orientation(): #######################################################
@@ -220,7 +241,7 @@ func get_looking_at_normal(position): #########################################
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
 	var camera = $Head/Camera
-	var space_state = get_world().direct_space_state
+	var space_state# = get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
 	
@@ -238,7 +259,7 @@ func get_looking_at(position): ################################################
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
 	var camera = $Head/Camera
-	var space_state = get_world().direct_space_state
+	var space_state# = get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
 	
@@ -254,21 +275,21 @@ func walk(delta): #############################################################
 	# reset the direction of the player
 	direction = Vector3()
 	
-	if Hud.analog_is_pressed:
+	#if Hud.analog_is_pressed:
 		# Half the speed
-		direction += Vector3(move_direction.x / 2, 0,  move_direction.y / 2)
-	else:
+		#direction += Vector3(move_direction.x / 2, 0,  move_direction.y / 2)
+	#else:
 		# get the rotation of the camera
-		var aim = $Head/Camera.get_global_transform().basis
-		if Input.is_action_pressed("move_forward") or World.player_move_forward:
-			direction -= aim.z
-		if Input.is_action_pressed("move_backward"):
-			direction += aim.z
+		#var aim = $Head/Camera.get_global_transform().basis
+		#if Input.is_action_pressed("move_forward") or World.player_move_forward:
+		#	direction -= aim.z
+	#	if Input.is_action_pressed("move_backward"):
+			#direction += aim.z
 			
-		if Input.is_action_pressed("move_left"):
-			direction -= aim.x
-		if Input.is_action_pressed("move_right"):
-			direction += aim.x
+		#if Input.is_action_pressed("move_left"):
+		#	direction -= aim.x
+		#if Input.is_action_pressed("move_right"):
+			#direction += aim.x
 	
 	direction = direction.normalized()
 	
@@ -299,7 +320,7 @@ func walk(delta): #############################################################
 	velocity.z = temp_velocity.z
 	
 	# move
-	velocity = move_and_slide(velocity, Vector3(0, 1, 0))
+	#velocity = move_and_slide(velocity, Vector3(0, 1, 0))
 	
 	if Input.is_action_just_pressed("jump"):
 		velocity.y = jump_height
@@ -330,7 +351,7 @@ func fly(delta): ##############################################################
 	velocity = velocity.linear_interpolate(target, FLY_ACCEL * delta)
 	
 	# move
-	move_and_slide(velocity)
+	#move_and_slide(velocity)
 
 
 

@@ -56,12 +56,13 @@ func init_world(): ############################################################
 	
 	Hud.msg("Geting world metadata...", "Info")
 	
-	if map_file.open_compressed(World.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
+	if map_file.open(World.map_path, File.READ) != 0:
 		Hud.msg("Error opening file", "Error")
-		Hud.msg("File length was " + str(map_file.get_len()), "Debug")
-		Hud.msg("File path was " + map_file.get_path(), "Debug")
+	Hud.msg("File length is " + str(map_file.get_len()), "Debug")
+	Hud.msg("File path was " + map_file.get_path(), "Debug")
 	
 	var compressed = map_file.get_buffer(map_file.get_len())
+	var uncompressed = compressed.decompress(compressed.size()*10, File.COMPRESSION_GZIP)
 	
 	return get_metadata()
 
@@ -78,6 +79,8 @@ func get_metadata(): ##########################################################
 		Hud.msg("Error opening file", "Error")
 		Hud.msg("File length was " + str(map_file.get_len()), "Debug")
 		Hud.msg("File path was " + map_file.get_path(), "Debug")
+	
+	var data = map_file.get_buffer(map_file.get_len())
 	
 	#while !file.eof_reached():
 		#Hud.msg("Loading map_data...", "Trace")

@@ -24,7 +24,6 @@ func _ready(): ################################################################
 	if chunk_location.y != 0:
 		return
 	Hud = World.Hud
-	Hud.msg("I'm here", "Debug")
 	
 	place_block(0, Vector3(0, 0, 0))
 	
@@ -36,7 +35,7 @@ func _ready(): ################################################################
 	generate_block_mesh(5, "leaves", single_sided_block("leaves_green"))
 	generate_block_mesh(6, "trunk", two_sided_block("tree_side", "tree_top"))
 	generate_block_mesh(7, "wood", single_sided_block("wood"))
-	generate_block_mesh(8, "grass", [ "grass_side", "grass_side", "grass_side", "grass_side", "grass_top", "dirt" ])
+	generate_block_mesh(8, "grass", [ "grass_top", "grass_side", "grass_side", "grass_side", "grass_top", "dirt" ])
 	generate_block_mesh(9, "tnt", two_sided_block("tnt_side", "tnt_top"))
 	generate_block_mesh(10, "rock", single_sided_block("dark_stone"))
 	
@@ -133,40 +132,33 @@ func _ready(): ################################################################
 	generate_block_mesh(78, "pW portal W", single_sided_block("bedrock"))
 	generate_block_mesh(79, "pT portal top", single_sided_block("bedrock"))
 	
-	# assign mesh library to the chunk
-	#cell_size = Vector3(1, 1, 1)
-	#cell_center_x = true
-	#cell_center_y = true
-	#cell_center_z = true
-	#mesh_library = blocks
 	
-	if World.map_seed == -1:
-		if chunk_location.y == 0:
-			generate_random_terrain()
+	var TerrainGenerator = load("res://scripts/terrain_generator.gd").new()
+	TerrainGenerator._ready()
+	
+	if World.map_seed == -1 and chunk_location == Vector3(0, 0, 0):
+		var chunk_data = TerrainGenerator.generate_random_terrain()
+		for position in chunk_data.keys():
+			place_block(chunk_data[position], position)
+		
+		compile()
+	elif World.map_seed == 0:
+		var chunk_data = TerrainGenerator.generate_flat_terrain()
+		for position in chunk_data.keys():
+			place_block(chunk_data[position], position)
+		
+		compile()
 	else:
-		load_terrain()
+		var chunk_data = TerrainGenerator.generate_natural_terrain()
+		for position in chunk_data.keys():
+			place_block(chunk_data[position], position)
+		
+		compile()
 
 
 
 
 ################################## functions ##################################
-
-func generate_flat_terrain(): #################################################
-	for x in range(16):
-		for y in range(16):
-			for z in range(16):
-				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
-				if y == 0 && x != 15 && z != 15:
-					place_block(2, Vector3(x, y, z))
-				elif y == 0:
-					place_block(4, Vector3(x, y, z))
-						#place_block(8, x, y, z)
-					#elif y > 10:
-						#place_block(3, x, y, z)
-					#else:
-						#place_block(x, y, z, 2)
-	#place_block(2, 0, 0, 0)
-	compile()
 
 
 func load_terrain(): ##########################################################
@@ -178,73 +170,31 @@ func load_terrain(): ##########################################################
 	var ChunkData = EdenWorldDecoder.get_chunk_data(Vector2(chunk_location.x, chunk_location.z))
 	World.loaded = true
 	if typeof(ChunkData) == TYPE_BOOL:
-		generate_flat_terrain()
+		var TerrainGenerator = load("res://scripts/terrain_generator.gd").new()
+		TerrainGenerator._ready()
+		var chunk_data = TerrainGenerator.generate_flat_terrain()
+		for position in chunk_data.keys():
+			place_block(chunk_data[position], position)
+		
+		compile()
 		return false
 	
 	Hud.msg("Creating the chunk mesh... ", "Debug")
 	#CreateChunk(ChunkMetadata[i].Address, x, y, z)
-	
-	#Hud.msg("Registering blocks... ", "Debug")
-	#for Blocks in range(ChunkData.size()):
-		#Indexer.RegisterBlock(ChunkData[Blocks].Id, ChunkData[Blocks].Position.X, ChunkData[Blocks].Position.Y, ChunkData[Blocks].Position.Z, ChunkMetadata[i].Address, 0);
 	
 	# ==============================================================================
 	Hud.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug")
 	Hud.msg("Placing blocks... ", "Debug")
 	# Place all the blocks contained in the chunk data.
 	for Blocks in range(ChunkData.size()):
-		var x = ChunkData[Blocks].position.x
-		var y = ChunkData[Blocks].position.y
-		var z = ChunkData[Blocks].position.z
+		var position = ChunkData[Blocks].position
 		var id = ChunkData[Blocks].id
 		
-		if x < 4:
-			place_block(id, Vector3(x, z, y))
-		
-		#Logger.Log("Checking block...", "Debug");
-		#Logger.LogFloat("X: ", X, "", "Debug");
-		#Logger.LogFloat("Y: ", Y, "", "Debug");
-		#Logger.LogFloat("Z: ", Z, "", "Debug");
-		
-		#if !(Indexer.CheckBlock(X, Y+100, Z) && Indexer.CheckBlock(X, Y-100, Z) && Indexer.CheckBlock(X+100,Y, Z) && Indexer.CheckBlock(X-100, Y, Z) && Indexer.CheckBlock(X, Y, Z+100) && Indexer.CheckBlock(X, Y, Z-100)):
-			# Logger.LogInt("Placing block ", ChunkData[Blocks].Id, "...", "Debug");
-			#CreateBlock(ChunkData[Blocks].Id, ChunkMetadata[i].Address, X, Y, Z);
-			#LoadedBlocks++;
-	# ==============================================================================
+		if position.x < 4:
+			place_block(id, position)
 	compile()
 	#Status+=1
 	#LoadedChunks+=1
-
-
-func generate_random_terrain(): ###############################################
-	for x in range(16):
-		for y in range(16):
-			for z in range(16):
-				randomize()
-				if floor(rand_range(0, 3)) == 1:
-					place_block(floor(rand_range(1, 80)), Vector3(x, y, z))
-				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
-				#if x == 0 and y == 0 and z == 0:
-					#if y >= 15:
-						#place_block(x, y, z, 8)
-					#elif y > 10:
-						#place_block(x, y, z, 3)
-					#else:
-						#place_block(x, y, z, 2)
-
-
-func generate_matrix_terrain(): ###############################################
-	for x in range(16):
-		for y in range(16):
-			for z in range(16):
-				#if x == 15 or x == 0 or z == 15 or z == 0 or y == 15:
-				if x == 0 and y == 0 and z == 0:
-					if y >= 15:
-						place_block(8, Vector3(x, y, z))
-					elif y > 10:
-						place_block(3, Vector3(x, y, z))
-					else:
-						place_block(2, Vector3(x, y, z))
 
 
 func generate_block_mesh(id, block_name, textures): ###########################
@@ -280,24 +230,20 @@ func break_block(location): ####################################################
 func place_block(id, location): ################################################
 	#Hud.msg("Chunk translation: " + str(translation), "Debug")
 	#Hud.msg("Placing block from chunk location " + str(location - translation), "Info")
-	block_data[location - translation] = id
+	if id != 0:
+		block_data[location - translation] = id
 	
 	#set_surface_material(0, "texture")
 
 func compile():
 	Hud.msg("Compiling chunk...", "Info")
-	var st = SurfaceTool.new()
+	mesh = null
+	mesh_data = Array()
 	
 	#mat.albedo_color = Color(1, 0, 0, 1)
-	var mat = SpatialMaterial.new()
-	var tex = load("res://sprite_sheet.png")
-	mat.albedo_texture = tex
-	
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	st.set_material(mat)
 	
 	for position in block_data.keys():
-		if can_be_seen(position):
+		if can_be_seen(position).size() != 6:
 			create_cube(position, block_data[position])
 			blocks_loaded += 1
 	
@@ -311,21 +257,15 @@ func compile():
 	var collision_shape = get_node("StaticBody/CollisionShape")
 	collision_shape.shape = shape
 
+const surrounding_blocks = [ Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0), Vector3(-1, 0, 0) ]
 
 func can_be_seen(position):
-	var surrounding_blocks = [ Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0), Vector3(-1, 0, 0) ]
-	var num_surrounding_blocks = 0
+	var num_surrounding_blocks = [ ]
 	
 	for surrounding_position in surrounding_blocks:
 		if block_data.has(position + surrounding_position):
-			num_surrounding_blocks += 1
-	Hud.msg("what?", "Debug")
-	if num_surrounding_blocks == surrounding_blocks.size():
-		Hud.msg("found", "Debug")
-		return true
-	else:
-		Hud.msg("false", "Debug")
-		return true
+			num_surrounding_blocks.append(surrounding_position)
+	return num_surrounding_blocks
 
 
 func create_cube(position, id):
@@ -333,17 +273,27 @@ func create_cube(position, id):
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_material(block_materials[id])
 	
-	create_horizontal_plane(st, position + Vector3(0, -1, 0), "down")
+	var sides_not_to_render = can_be_seen(position)
 	
-	create_horizontal_plane(st, position + Vector3(0, 0, 0), "up")
+	if !sides_not_to_render.has(Vector3(0, -1, 0)):
+		create_horizontal_plane(st, position + Vector3(0, -1, 0), "down")
 	
-	create_vertical_plane(st, position + Vector3(0, 0, 1), "west")
+	if !sides_not_to_render.has(Vector3(0, 1, 0)): 
+		create_horizontal_plane(st, position + Vector3(0, 0, 0), "up")
 	
-	create_vertical_plane(st, position + Vector3(0, 0, 0), "east")
 	
-	create_vertical_plane(st, position + Vector3(0, 0, 0), "north")
 	
-	create_vertical_plane(st, position + Vector3(1, 0, 0), "south")
+	if !sides_not_to_render.has(Vector3(0, 0, 1)):
+		create_vertical_plane(st, position + Vector3(0, 0, 1), "west")
+	
+	if !sides_not_to_render.has(Vector3(0, 0, -1)):
+		create_vertical_plane(st, position + Vector3(0, 0, 0), "east")
+	
+	if !sides_not_to_render.has(Vector3(-1, 0, 0)):
+		create_vertical_plane(st, position + Vector3(0, 0, 0), "north")
+	
+	if !sides_not_to_render.has(Vector3(1, 0, 0)):
+		create_vertical_plane(st, position + Vector3(1, 0, 0), "south")
 	
 	mesh = st.commit(mesh)
 

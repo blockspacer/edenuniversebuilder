@@ -1,4 +1,4 @@
-extends Spatial
+extends Node
 
 #################################### nodes ####################################
 
@@ -52,6 +52,13 @@ var last_downloaded_bytes
 var search_client
 var past_frames = 0
 
+var downloading_direct_city = false
+var direct_city_downloader
+
+var music_player = AudioStreamPlayer3D.new()
+var playlist_progress = 0
+var playlist = "Eden"
+
 var map_seed = 0
 var map_path = "res://worlds/direct_city.eden2"
 var map_name = "direct_city.eden2"
@@ -59,33 +66,55 @@ var map_name = "direct_city.eden2"
 const EDEN2_SEARCH = "http://app.edengame.net/list2.php?search="
 const EDEN2_DOWNLOAD = "http://files.edengame.net/"
 
+const TITLE_SCREEN = 0
+const HOME = 1
+const LEADERBOARD = 2
+const WORLD_SHARING = 3
+const CREDITS = 4
+const ACCOUNT = 5
+const PAUSE = 10
+const BUILD = 11
+const PAINT = 12
+const CHAT = 13
+const NAVBAR = 14
+const TOOLBOX = 15
 
+var current_interface = [ TITLE_SCREEN ]
 
+func change_interface(interfaces):
+	for interface in interfaces:
+		pass
+		#load_scene interface/main_menui
 
-################################### signals ###################################
-
-func _ready(): ################################################################
-	var music_player = AudioStreamPlayer3D.new()
-	music_player.stream = load("res://sounds/music/Eden0.wav")
-	add_child(music_player)
-	music_player.play()
+func process_interface(): ################################################################
 	
 	
-	TitleScreenPlayer.play("TitleScreen")
+	
+	
+	
+	if get_node("/root/MainMenu/TitleScreen").visible == false:
+		get_node("/root/MainMenu/TitleScreen").visible = true
+		get_node("/root/MainMenu/UI").visible = false
+	
+	music_player.translation = Vector3(8, 8, 0)
+	_music_player_finished()
+	
+	
+	#TitleScreenPlayer.play("TitleScreen")
 	
 	# get current scene for the scene loader
 	var root = get_tree().get_root()
 	current_scene = root.get_child(root.get_child_count() -1)
 	
 	# initialize the background scene
-	World = world_template.instance()
-	World.map_seed = -1
-	add_child(World)
-	draw_dots()
+	#World = world_template.instance()
+	#World.map_seed = -1
+	#add_child(World)
+	#draw_dots()
 	msg("Starting logs...", "Info")
 	
 	# fetch data from the website for the main menu
-	fetch_data()
+	#fetch_data()
 	
 	var world_data = Dictionary()
 	world_data[1] = "New World"
@@ -97,7 +126,7 @@ func _ready(): ################################################################
 
 
 func _process(delta): #########################################################
-	update_positions()
+	#update_positions()
 	if Input.is_action_just_pressed("action"):
 		background_pressed = true
 	if Input.is_action_just_released("action"):
@@ -105,21 +134,25 @@ func _process(delta): #########################################################
 		if ui_just_moved:
 			ui_snaped = false
 	
+	
+	if downloading_direct_city and OS.get_unix_time() - downloading_wait > 5:
+		msg("KB downloaded: " + str(direct_city_downloader.get_downloaded_bytes() * 0.001), "Info")
+		downloading_wait = OS.get_unix_time()
+	
 	if ui_snaped == false:
 		var closest_position = Vector2(0, 0)
 		for position in positions.values():
 			if abs(position.x - get_node("UI").rect_position.x) <= abs(closest_position.x - get_node("UI").rect_position.x):
 				if abs(position.y - get_node("UI").rect_position.y) <= abs(closest_position.y - get_node("UI").rect_position.y):
 					closest_position = position
-		msg("Snap position is " + str(closest_position), "Debug")
 		snaped_position = closest_position
 		ui_snaped = true
 	
-	if get_node("UI").rect_position != snaped_position and ui_snaped and background_pressed == false:
-		distance_to_move.x = abs(get_node("UI").rect_position.x - snaped_position.x)
-		distance_to_move.y = abs(get_node("UI").rect_position.y - snaped_position.y)
+	#if get_node("UI").rect_position != snaped_position and ui_snaped and background_pressed == false:
+		#distance_to_move.x = abs(get_node("UI").rect_position.x - snaped_position.x)
+		#distance_to_move.y = abs(get_node("UI").rect_position.y - snaped_position.y)
 		#msg("Position is now " + str(get_node("UI").rect_position), "Debug")
-		distance_moved = Vector2(0, 0)
+		#distance_moved = Vector2(0, 0)
 	
 	if distance_moved < distance_to_move:
 		var distance_to_move_sub = Vector2(0, 0)
@@ -128,32 +161,35 @@ func _process(delta): #########################################################
 		if distance_to_move_sub < Vector2(1, 1):
 			distance_to_move_sub = Vector2(1, 1)
 		
+		#msg("Music player position is " + str(music_player.translation), "Debug")
+		
 		if get_node("UI").rect_position.x < snaped_position.x:
 			get_node("UI").rect_position.x += distance_to_move_sub.x
+			music_player.translation.x += distance_to_move_sub.x / 100
 			distance_moved.x += distance_to_move_sub.x
 		else:
 			get_node("UI").rect_position.x -= distance_to_move_sub.x
+			music_player.translation.x -= distance_to_move_sub.x / 100
 			distance_moved.x -= distance_to_move_sub.x
 		
 		if get_node("UI").rect_position.y < snaped_position.y:
 			get_node("UI").rect_position.y += distance_to_move_sub.y
+			music_player.translation.y += distance_to_move_sub.y / 100
 			distance_moved.y += distance_to_move_sub.y
 		else:
 			get_node("UI").rect_position.y -= distance_to_move_sub.y
+			music_player.translation.y -= distance_to_move_sub.y / 100
 			distance_moved.y -= distance_to_move_sub.y
 	
 	if downloading:
-		if OS.get_unix_time() - downloading_wait > 2:
+		if OS.get_unix_time() - downloading_wait > 5:
 			msg("KB downloaded: " + str(download_world_client.get_downloaded_bytes() * 0.001), "Info")
 			downloading_wait = OS.get_unix_time()
 			
 			if last_downloaded_bytes == download_world_client.get_downloaded_bytes() and last_downloaded_bytes != 0:
 				_on_world_download_completed(downloaded_world_path)
-		
-		if past_frames > 2000:
+			
 			last_downloaded_bytes = download_world_client.get_downloaded_bytes()
-	
-	past_frames += 1
 	
 	if process:
 		if loader == null:
@@ -189,11 +225,38 @@ func _process(delta): #########################################################
 			break
 
 
+func _music_player_finished():
+	if playlist == "Eden":
+		if playlist_progress > 7:
+			playlist_progress = 0
+		
+		var audio = load("res://sounds/music/eden" + str(playlist_progress) + ".ogg")
+		audio.loop = false
+		music_player.stream = audio
+		
+		#if playlist_progress != 7:
+#			get_node("UI/Home/VBoxContainer/BottomContainer/VBoxContainer/Button/Song").text = "Eden " + str(playlist_progress) + " by Adam Gubman"
+		#else:
+				#get_node("UI/Home/VBoxContainer/BottomContainer/VBoxContainer/Button/Song").text = "Eden " + str(playlist_progress) + " by Vodlos"
+		
+	elif playlist == "Engineer":
+		pass
+	
+	add_child(music_player)
+	music_player.play()
+	playlist_progress += 1
+
+
+func _skip_song():
+	_music_player_finished()
+
+
 func _on_AnimationPlayer_animation_finished(anim_name): #######################
-	if anim_name == "TitleScreen":
-		get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
-	if anim_name == "TitleScreenFlashingText":
-		get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
+	pass
+	#if anim_name == "TitleScreen":
+		#get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
+	#if anim_name == "TitleScreenFlashingText":
+		#get_node("TitleScreen/AnimationPlayer").play("TitleScreenFlashingText")
 
 
 func _on_CreateServerButton_pressed(): ########################################
@@ -201,8 +264,9 @@ func _on_CreateServerButton_pressed(): ########################################
 
 
 func _on_JoinServerButton_pressed(): ##########################################
-	var address = get_node("UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column1/Input").text
-	World.join_server("player", address)
+	pass
+	#var address = get_node("UI/Home/VBoxContainer/TopContainer/Chat/VBoxContainer/Row1/Column1/Input").text
+	#World.join_server("player", address)
 
 
 func _on_SendButton_pressed(): ################################################
@@ -229,19 +293,44 @@ func _on_OptionsBackButton_pressed(): #########################################
 
 func _input(event): ###########################################################
 	if event is InputEventScreenDrag:
-		get_node("UI").rect_position += event.relative
+		#get_node("UI").rect_position += event.relative
+		music_player.translation += Vector3(event.relative.x, event.relative.y, 0) / 100
+		ui_just_moved = true
 	if event is InputEventMouseMotion:
 		if background_pressed:
-			get_node("UI").rect_position += event.relative
+			#get_node("UI").rect_position += event.relative
+			music_player.translation += Vector3(event.relative.x, event.relative.y, 0) / 100
 			ui_just_moved = true
 	if event is InputEventScreenTouch:
 		if get_node("TitleScreen").visible:
+			
+			var music_player = AudioStreamPlayer3D.new()
+			var audio = load("res://sounds/engineer/271945__rodincoil__stingers-001.ogg")
+			audio.loop = false
+			music_player.stream = audio
+			music_player.unit_db = 1
+			music_player.connect("finished", self, "_stop_player", [music_player])
+			add_child(music_player)
+			music_player.play()
+			
 			get_node("TitleScreen").visible = false
 			get_node("UI").visible = true
+			
 	if event.is_action_pressed("action"):
-		if get_node("TitleScreen").visible:
-			get_node("TitleScreen").visible = false
-			get_node("UI").visible = true
+		pass
+		#if get_node("TitleScreen").visible:
+			
+			#var music_player = AudioStreamPlayer3D.new()
+			#var audio = load("res://sounds/engineer/271945__rodincoil__stingers-001.ogg")
+			#audio.loop = false
+			#music_player.stream = audio
+			#music_player.unit_db = 1
+			#music_player.connect("finished", self, "_stop_player", [music_player])
+			#add_child(music_player)
+			#music_player.play()
+			
+			#get_node("TitleScreen").visible = false
+			#get_node("UI").visible = true
 	if event.is_action_pressed("ui_accept"):
 		if search_is_focused:
 			msg("Searching eden2 world database...", "Info")
@@ -259,8 +348,13 @@ func _input(event): ###########################################################
 			search_client = http
 
 
+func _stop_player(player):
+	player.stop()
+	player.queue_free()
+
+
 func _on_fetch_data_request_completed(result, response_code, headers, body):
-	msg("Result: " + str(result), "Debug")
+	#msg("Result: " + str(result), "Debug")
 	var filename = fetch_data_request.get_download_file()
 	var file = File.new()
 	
@@ -327,7 +421,7 @@ func show_world_list(parent, world_data, is_downloaded):
 	for path in world_data.keys():
 		var content = HBoxContainer.new()
 		content.rect_min_size = Vector2(0, 125)
-		parent.add_child(content)
+		#parent.add_child(content)
 		
 		var button = TextureButton.new()
 		button.texture_normal = load("res://textures/tnt_side.png")
@@ -353,18 +447,48 @@ func show_world_list(parent, world_data, is_downloaded):
 		content.add_child(label)
 
 func world_button(world):
-	if world == null:
-		msg("Loading a new flat terrain world...", "Info")
-		map_path = ""
-		map_name = "New Flat Terrain World"
-		map_seed = 0
-		load_world()
+	if world == 1:
+		msg("Opening world creation menu...", "Info")
+		create_new_world()
+		#msg("Loading a new flat terrain world...", "Info")
+		#map_path = ""
+		#map_name = "New Flat Terrain World"
+		#map_seed = 0
+		#load_world()
+	elif world == 3:
+		if File.new().file_exists("user://worlds/direct_city.eden2") == false:
+			Directory.new().make_dir("user://worlds/")
+			
+			msg("Please wait, downloading Direct City...", "Info")
+			
+			var http = HTTPRequest.new()
+			http.set_download_file("user://worlds/direct_city.eden2")
+			http.connect("request_completed", self, "_on_direct_city_request_completed")
+			add_child(http)
+			msg("Connecting to http://josephtheengineer.ddns.net/eden/worlds/direct-city.eden2...", "Debug")
+			http.request("http://josephtheengineer.ddns.net/eden/worlds/direct-city.eden2", Array(), false)
+			downloading_direct_city = true
+			direct_city_downloader = http
+		else:
+			_on_direct_city_request_completed()
 	else:
 		msg("Loading a new natural terrain world...", "Info")
 		map_path = ""
 		map_name = "New Natural Terrain World"
 		map_seed = floor(rand_range(0, 9999999))
 		load_world()
+
+func _on_direct_city_request_completed():
+	downloading_direct_city = false
+	msg("Loading direct city...", "Info")
+	map_path = "user://worlds/direct_city.eden2"
+	map_name = "Direct City"
+	map_seed = 0
+	load_world()
+
+func create_new_world():
+	msg("World creation menu", "Debug")
+	add_child(load("res://scenes/new_world_panel.tscn").instance())
 
 func draw_dots(): #############################################################
 	for x in range(OS.get_window_size().x / 10):

@@ -14,7 +14,6 @@ var chat_items = Dictionary()
 
 func _ready(): ################################################################
 	load_debug_screen()
-	create_block_menu()
 
 
 func _process(delta): #########################################################
@@ -273,17 +272,6 @@ func load_debug_screen(): ####################################################
 		var map_seed = find_node("Seed")
 		map_seed.set_text("Seed: " + str(World.map_seed))
 
-func create_block_menu():
-	var parent = get_node("HorizontalMain/VerticalMain/VerticalCenterContent/BuildWindow/MarginContainer/GridContainer")
-	var block_data = Array()
-	for i in range(35):
-		var button = TextureButton.new()
-		button.texture_normal = load("res://textures/brick.png")
-		button.expand = true
-		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		button.rect_min_size = Vector2(100, 100)
-		parent.add_child(button)
-
 
 func fetch_client_version(): ##################################################
 	#var file = File.new()
@@ -293,6 +281,10 @@ func fetch_client_version(): ##################################################
 	#return file.get_as_text()
 	var World = get_node("/root/World")
 	return World.version
+
+
+func _block_button_pressed(button):
+	pass
 
 
 func show_msg(message, tag): ##################################################	
