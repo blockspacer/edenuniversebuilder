@@ -1,29 +1,29 @@
 [gd_scene load_steps=26 format=2]
 
-[ext_resource path="res://textures/ui/cusor.png" type="Texture" id=1]
+[ext_resource path="res://textures/ui/eden2/iphone/cusor.png" type="Texture" id=1]
 [ext_resource path="res://fonts/label-background.tres" type="StyleBox" id=2]
 [ext_resource path="res://fonts/body.tres" type="DynamicFont" id=3]
-[ext_resource path="res://textures/ui/ipad~save.png" type="Texture" id=4]
+[ext_resource path="res://textures/ui/eden2/ipad/windows/pause_window/ipad~save.png" type="Texture" id=4]
 [ext_resource path="res://fonts/header.tres" type="DynamicFont" id=5]
-[ext_resource path="res://textures/ui/ipad~home.png" type="Texture" id=6]
-[ext_resource path="res://textures/ui/ipad~camera.png" type="Texture" id=7]
-[ext_resource path="res://textures/ui/ipad~cancel.png" type="Texture" id=8]
+[ext_resource path="res://textures/ui/eden2/ipad/windows/pause_window/ipad~home.png" type="Texture" id=6]
+[ext_resource path="res://textures/ui/eden2/ipad/windows/pause_window/ipad~camera.png" type="Texture" id=7]
+[ext_resource path="res://textures/ui/eden2/ipad/windows/pause_window/ipad~cancel.png" type="Texture" id=8]
 [ext_resource path="res://scenes/build_window.tscn" type="PackedScene" id=9]
 [ext_resource path="res://textures/cloud.png" type="Texture" id=10]
 [ext_resource path="res://textures/sphere_map2.png" type="Texture" id=11]
-[ext_resource path="res://textures/ui/ipad~analog_bottom.png" type="Texture" id=12]
-[ext_resource path="res://textures/ui/ipad~analog_top.png" type="Texture" id=13]
-[ext_resource path="res://textures/ui/ipad~jump.png" type="Texture" id=14]
-[ext_resource path="res://textures/ui/ipad~jump_depressed.png" type="Texture" id=15]
-[ext_resource path="res://textures/ui/ipad~burn.png" type="Texture" id=16]
-[ext_resource path="res://textures/ui/ipad~burn_active.png" type="Texture" id=17]
-[ext_resource path="res://textures/ui/ipad~destroy.png" type="Texture" id=18]
-[ext_resource path="res://textures/ui/ipad~destroy_active.png" type="Texture" id=19]
-[ext_resource path="res://textures/ui/ipad~build2.png" type="Texture" id=20]
-[ext_resource path="res://textures/ui/ipad~build2_active.png" type="Texture" id=21]
-[ext_resource path="res://textures/ui/ipad~palette.png" type="Texture" id=22]
-[ext_resource path="res://textures/ui/ipad~paint_active.png" type="Texture" id=23]
-[ext_resource path="res://textures/ui/ipad~settings.png" type="Texture" id=24]
+[ext_resource path="res://textures/ui/eden2/ipad/nav_controls/joystick/joystick_bottom.png" type="Texture" id=12]
+[ext_resource path="res://textures/ui/eden2/ipad/nav_controls/joystick/joystick_top.png" type="Texture" id=13]
+[ext_resource path="res://textures/ui/eden2/ipad/nav_controls/jump/jump.png" type="Texture" id=14]
+[ext_resource path="res://textures/ui/eden2/ipad/nav_controls/jump/jump_pressed.png" type="Texture" id=15]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~burn.png" type="Texture" id=16]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~burn_active.png" type="Texture" id=17]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~destroy.png" type="Texture" id=18]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~destroy_active.png" type="Texture" id=19]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~build2.png" type="Texture" id=20]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~build2_active.png" type="Texture" id=21]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~palette.png" type="Texture" id=22]
+[ext_resource path="res://textures/ui/eden2/ipad/toolbox/ipad~paint_active.png" type="Texture" id=23]
+[ext_resource path="res://textures/ui/eden2/ipad/ipad~settings.png" type="Texture" id=24]
 [ext_resource path="res://textures/quit.png" type="Texture" id=25]
 
 [node name="HUD" type="Control"]
@@ -525,6 +525,7 @@ custom_fonts/font = ExtResource( 5 )
 text = "Exit World"
 
 [node name="BuildWindow" parent="HorizontalMain/VerticalMain/VerticalCenterContent" instance=ExtResource( 9 )]
+visible = false
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 558.0
@@ -582,7 +583,6 @@ expand = true
 stretch_mode = 5
 
 [node name="Navbox" type="HBoxContainer" parent="HorizontalMain/VerticalMain"]
-editor/display_folded = true
 margin_top = 726.0
 margin_right = 1716.0
 margin_bottom = 1026.0

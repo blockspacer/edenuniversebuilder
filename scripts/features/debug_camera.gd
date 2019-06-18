@@ -1,7 +1,7 @@
 # Generic debug camera controller. Use anywhere.
 # Nothing game-related, no reference from and to outside.
 
-extends Camera
+#extends Camera
 
 
 export var sensitivity = 0.4
@@ -15,36 +15,36 @@ var _pitch = 0
 var _forward = Vector3(0,0,0)
 
 
-func _ready():
-	if capture_mouse:
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	set_process(true)
-	set_process_input(true)
+#func _ready():
+#	if capture_mouse:
+#		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+#	set_process(true)
+#	set_process_input(true)
 
-func _process(delta):
-	var motor = Vector3(0,0,0)
-	
-	var forward = get_transform().basis * Vector3(0,0,-1)
-	var right = get_transform().basis * Vector3(1,0,0)
-	var up = Vector3(0,1,0)
-	
-	if abs(forward.y) < 1.0:
-		_forward = Vector3(forward.x, 0, forward.z).normalized()
-	
-	if Input.is_key_pressed(KEY_Z) or Input.is_key_pressed(KEY_W):
-		motor += _forward
-	if Input.is_key_pressed(KEY_S):
-		motor -= _forward
-	if Input.is_key_pressed(KEY_Q) or Input.is_key_pressed(KEY_A):
-		motor -= right
-	if Input.is_key_pressed(KEY_D):
-		motor += right
-	if Input.is_key_pressed(KEY_SPACE):
-		motor += up
-	if Input.is_key_pressed(KEY_SHIFT):
-		motor -= up
-	
-	set_translation(get_translation() + motor * (delta * speed))
+#func _process(delta):
+#	var motor = Vector3(0,0,0)
+#	
+#	var forward = get_transform().basis * Vector3(0,0,-1)
+#	var right = get_transform().basis * Vector3(1,0,0)
+#	var up = Vector3(0,1,0)
+#	
+#	if abs(forward.y) < 1.0:
+#		_forward = Vector3(forward.x, 0, forward.z).normalized()
+#	
+#	if Input.is_key_pressed(KEY_Z) or Input.is_key_pressed(KEY_W):
+#		motor += _forward
+#	if Input.is_key_pressed(KEY_S):
+#		motor -= _forward
+#	if Input.is_key_pressed(KEY_Q) or Input.is_key_pressed(KEY_A):
+#		motor -= right
+#	if Input.is_key_pressed(KEY_D):
+#		motor += right
+#	if Input.is_key_pressed(KEY_SPACE):
+#		motor += up
+#	if Input.is_key_pressed(KEY_SHIFT):
+#		motor -= up
+#	
+#	set_translation(get_translation() + motor * (delta * speed))
 
 
 func _input(event):

@@ -2,7 +2,7 @@ extends Node
 
 var noise = OpenSimplexNoise.new()
 
-func _ready():
+func setup_vars():
 	randomize()
 	noise.seed = randi()
 	
@@ -10,8 +10,6 @@ func _ready():
 	noise.period = 15
 	noise.lacunarity = 1.5
 	noise.persistence = 0.75
-	
-	#_generate_world()
 
 func generate_random_terrain(): ###############################################
 	var chunk_data = Dictionary()

@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="edenuniversebuilder"
-run/main_scene="res://scenes/main_menu.tscn"
+run/main_scene="res://scenes/ui.tscn"
 boot_splash/image="res://icons/splash2.png"
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
 
@@ -36,6 +36,10 @@ TerrainGenerator="*res://scripts/features/terrain_generator.gd"
 InterfaceSystem="*res://scripts/systems/interface_system.gd"
 DownloadSystem="*res://scripts/systems/download_system.gd"
 SoundSystem="*res://scripts/systems/sound_system.gd"
+Diagnostics="*res://scripts/features/diagnostics.gd"
+Geometry="*res://scripts/features/geometry.gd"
+BlockData="*res://scripts/features/block_data.gd"
+Player="*res://scripts/features/player.gd"
 
 [display]
 

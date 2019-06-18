@@ -3,13 +3,16 @@
 [ext_resource path="res://scenes/environment.tres" type="Environment" id=1]
 [ext_resource path="res://fonts/header.tres" type="DynamicFont" id=2]
 [ext_resource path="res://fonts/body.tres" type="DynamicFont" id=3]
-[ext_resource path="res://textures/ui/ui_text/ipad~menu_options.png" type="Texture" id=4]
+[ext_resource path="res://textures/ui/eden2/ui_text/ipad~menu_options.png" type="Texture" id=4]
 [ext_resource path="res://fonts/league-mono/LeagueMono-Thin.otf" type="DynamicFontData" id=5]
-[ext_resource path="res://textures/ui/edenlogo.png" type="Texture" id=6]
+[ext_resource path="res://textures/ui/eden2/iphone/edenlogo.png" type="Texture" id=6]
 [ext_resource path="res://fonts/orbitron/Orbitron Medium.otf" type="DynamicFontData" id=7]
 [ext_resource path="res://icons/splash2.png" type="Texture" id=8]
 [ext_resource path="res://icons/josephtheengineer/JosephTheEngineer Logo 2018 Engineer Edition v2 Transparent Round.png" type="Texture" id=9]
 [ext_resource path="res://sounds/music/eden1.ogg" type="AudioStream" id=10]
+
+
+
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 5 )
@@ -104,7 +107,6 @@ anchor_bottom = 1.0
 color = Color( 0.230469, 0.230469, 0.230469, 0.353569 )
 
 [node name="Home" type="MarginContainer" parent="UI"]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 20.0
