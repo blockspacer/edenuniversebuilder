@@ -42,18 +42,14 @@
 
 	hud : container of hud elements
 		- rendered (bool) : triggers the system to render
-		- nav_controls (dictonary) : controls used to move the player
+		- components (dictonary) : embedded components
 
-	nav_controls : container of joystick and jump button
-		- rendered (bool) : triggers the system to render
-		- joystick (dictonary) : used to move the player position
-		- jump (dictonary) : makes the player jump
+	vertical_container : arranges child components vertically
+		- rendered (bool)
+		- min_size (Vector2)
+		- components (dictonary)
 
-	joystick (1) : displays touch joystick (attaches to nav controls)
-		- rendered (bool) : triggers the system to render
-
-	jump : displays jump button
-		- rendered (bool) : triggers the system to render
-# Server System
-
-# Sound System
+	horizontal_container : arranges child components horizontally
+		- rendered (bool)
+		- min_size (Vector2)
+		- components (dictonary)

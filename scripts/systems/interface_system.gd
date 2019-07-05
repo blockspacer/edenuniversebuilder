@@ -28,35 +28,121 @@ func _process(delta):
 	entities = Entity.get_entities_with("hud")
 	for id in entities:
 		if get_node("/root/Entity/" + str(id)):
-			var components = entities[id].components
-			if components.hud.rendered == false:
-				var node = get_node("/root/Entity/" + str(id))
+			if Entity.get_component(id, "hud.rendered"):
+				process_hud(id)
+			else:
+				Debug.msg("Creating HUD...", "Info")
+				create_hud(id)
+
+func process_child_components(id, container, component):
+	var children = Entity.get_component(id, component + ".components").keys()
+	
+	for name in children:
+		var type = name.split("0", false)[0]
+		
+		if type == "vertical_container":
+			if Entity.get_component(id, component + ".components." + name + ".rendered"):
+				process_vertical_container(id, container, component + ".components." + name)
+			else:
+				create_vertical_container(id, container, component + ".components." + name)
 				
-				var hud = Control.new()
-				hud.anchor_right = 1
-				hud.anchor_bottom = 1
-				node.add_child(hud)
+				Entity.set_component(id, component + ".components." + name + ".rendered", true)
+		
+		elif type == "horizontal_container":
+			if Entity.get_component(id, component + ".components." + name + ".rendered"):
+				process_horizontal_container(id, container, component + ".components." + name)
+			else:
+				create_horizontal_container(id, container, component + ".components." + name)
 				
-				if components.hud.nav_controls.rendered == false:
-					var nav_controls = HBoxContainer.new()
-					nav_controls.rect_min_size.y = 300
-					hud.add_child(nav_controls)
-					
-					if components.hud.nav_controls.joystick.rendered == false:
-						var joystick = load("res://scenes/joystick.tscn").instance()
-						nav_controls.add_child(joystick)
-						
-						components.hud.nav_controls.joystick.rendered = true
-					
-					components.hud.nav_controls.rendered = true
+				Entity.set_component(id, component + ".components." + name + ".rendered", true)
+		
+		elif type == "joystick":
+			if Entity.get_component(id, component + ".components." + name + ".interface_system"):
+				process_joystick(container)
+			else:
+				create_joystick(container)
 				
-				components.hud.rendered = true
-				Entity.edit(id, components)
+				Entity.set_component(id, component + ".components." + name + ".interface_system", true)
+		
+		elif type == "toolbox":
+			if Entity.get_component(id, component + ".components." + name + ".rendered"):
+				process_toolbox(container)
+			else:
+				create_toolbox(container)
+				
+				Entity.set_component(id, component + ".components." + name + ".rendered", true)
+		
+		#elif type == "terminal":
+			#if Entity.get_component(id, component + ".components." + name + ".rendered"):
+				#process_toolbox(container)
+			#else:
+				#create_toolbox(container)
+				
+				#Entity.set_component(id, component + ".components." + name + ".rendered", true)
 
+func create_hud(id):
+	var node = get_node("/root/Entity/" + str(id))
+	
+	var hud = Control.new()
+	hud.name = "Hud"
+	hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hud.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	hud.anchor_right = 1
+	hud.anchor_bottom = 1
+	node.add_child(hud)
+	
+	process_child_components(id, hud, "hud")
+	
+	Entity.set_component(id, "hud.rendered", true)
 
+func process_hud(id):
+	process_child_components(id, get_node("/root/Entity/" + str(id) + "/Hud"), "hud")
 
+func create_vertical_container(id, parent, path):
+	var vertical_container = VBoxContainer.new()
+	vertical_container.name = "VerticalContainer"
+	vertical_container.rect_min_size.y = 300
+	vertical_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vertical_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vertical_container.anchor_right = 1
+	vertical_container.anchor_bottom = 1
+	parent.add_child(vertical_container)
+	
+	process_child_components(id, vertical_container, path)
 
-#################################### nodes ####################################
+func process_vertical_container(id, parent, path):
+	pass
+
+func create_horizontal_container(id, parent, path):
+	var horizontal_container = HBoxContainer.new()
+	horizontal_container.name = "HorizontalContainer"
+	horizontal_container.rect_min_size.y = 300
+	horizontal_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	horizontal_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	horizontal_container.anchor_right = 1
+	horizontal_container.anchor_bottom = 1
+	parent.add_child(horizontal_container)
+	
+	process_child_components(id, horizontal_container, path)
+
+func process_horizontal_container(id, parent, path):
+	pass
+
+func create_joystick(parent):
+	var joystick = load("res://scenes/joystick.tscn").instance()
+	parent.add_child(joystick)
+
+func process_joystick(parent):
+	pass
+
+func create_toolbox(parent):
+	var toolbox = load("res://scenes/toolbox.tscn").instance()
+	parent.add_child(toolbox)
+
+func process_toolbox(parent):
+	pass
+
+#################################### Main Menu stuff ####################################
 
 onready var Home = get_node("/root/Main Menu/UI/Home")
 onready var Leaderboard = get_node("/root/Main Menu/UI/Leaderboard")

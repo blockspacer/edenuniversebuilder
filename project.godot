@@ -40,6 +40,7 @@ Diagnostics="*res://scripts/features/diagnostics.gd"
 Geometry="*res://scripts/features/geometry.gd"
 BlockData="*res://scripts/features/block_data.gd"
 Player="*res://scripts/features/player.gd"
+DictonaryFunc="*res://scripts/features/dictonary_func.gd"
 
 [display]
 

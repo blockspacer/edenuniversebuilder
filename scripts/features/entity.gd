@@ -42,3 +42,17 @@ func edit(id, components):
 	objects[entity.id] = entity
 	
 	return entity.id
+
+func get_component(id, path):
+	var data = objects[id].components
+	for i in path.split(".", false):
+		if data.has(i):
+			data = data[i]
+		else:
+			return false
+	return data
+
+func set_component(id, path, value):
+	var components = objects[id].components
+	DictonaryFunc.setInDict(components, path.split(".", false), value)
+	edit(id, components)

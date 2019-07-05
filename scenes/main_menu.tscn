@@ -11,9 +11,6 @@
 [ext_resource path="res://icons/josephtheengineer/JosephTheEngineer Logo 2018 Engineer Edition v2 Transparent Round.png" type="Texture" id=9]
 [ext_resource path="res://sounds/music/eden1.ogg" type="AudioStream" id=10]
 
-
-
-
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 5 )
 
@@ -923,7 +920,6 @@ Lost City : 10900 blocks : avg rating 8/10 : 8 points : User builder88"
 selection_enabled = true
 
 [node name="Credits" type="MarginContainer" parent="UI"]
-editor/display_folded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0

@@ -12,7 +12,7 @@ var blocks_found = 0
 var total_chunks = 0
 var chunks_cache_size = 0
 var loaded_chunks = 0
-var chunk_index = {}
+var chunk_index = []
 var temp_player_chunk = Vector3(0, 0, 0)
 
 
@@ -83,15 +83,22 @@ func world_loaded():
 	
 	# Create HUD
 	var hud = Dictionary()
-	hud.rendered = false
+	hud.components = Dictionary()
 	
-	var nav_controls = Dictionary()
-	nav_controls.rendered = false
+	hud.components.horizontal_container = Dictionary() # MainHor
+	hud.components.horizontal_container.components = Dictionary()
+	hud.components.horizontal_container.components.vertical_container = Dictionary() # MainVert
+	hud.components.horizontal_container.components.vertical_container.components = Dictionary()
+	hud.components.horizontal_container.components.toolbox = Dictionary() # ToolBox
 	
-	var joystick = Dictionary()
-	joystick.rendered = false
-	nav_controls.joystick = joystick
-	hud.nav_controls = nav_controls
+	var horizontal_container = Dictionary()
+	horizontal_container.min_size = Vector2(0, OS.get_screen_size().y * 1/3)
+	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox = horizontal_container # NavBox
+	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox.components = Dictionary()
+	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0gamearea = Dictionary() # GameArea
+	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0gamearea.components = Dictionary()
+	
+	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox.components.joystick = Dictionary() # Joystick
 	
 	var hud_id = Entity.create({"hud" : hud})
 

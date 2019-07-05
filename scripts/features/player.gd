@@ -125,9 +125,10 @@ func _input(event): ###########################################################
 func move(position):
 	move_direction = position
 
-
 func action(position): ########################################################
 	#Hud.msg("Modifing block in position: " + position, "Debug")
+	
+	action_mode = "build"
 	
 	if action_mode == "burn":
 		pass
@@ -261,7 +262,7 @@ func get_looking_at(position): ################################################
 		return Vector3(0, 0, 0)
 
 
-func walk(delta, player): #############################################################
+func walk(delta, id): #############################################################
 	# reset the direction of the player
 	direction = Vector3()
 	
@@ -270,8 +271,8 @@ func walk(delta, player): ######################################################
 	#	direction += Vector3(move_direction.x / 2, 0,  move_direction.y / 2)
 	#else:
 	# get the rotation of the camera
-	var aim = $Head/Camera.get_global_transform().basis
-	if Input.is_action_pressed("move_forward") or World.player_move_forward:
+	var aim = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera").get_global_transform().basis
+	if Input.is_action_pressed("move_forward"): # or World.player_move_forward:
 		direction -= aim.z
 	if Input.is_action_pressed("move_backward"):
 		direction += aim.z
@@ -310,7 +311,7 @@ func walk(delta, player): ######################################################
 	velocity.z = temp_velocity.z
 	
 	# move
-	velocity = player.move_and_slide(velocity, Vector3(0, 1, 0))
+	get_node("/root/Entity/" + str(id) + "/Player").move_and_slide(velocity, Vector3(0, 1, 0))
 	
 	if Input.is_action_just_pressed("jump"):
 		velocity.y = jump_height
