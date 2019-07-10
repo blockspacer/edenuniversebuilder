@@ -95,6 +95,10 @@ func _input(event): ###########################################################
 				if change + Player.camera_angle < 90 and change + Player.camera_angle > -90:
 					camera.rotate_x(deg2rad(change))
 					Player.camera_angle += change
+				
+			elif event.is_action_pressed("action"):
+				Debug.msg("Action pressed!", "Debug")
+				Player.action(id, OS.get_window_size() / 2)
 			
 			#player.translation = components.player.position
 			#components.player.rendered = true
@@ -111,10 +115,6 @@ func _input(event): ###########################################################
 			#Debug.msg("Changing move_mode to walk...", "Info")
 			#move_mode = "walk"
 			#get_node("Capsule").disabled = false
-	
-	if event.is_action_pressed("action"):
-		Debug.msg("Action pressed!", "Debug")
-		Player.action(OS.get_window_size() / 2)
 	
 	if event.is_action_pressed("break"):
 		#action(OS.get_window_size() / 2)

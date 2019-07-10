@@ -83,24 +83,47 @@ func world_loaded():
 	
 	# Create HUD
 	var hud = Dictionary()
-	hud.components = Dictionary()
+	var hud_id = Entity.create({"hud" : hud})
 	
-	hud.components.horizontal_container = Dictionary() # MainHor
-	hud.components.horizontal_container.components = Dictionary()
-	hud.components.horizontal_container.components.vertical_container = Dictionary() # MainVert
-	hud.components.horizontal_container.components.vertical_container.components = Dictionary()
-	hud.components.horizontal_container.components.toolbox = Dictionary() # ToolBox
 	
 	var horizontal_container = Dictionary()
-	horizontal_container.min_size = Vector2(0, OS.get_screen_size().y * 1/3)
-	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox = horizontal_container # NavBox
-	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox.components = Dictionary()
-	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0gamearea = Dictionary() # GameArea
-	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0gamearea.components = Dictionary()
+	horizontal_container.parent = Dictionary()
+	horizontal_container.parent.id = hud_id
+	horizontal_container.parent.component = "hud"
+	var horizontal_id = Entity.create({"horizontal_container" : horizontal_container})
 	
-	hud.components.horizontal_container.components.vertical_container.components.horizontal_container0navbox.components.joystick = Dictionary() # Joystick
+	var vertical_container = Dictionary()
+	vertical_container.parent = Dictionary()
+	vertical_container.parent.id = horizontal_id
+	vertical_container.parent.component = "horizontal_container"
+	var vertical_id = Entity.create({"vertical_container" : vertical_container})
 	
-	var hud_id = Entity.create({"hud" : hud})
+	var toolbox = Dictionary()
+	toolbox.parent = Dictionary()
+	toolbox.parent.id = horizontal_id
+	toolbox.parent.component = "horizontal_container"
+	var toolbox_id = Entity.create({"toolbox" : toolbox})
+	
+	
+	var navbox = Dictionary()
+	navbox.min_size = Vector2(0, OS.get_screen_size().y * 1/3)
+	navbox.parent = Dictionary()
+	navbox.parent.id = vertical_id
+	navbox.parent.component = "vertical_container"
+	var navbox_id = Entity.create({"horizontal_container" : navbox})
+	
+	var gamearea = Dictionary()
+	gamearea.parent = Dictionary()
+	gamearea.parent.id = vertical_id
+	gamearea.parent.component = "vertical_container"
+	var gamearea_id = Entity.create({"horizontal_container" : gamearea})
+	
+	
+	var joystick = Dictionary()
+	joystick.parent = Dictionary()
+	joystick.parent.id = navbox_id
+	joystick.parent.component = "horizontal_container"
+	var joystick_id = Entity.create({"joystick" : joystick})
 
 func init_main_menu():
 	ChunkSystem.create_chunk(Vector3(0, 0, 0))
@@ -182,26 +205,6 @@ func _on_ForwardButton_released(): ############################################
 
 
 ################################## functions ##################################
-
-func get_chunk_sub(location): #################################################
-	var x = 0
-	if location == 0:
-		return 0
-	elif location > 0:
-		while !(location >= x and location < x*16):
-			x += 1
-	else:
-		while !(location <= x and location > x*16):
-			x -= 1
-	return x - 1
-
-
-func get_chunk(location): #####################################################
-	var x = get_chunk_sub(int(round(location.x)))
-	var y = get_chunk_sub(int(round(location.y)))
-	var z = get_chunk_sub(int(round(location.z)))
-	
-	return Vector3(x, y, z)
 
 
 

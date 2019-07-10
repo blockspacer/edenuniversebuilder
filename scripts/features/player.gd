@@ -125,7 +125,7 @@ func _input(event): ###########################################################
 func move(position):
 	move_direction = position
 
-func action(position): ########################################################
+func action(id, position): ########################################################
 	#Hud.msg("Modifing block in position: " + position, "Debug")
 	
 	action_mode = "build"
@@ -133,9 +133,9 @@ func action(position): ########################################################
 	if action_mode == "burn":
 		pass
 	elif action_mode == "mine":
-		var normal = get_looking_at_normal(position)
-		var block_location = get_looking_at(position)# - normal
-		var location = World.get_chunk(block_location)
+		var normal = get_looking_at_normal(id, position)
+		var block_location = get_looking_at(id, position)# - normal
+		var location = ChunkSystem.get_chunk(block_location)
 		
 		if normal == Vector3(0, 0, -1):
 			block_location += Vector3(0, 1, 0)
@@ -148,8 +148,9 @@ func action(position): ########################################################
 		elif normal == Vector3(0, -1, 0):
 			block_location += Vector3(0, 1, 0)
 		
-		if World.chunk_index.has(location):
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(0) + ", " + str(location.z))
+		var chunk_id = ChunkSystem.get_chunk_id(location)
+		
+		if chunk_id:
 			Debug.msg("Breaking block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
 			
 			var music_player = AudioStreamPlayer3D.new()
@@ -160,15 +161,15 @@ func action(position): ########################################################
 			add_child(music_player)
 			music_player.play()
 			
-			Chunk.break_block(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
-			Chunk.compile()
+			ChunkSystem.break_block(id, Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
+			#ChunkSystem.compile()
 		else:
 			Debug.msg("Invalid chunk!", "Error")
 	elif action_mode == "build":
-		var normal = get_looking_at_normal(position)
-		var block_location = get_looking_at(position) + normal
-		Debug.msg("Normal is " + str(get_looking_at_normal(position)), "Debug")
-		var location = World.get_chunk(block_location)
+		var normal = get_looking_at_normal(id, position)
+		var block_location = get_looking_at(id, position) + normal
+		Debug.msg("Normal is " + str(get_looking_at_normal(id, position)), "Debug")
+		var location = ChunkSystem.get_chunk(block_location)
 		
 		if normal == Vector3(0, 0, -1):
 			block_location += Vector3(0, 1, 0)
@@ -181,8 +182,9 @@ func action(position): ########################################################
 		elif normal == Vector3(0, -1, 0):
 			block_location += Vector3(0, 1, 0)
 		
-		if World.chunk_index.has(location):
-			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(0) + ", " + str(location.z))
+		var chunk_id = ChunkSystem.get_chunk_id(location)
+		
+		if chunk_id:
 			Debug.msg("Placing block: " + str(Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z))), "Info")
 			
 			var music_player = AudioStreamPlayer3D.new()
@@ -193,8 +195,8 @@ func action(position): ########################################################
 			add_child(music_player)
 			music_player.play()
 			
-			Chunk.place_block(6, Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
-			Chunk.compile()
+			ChunkSystem.place_block(chunk_id, 6, Vector3(floor(block_location.x), floor(block_location.y), floor(block_location.z)))
+			#Chunk.compile()
 		else:
 			Debug.msg("Invalid chunk!", "Error")
 	elif action_mode == "paint":
@@ -226,13 +228,13 @@ func get_orientation(): #######################################################
 		return "invaild"
 
 
-func get_looking_at_normal(position): #########################################
+func get_looking_at_normal(id, position): #########################################
 	#var camera = $Head/Camera
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
-	var camera = $Head/Camera
-	var space_state = get_tree().get_world().direct_space_state
+	var camera = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera")
+	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
 	
@@ -244,13 +246,13 @@ func get_looking_at_normal(position): #########################################
 		return Vector3(0, 0, 0)
 
 
-func get_looking_at(position): ################################################
+func get_looking_at(id, position): ################################################
 	#var camera = $Head/Camera
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
-	var camera = $Head/Camera
-	var space_state = get_tree().get_world().direct_space_state
+	var camera = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera")
+	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
 	

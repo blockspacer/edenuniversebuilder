@@ -56,3 +56,43 @@ func set_component(id, path, value):
 	var components = objects[id].components
 	DictonaryFunc.setInDict(components, path.split(".", false), value)
 	edit(id, components)
+
+func get_node_path(parent): # {id:int, compnent:string}
+	var parents = Array()
+	var root = false
+	while root == false:
+		#Debug.msg("Parent = " + str(parent.id) + parent.component, "Debug")
+		parents.append(parent)
+		var woah = get_component(parent.id, parent.component + ".parent" )
+		
+		if woah:
+			parent = woah
+		else:
+			root = true
+	
+	var path = "/root/Entity/"
+	parents.invert()
+	for entity in parents:
+		var comp = entity.component.capitalize().split(" ").join("")
+		
+		path += str(entity.id) + "/" + comp + "/"
+	
+	return path
+
+func add_node(id, component, node):
+	var parent = Entity.get_component(id, component + ".parent")
+	if parent:
+		var path = Entity.get_node_path(parent)
+		#Debug.msg(path, "Debug")
+		if get_tree().get_root().has_node(path):
+			if !get_node(path).has_node(path + str(id)):
+				var entity = Node.new()
+				entity.name = str(id)
+				get_node(path).add_child(entity)
+			
+			get_node(path + str(id)).add_child(node)
+		else:
+			Debug.msg("Parent node doesn't exist yet!", "Warn")
+			return false
+	
+	Entity.set_component(id, component + ".rendered", true)

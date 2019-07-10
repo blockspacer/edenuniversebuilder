@@ -5,80 +5,61 @@ func _ready():
 	Debug.msg("Interface System ready.", "Info")
 
 func _process(delta):
-	var entities = Entity.get_entities_with("terminal")
-	for id in entities:
+	for id in Entity.get_entities_with("terminal"):
 		if get_node("/root/Entity/" + str(id)):
-			var components = entities[id].components
-			if components.terminal.rendered == false:
+			if Entity.get_component(id, "terminal.rendered") == false:
 				var node = get_node("/root/Entity/" + str(id))
 				
 				var terminal = load("res://scenes/terminal.tscn").instance()
 				node.add_child(terminal)
 				
-				get_node("/root/Entity/" + str(id) + "/Terminal").rect_position = components.terminal.position
-				get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = components.terminal.text
-				components.terminal.rendered = true
-				Entity.edit(id, components)
-			if components.terminal.has("text_rendered"):
-				if components.terminal.text_rendered == false:
-					get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = components.terminal.text
-					components.terminal.text_rendered = true
-					Entity.edit(id, components)
+				get_node("/root/Entity/" + str(id) + "/Terminal").rect_position = Entity.get_component(id, "terminal.position")
+				get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
+				Entity.set_component(id, "terminal.rendered", true)
+			if Entity.get_component(id, "terminal.text_rendered") == false:
+				get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
+				Entity.set_component(id, "terminal.text_rendered", true)
 	
-	entities = Entity.get_entities_with("hud")
-	for id in entities:
+	for id in Entity.get_entities_with("hud"):
 		if get_node("/root/Entity/" + str(id)):
 			if Entity.get_component(id, "hud.rendered"):
 				process_hud(id)
 			else:
 				Debug.msg("Creating HUD...", "Info")
 				create_hud(id)
-
-func process_child_components(id, container, component):
-	var children = Entity.get_component(id, component + ".components").keys()
 	
-	for name in children:
-		var type = name.split("0", false)[0]
-		
-		if type == "vertical_container":
-			if Entity.get_component(id, component + ".components." + name + ".rendered"):
-				process_vertical_container(id, container, component + ".components." + name)
+	for id in Entity.get_entities_with("vertical_container"):
+		if get_node("/root/Entity/" + str(id)):
+			if Entity.get_component(id, "vertical_container.rendered"):
+				process_vertical_container(id)
 			else:
-				create_vertical_container(id, container, component + ".components." + name)
-				
-				Entity.set_component(id, component + ".components." + name + ".rendered", true)
-		
-		elif type == "horizontal_container":
-			if Entity.get_component(id, component + ".components." + name + ".rendered"):
-				process_horizontal_container(id, container, component + ".components." + name)
+				Debug.msg("Creating Vertical Container...", "Info")
+				create_vertical_container(id)
+	
+	for id in Entity.get_entities_with("horizontal_container"):
+		if get_node("/root/Entity/" + str(id)):
+			if Entity.get_component(id, "horizontal_container.rendered"):
+				process_horizontal_container(id)
 			else:
-				create_horizontal_container(id, container, component + ".components." + name)
-				
-				Entity.set_component(id, component + ".components." + name + ".rendered", true)
-		
-		elif type == "joystick":
-			if Entity.get_component(id, component + ".components." + name + ".interface_system"):
-				process_joystick(container)
+				Debug.msg("Creating Horizontal Container...", "Info")
+				create_horizontal_container(id)
+	
+	for id in Entity.get_entities_with("joystick"):
+		if get_node("/root/Entity/" + str(id)):
+			if Entity.get_component(id, "joystick.rendered"):
+				process_joystick(id)
 			else:
-				create_joystick(container)
-				
-				Entity.set_component(id, component + ".components." + name + ".interface_system", true)
-		
-		elif type == "toolbox":
-			if Entity.get_component(id, component + ".components." + name + ".rendered"):
-				process_toolbox(container)
+				Debug.msg("Creating Joystick...", "Info")
+				create_joystick(id)
+	
+	for id in Entity.get_entities_with("toolbox"):
+		if get_node("/root/Entity/" + str(id)):
+			if Entity.get_component(id, "toolbox.rendered"):
+				process_toolbox(id)
 			else:
-				create_toolbox(container)
-				
-				Entity.set_component(id, component + ".components." + name + ".rendered", true)
-		
-		#elif type == "terminal":
-			#if Entity.get_component(id, component + ".components." + name + ".rendered"):
-				#process_toolbox(container)
-			#else:
-				#create_toolbox(container)
-				
-				#Entity.set_component(id, component + ".components." + name + ".rendered", true)
+				Debug.msg("Creating Toolbox...", "Info")
+				create_toolbox(id)
+	
 
 func create_hud(id):
 	var node = get_node("/root/Entity/" + str(id))
@@ -91,14 +72,12 @@ func create_hud(id):
 	hud.anchor_bottom = 1
 	node.add_child(hud)
 	
-	process_child_components(id, hud, "hud")
-	
 	Entity.set_component(id, "hud.rendered", true)
 
 func process_hud(id):
-	process_child_components(id, get_node("/root/Entity/" + str(id) + "/Hud"), "hud")
+	pass
 
-func create_vertical_container(id, parent, path):
+func create_vertical_container(id):
 	var vertical_container = VBoxContainer.new()
 	vertical_container.name = "VerticalContainer"
 	vertical_container.rect_min_size.y = 300
@@ -106,14 +85,13 @@ func create_vertical_container(id, parent, path):
 	vertical_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vertical_container.anchor_right = 1
 	vertical_container.anchor_bottom = 1
-	parent.add_child(vertical_container)
 	
-	process_child_components(id, vertical_container, path)
+	Entity.add_node(id, "vertical_container", vertical_container)
 
-func process_vertical_container(id, parent, path):
+func process_vertical_container(id):
 	pass
 
-func create_horizontal_container(id, parent, path):
+func create_horizontal_container(id):
 	var horizontal_container = HBoxContainer.new()
 	horizontal_container.name = "HorizontalContainer"
 	horizontal_container.rect_min_size.y = 300
@@ -121,25 +99,26 @@ func create_horizontal_container(id, parent, path):
 	horizontal_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	horizontal_container.anchor_right = 1
 	horizontal_container.anchor_bottom = 1
-	parent.add_child(horizontal_container)
 	
-	process_child_components(id, horizontal_container, path)
+	Entity.add_node(id, "horizontal_container", horizontal_container)
 
-func process_horizontal_container(id, parent, path):
+func process_horizontal_container(id):
 	pass
 
-func create_joystick(parent):
+func create_joystick(id):
 	var joystick = load("res://scenes/joystick.tscn").instance()
-	parent.add_child(joystick)
+	
+	Entity.add_node(id, "joystick", joystick)
 
-func process_joystick(parent):
+func process_joystick(id):
 	pass
 
-func create_toolbox(parent):
+func create_toolbox(id):
 	var toolbox = load("res://scenes/toolbox.tscn").instance()
-	parent.add_child(toolbox)
+	
+	Entity.add_node(id, "toolbox", toolbox)
 
-func process_toolbox(parent):
+func process_toolbox(id):
 	pass
 
 #################################### Main Menu stuff ####################################

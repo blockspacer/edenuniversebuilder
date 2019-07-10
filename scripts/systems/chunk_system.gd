@@ -89,7 +89,7 @@ func _process(delta):
 	entities = Entity.get_entities_with("player")
 	for id in entities:
 		if get_node("/root/Entity/" + str(id) + "/Player"):
-			create_surrounding_chunks(ClientSystem.get_chunk(get_node("/root/Entity/" + str(id) + "/Player").translation))
+			create_surrounding_chunks(get_chunk(get_node("/root/Entity/" + str(id) + "/Player").translation))
 	
 	pass
 	# check if we should unload / load chunks
@@ -180,7 +180,8 @@ func load_terrain(): ##########################################################
 		TerrainGenerator._ready()
 		var chunk_data = TerrainGenerator.generate_flat_terrain()
 		for position in chunk_data.keys():
-			place_block(chunk_data[position], position)
+			#place_block(chunk_data[position], position)
+			pass
 		
 		#compile()
 		return false
@@ -197,24 +198,71 @@ func load_terrain(): ##########################################################
 		var id = ChunkData[Blocks].id
 		
 		if position.x < 4:
-			place_block(id, position)
+			#place_block(id, position)
+			pass
 	#compile()
 	#Status+=1
 	#LoadedChunks+=1
 
 
-func break_block(location): ####################################################
+func break_block(chunk_id, location): ####################################################
 	#Hud.msg("Chunk translation: " + str(translation), "Debug")
 	#Hud.msg("Removing block from chunk location " + str(location - translation), "Info")
-	#block_data.erase(location - translation)
-	pass
-
-
-func place_block(id, location): ################################################
-	#Hud.msg("Chunk translation: " + str(translation), "Debug")
-	#Hud.msg("Placing block from chunk location " + str(location - translation), "Info")
-	#if id != 0:
-		#block_data[location - translation] = id
 	
-	#set_surface_material(0, "texture")
-	pass
+	var block_data = Entity.get_component(chunk_id, "chunk.block_data")
+	block_data.erase(location - Entity.get_component(chunk_id, "chunk.position"))
+	Entity.set_component(chunk_id, "chunk.block_data", block_data)
+
+	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials")) # Returns blocks_loaded, mesh, vertex_data
+	
+	get_node("/root/Entity/" + str(chunk_id) + "/Chunk/MeshInstance").mesh = chunk_data.mesh
+	
+	var shape = ConcavePolygonShape.new()
+	shape.set_faces(chunk_data.vertex_data)
+	get_node("/root/Entity/" + str(chunk_id) + "/Chunk/MeshInstance/StaticBody/CollisionShape").shape = shape
+
+func place_block(chunk_id, block_id, location): ####################################################
+	if block_id == 0:
+		return
+	
+	#Hud.msg("Chunk translation: " + str(translation), "Debug")
+	#Hud.msg("Removing block from chunk location " + str(location - translation), "Info")
+	
+	var block_data = Entity.get_component(chunk_id, "chunk.block_data")
+	block_data[location - Entity.get_component(chunk_id, "chunk.position")] = block_id
+	Entity.set_component(chunk_id, "chunk.block_data", block_data)
+
+	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials")) # Returns blocks_loaded, mesh, vertex_data
+	
+	get_node("/root/Entity/" + str(chunk_id) + "/Chunk/MeshInstance").mesh = chunk_data.mesh
+	
+	var shape = ConcavePolygonShape.new()
+	shape.set_faces(chunk_data.vertex_data)
+	get_node("/root/Entity/" + str(chunk_id) + "/Chunk/MeshInstance/StaticBody/CollisionShape").shape = shape
+
+func get_chunk_sub(location): #################################################
+	var x = 0
+	if location == 0:
+		return 0
+	elif location > 0:
+		while !(location >= x and location < x*16):
+			x += 1
+	else:
+		while !(location <= x and location > x*16):
+			x -= 1
+	return x - 1
+
+
+func get_chunk(location): #####################################################
+	var x = get_chunk_sub(int(round(location.x)))
+	var y = get_chunk_sub(int(round(location.y)))
+	var z = get_chunk_sub(int(round(location.z)))
+	
+	return Vector3(x, y, z)
+
+func get_chunk_id(location):
+	var entities = Entity.get_entities_with("chunk")
+	for id in entities:
+		if Entity.get_component(id, "chunk.position") == location:
+			return id
+	return false

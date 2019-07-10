@@ -32,24 +32,29 @@
 
 	joystick (2) : processes touch movement
 		- rendered (bool) : triggers the system to render
+		- parent (dictonary) {id:int, compnent:string}
 
 # Interface System
 	terminal : displays text
 		- rendered (bool) : triggers the system to render
+		- parent (dictonary) : the parent control this entity is attached to {id:int, component:string}
 		- position (vector2) : the position of the terminal
 		- debug (bool) : if true, shows debug logs
 		- text (string) : the text to display
 
 	hud : container of hud elements
 		- rendered (bool) : triggers the system to render
-		- components (dictonary) : embedded components
 
 	vertical_container : arranges child components vertically
 		- rendered (bool)
+		- parent (dictonary) {id:int, compnent:string}
 		- min_size (Vector2)
-		- components (dictonary)
+		- position (int)
 
 	horizontal_container : arranges child components horizontally
 		- rendered (bool)
+		- parent (dictonary) {id:int, compnent:string}
 		- min_size (Vector2)
-		- components (dictonary)
+		- position (int)
+	
+
