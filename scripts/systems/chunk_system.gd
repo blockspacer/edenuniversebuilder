@@ -13,7 +13,13 @@ func create_chunk(position):
 	
 	Debug.msg("Creating chunk " + str(position) + "...", "Debug")
 	
-	var chunk_data = TerrainGenerator.generate_flat_terrain()
+	var chunk_data = EdenWorldDecoder.get_chunk_data(position)
+	
+	if !chunk_data:
+		if ServerSystem.map_seed == 0:
+			chunk_data = TerrainGenerator.generate_flat_terrain()
+		else:
+			chunk_data = TerrainGenerator.generate_flat_terrain()
 	
 	var chunk = Dictionary()
 	chunk.rendered = false
@@ -118,9 +124,9 @@ func create_surrounding_chunks(center_chunk): #################################
 	
 	for chunk in ClientSystem.chunk_index:
 		if created_chunks.has(chunk) == false and ServerSystem.map_seed != -1:
-			var node = get_node("/root/World/" + str(chunk.x) + ", " + str(chunk.y) + ", " + str(chunk.z))
-			if node != null:
-				node.queue_free()
+			var path = "/root/World/" + str(chunk.x) + ", " + str(chunk.y) + ", " + str(chunk.z)
+			if get_tree().get_root().has_node(path):
+				get_node(path).queue_free()
 				#chunk_index.erase(chunk)
 
 #func init_chunk(id):

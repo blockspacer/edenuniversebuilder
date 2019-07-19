@@ -18,4 +18,3 @@ focus_mode = 2
 custom_fonts/normal_font = ExtResource( 1 )
 scroll_following = true
 selection_enabled = true
-

@@ -8,10 +8,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 rect_min_size = Vector2( 400, 0 )
 rect_pivot_offset = Vector2( -890, -40 )
+mouse_filter = 2
 
 [node name="Bottom" type="TextureButton" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 1
 texture_normal = ExtResource( 1 )
 texture_pressed = ExtResource( 1 )
 texture_hover = ExtResource( 1 )
@@ -23,6 +25,7 @@ stretch_mode = 5
 [node name="Top" type="TextureButton" parent="Bottom"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 1
 texture_normal = ExtResource( 2 )
 texture_pressed = ExtResource( 2 )
 texture_hover = ExtResource( 2 )
@@ -30,4 +33,3 @@ texture_disabled = ExtResource( 2 )
 texture_focused = ExtResource( 2 )
 expand = true
 stretch_mode = 5
-

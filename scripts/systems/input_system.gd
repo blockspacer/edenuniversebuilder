@@ -1,23 +1,25 @@
 # just routes input signals to other systems
 extends Node
 
+var pressed = false
+
 func _ready():
 	Debug.msg("Input System ready.", "Info")
 
 func _process(delta):
 	var entities = Entity.get_entities_with("hud")
-	for id in entities:
-		if get_node("/root/Entity/" + str(id)):
-			var components = entities[id].components
-			if !Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.input_system") and Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.interface_system"):
-				var bottom = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Bottom")
-				var top = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Top")
-				
-				bottom.connect("button_down", self, "_joystick_pressed", [true])
-				bottom.connect("button_up", self, "_joystick_pressed", [false])
-				
-				components.hud.horizontal_main.vertical_main.nav_controls.joystick.input_system = true
-				Entity.edit(id, components)
+#	for id in entities:
+#		if get_node("/root/Entity/" + str(id)):
+#			var components = entities[id].components
+#			if !Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.input_system") and Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.interface_system"):
+#				var bottom = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Bottom")
+#				var top = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Top")
+#
+#				bottom.connect("button_down", self, "_joystick_pressed", [true])
+#				bottom.connect("button_up", self, "_joystick_pressed", [false])
+#
+#				components.hud.horizontal_main.vertical_main.nav_controls.joystick.input_system = true
+#				Entity.edit(id, components)
 	
 	
 	if Input.is_action_pressed("ui_cancel"):
@@ -27,8 +29,11 @@ func _process(delta):
 	if Input.is_action_just_pressed("restart"):
 		get_tree().reload_current_scene()
 
-func _joystick_pressed(down):
-	Debug.msg("Woah", "Debug")
+func _joystick_pressed(down, id):
+	Debug.msg("Joystick pressed!", "Debug")
+	Entity.set_component(id, "joystick.pressed", down)
+	
+	pressed = true
 
 ################################### signals ###################################
 
@@ -80,6 +85,11 @@ func _input(event): ###########################################################
 						components.terminal.text_rendered = false
 					Entity.edit(id, components)
 	
+	#for id in Entity.get_entities_with("joystick"):
+		#if Entity.get_component(id, "joystick.rendered"):
+			#var path = Entity.get_node_path(Entity.get_component(id, "joystick.parent") + str(id) + "/Joystick/")
+			#get_node(path + bottom)
+	
 	var entities = Entity.get_entities_with("player")
 	for id in entities:
 		var components = entities[id].components
@@ -95,15 +105,23 @@ func _input(event): ###########################################################
 				if change + Player.camera_angle < 90 and change + Player.camera_angle > -90:
 					camera.rotate_x(deg2rad(change))
 					Player.camera_angle += change
-				
+			
 			elif event.is_action_pressed("action"):
 				Debug.msg("Action pressed!", "Debug")
+				
+				for id in Entity.get_entities_with("joystick"):
+					Debug.msg("Mouse Position: " + str(event.position), "Debug")
+					if event.position.x > 31 and event.position.x < 385 and event.position.y > 505 and event.position.y < 864:
+						Debug.msg("Joystick pressed!", "Debug")
+						pass
+						#_joystick_pressed(true, 0)
+				
 				Player.action(id, OS.get_window_size() / 2)
-			
+				if pressed:
+					Debug.msg("Woah", "Info")
 			#player.translation = components.player.position
 			#components.player.rendered = true
 			#Entity.edit(id, components)
-	
 	
 	if event.is_action_pressed("fly"):
 		pass
@@ -143,7 +161,6 @@ func _input(event): ###########################################################
 		Debug.msg("Changing action_mode to paint...", "Info")
 		#action_mode = "paint"
 		#Debug.switch_mode("paint")
-
 
 ################################## functions ##################################
 

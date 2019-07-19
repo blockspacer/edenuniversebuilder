@@ -1,8 +1,11 @@
 extends Node
 
 var map_seed = 0
-var map_path = "res://worlds/direct_city.eden2"
+var map_path = "user://worlds/direct_city.eden2"
 var map_name = "direct_city.eden2"
+
+var chunks_cache_size = 0
+var total_chunks = 0
 
 func start():
 	#create_world()
@@ -40,23 +43,7 @@ func load_world(object, method):
 	for id in Entity.objects:
 		Entity.destory(id)
 	
-	Debug.msg("Starting terrain generator...", "Info")
-	TerrainGenerator.setup_vars()
-	var chunk_data = TerrainGenerator.generate_flat_terrain()
-	
-	var chunk = Dictionary()
-	chunk.rendered = false
-	chunk.position = Vector3(0, 0, 0)
-	chunk.address = 0
-	chunk.gen_seed = 0
-	chunk.block_data = chunk_data
-	chunk.blocks_loaded = 0
-	chunk.mesh = null
-	chunk.vertex_data = Array()
-	chunk.shape = null
-	chunk.materials = Dictionary()
-	chunk.entities = Dictionary()
-	chunk.object = object
-	chunk.method = method
-	
-	var id = Entity.create({"chunk" : chunk})
+	EdenWorldDecoder.set_vars()
+	EdenWorldDecoder.init_world()
+	EdenWorldDecoder.get_metadata()
+	ChunkSystem.create_chunk(Vector3(0, 0, 0))

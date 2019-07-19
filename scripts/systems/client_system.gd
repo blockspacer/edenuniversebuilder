@@ -80,8 +80,11 @@ func world_loaded():
 	player.object = Player
 	
 	var player_id = Entity.create({"player" : player})
+	#Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
-	# Create HUD
+	create_hud()
+
+func create_hud():
 	var hud = Dictionary()
 	var hud_id = Entity.create({"hud" : hud})
 	
@@ -108,15 +111,38 @@ func world_loaded():
 	var navbox = Dictionary()
 	navbox.min_size = Vector2(0, OS.get_screen_size().y * 1/3)
 	navbox.parent = Dictionary()
+	navbox.position = 1
 	navbox.parent.id = vertical_id
 	navbox.parent.component = "vertical_container"
 	var navbox_id = Entity.create({"horizontal_container" : navbox})
 	
 	var gamearea = Dictionary()
 	gamearea.parent = Dictionary()
+	gamearea.min_size = Vector2(500, 500)
+	gamearea.position = 0
 	gamearea.parent.id = vertical_id
 	gamearea.parent.component = "vertical_container"
 	var gamearea_id = Entity.create({"horizontal_container" : gamearea})
+	
+	var terminal = Dictionary()
+	terminal.parent = Dictionary()
+	terminal.position = Vector2(0, 0)
+	terminal.debug = true
+	terminal.text = ""
+	terminal.min_size =  Vector2(500, 500)
+	terminal.parent.id = gamearea_id
+	terminal.parent.component = "horizontal_container"
+	var terminal_id = Entity.create({"terminal" : terminal})
+	
+	var terminal2 = Dictionary()
+	terminal2.parent = Dictionary()
+	terminal2.position = Vector2(0, 0)
+	terminal2.debug = true
+	terminal2.text = ""
+	terminal2.min_size =  Vector2(500, 500)
+	terminal2.parent.id = gamearea_id
+	terminal2.parent.component = "horizontal_container"
+	var terminal2_id = Entity.create({"terminal" : terminal2})
 	
 	
 	var joystick = Dictionary()

@@ -18,6 +18,6 @@ func msg(message, level):
 	
 	for id in Entity.get_entities_with("terminal"):
 		var components = Entity.objects[id].components
-		if components.terminal.debug == true:
+		if Entity.get_component(id, "terminal.debug"):
 			components.terminal.text += level + ": " + message + '\n'
 			components.terminal.text_rendered = false

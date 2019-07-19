@@ -30,15 +30,18 @@
 		- object (object) : object that has callback method
 		- method (method) : calls this method when KEY_ENTER is received
 
-	joystick (2) : processes touch movement
+	joystick : processes touch movement {also processed by interface system}
 		- rendered (bool) : triggers the system to render
 		- parent (dictonary) {id:int, compnent:string}
+		- pressed (bool)
+		- move_position (int)
 
 # Interface System
 	terminal : displays text
 		- rendered (bool) : triggers the system to render
 		- parent (dictonary) : the parent control this entity is attached to {id:int, component:string}
 		- position (vector2) : the position of the terminal
+		- min_size (vector2) : the minium size of the control
 		- debug (bool) : if true, shows debug logs
 		- text (string) : the text to display
 

@@ -6,10 +6,6 @@ extends Spatial
 
 ############################## public variables ###############################
 
-var World
-var Hud
-
-
 var map_file = File.new()
 var ChunkLocations = Dictionary()
 var ChunkAddresses = Dictionary()
@@ -27,39 +23,39 @@ var worldAreaHeight = 0
 ################################## functions ##################################
 
 func set_vars(): ##############################################################
-	Hud = World.Hud
-	map_file = World.map_file
-	ChunkLocations = World.ChunkLocations
-	ChunkAddresses = World.ChunkAddresses
-	ChunkMetadata = World.ChunkMetadata
+	pass
+	#map_file = ServerSystem.map_path
+	#ChunkLocations = ServerSystem.ChunkLocations
+	#ChunkAddresses = ServerSystem.ChunkAddresses
+	#ChunkMetadata = ServerSystem.ChunkMetadata
 
-	worldAreaX = World.worldAreaX
-	worldAreaY = World.worldAreaY
-	worldAreaWidth = World.worldAreaWidth
-	worldAreaHeight = World.worldAreaHeight
+	#worldAreaX = ServerSystem.worldAreaX
+	#worldAreaY = ServerSystem.worldAreaY
+	#worldAreaWidth = ServerSystem.worldAreaWidth
+	#worldAreaHeight = ServerSystem.worldAreaHeight
 
 
 func init_world(): ############################################################
-	Hud.msg("We are online. Starting world convertion...", "Info")
-	if World.map_path == null:
-		Hud.msg("InitializeWorld: WorldPath is null", "Error")
-		return false;
+	Debug.msg("We are online. Starting world convertion...", "Info")
+	if ServerSystem.map_path == null:
+		Debug.msg("InitializeWorld: WorldPath is null", "Error")
+		return false
 	
-	Hud.msg("WorldPath is: " + World.map_path, "Info")
+	Debug.msg("WorldPath is: " + ServerSystem.map_path, "Info")
 	
 	var file = File.new()
-	if not file.file_exists(World.map_path):
-		Hud.msg("Creating file " + World.map_path, "Info")
-		World.create_chunk(Vector3(0, 0, 0))
+	if not file.file_exists(ServerSystem.map_path):
+		Debug.msg("Creating file " + ServerSystem.map_path, "Info")
+		ChunkSystem.create_chunk(Vector3(0, 0, 0))
 		#create_metadata()
 		return false
 	
-	Hud.msg("Geting world metadata...", "Info")
+	Debug.msg("Geting world metadata...", "Info")
 	
-	if map_file.open(World.map_path, File.READ) != 0:
-		Hud.msg("Error opening file", "Error")
-	Hud.msg("File length is " + str(map_file.get_len()), "Debug")
-	Hud.msg("File path was " + map_file.get_path(), "Debug")
+	if map_file.open(ServerSystem.map_path, File.READ) != 0:
+		Debug.msg("Error opening file", "Error")
+	Debug.msg("File length is " + str(map_file.get_len()), "Debug")
+	Debug.msg("File path was " + map_file.get_path(), "Debug")
 	
 	var compressed = map_file.get_buffer(map_file.get_len())
 	var uncompressed = compressed.decompress(compressed.size()*10, File.COMPRESSION_GZIP)
@@ -75,34 +71,34 @@ func read_int(position): ######################################################
 
 func get_metadata(): ##########################################################
 	# Open existing file
-	if map_file.open_compressed(World.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
-		Hud.msg("Error opening file", "Error")
-		Hud.msg("File length was " + str(map_file.get_len()), "Debug")
-		Hud.msg("File path was " + map_file.get_path(), "Debug")
+	if map_file.open_compressed(ServerSystem.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
+		Debug.msg("Error opening file", "Error")
+		Debug.msg("File length was " + str(map_file.get_len()), "Debug")
+		Debug.msg("File path was " + map_file.get_path(), "Debug")
 	
 	var data = map_file.get_buffer(map_file.get_len())
 	
 	#while !file.eof_reached():
-		#Hud.msg("Loading map_data...", "Trace")
+		#Debug.msg("Loading map_data...", "Trace")
 		#map_data.append(file.get_buffer(1)[0])
 	
-	World.chunks_cache_size = 0
+	ServerSystem.chunks_cache_size = 0
 	
 	if read_int(0) == null:
-		Hud.msg("Couldn't open input file for reading", "Error")
-		#Hud.msg("World file length is ", FileSize, "", "Error")
+		Debug.msg("Couldn't open input file for reading", "Error")
+		#Debug.msg("World file length is ", FileSize, "", "Error")
 	
-	Hud.msg(["WorldData[0]: ", read_int(0), "!"], "Debug")
-	Hud.msg(["WorldData[1]: ", read_int(1), "!"], "Debug")
-	Hud.msg(["WorldData[4]: ", read_int(4), "!"], "Debug")
+	Debug.msg("WorldData[0]: " + str(read_int(0)) + "!", "Debug")
+	Debug.msg("WorldData[1]: " + str(read_int(1)) + "!", "Debug")
+	Debug.msg("WorldData[4]: " + str(read_int(4)) + "!", "Debug")
 	
 	var chunkPointer = read_int(35) * 256 * 256 * 256 + read_int(34) * 256 * 256 + read_int(33) * 256 + read_int(32)
 	var worldAreaWidthTemp = 0
 	var worldAreaHeightTemp = 0
 	
-	Hud.msg(["chunkPointer: ", chunkPointer], "Debug")
-	#Hud.msg(map_data.size(), "Debug")
-	Hud.msg("World file path is vaid. All systems are go for launch.", "Info")
+	Debug.msg("chunkPointer: " + str(chunkPointer), "Debug")
+	#Debug.msg(map_data.size(), "Debug")
+	Debug.msg("World file path is vaid. All systems are go for launch.", "Info")
 	while chunkPointer + 11 < map_file.get_len():
 		# Find chunk address
 		var address = read_int(chunkPointer + 11) * 256 * 256 * 256 + read_int(chunkPointer + 10) * 256 * 256 + read_int(chunkPointer + 9) * 256 + read_int(chunkPointer + 8)
@@ -135,11 +131,11 @@ func get_metadata(): ##########################################################
 		
 		chunkPointer += 16
 	
-	Hud.msg(["Found ", ChunkLocations.size(), " chunks"], "Info");
-	World.total_chunks = ChunkLocations.size()
-	Hud.msg("Starting chunk is at " + str(ChunkMetadata[0].x) + ", " + str(ChunkMetadata[0].y), "Info")
-	Hud.msg("Spawning the player at " + str(ChunkMetadata[0].x * 16) + ", " + str(ChunkMetadata[0].y * 16), "Info")
-	World.first_chunk = Vector3(ChunkMetadata[0].x * 16, 50, ChunkMetadata[0].y * 16)
+	Debug.msg("Found " + str(ChunkLocations.size()) + " chunks", "Info");
+	ServerSystem.total_chunks = ChunkLocations.size()
+	Debug.msg("Starting chunk is at " + str(ChunkMetadata[0].x) + ", " + str(ChunkMetadata[0].y), "Info")
+	Debug.msg("Spawning the player at " + str(ChunkMetadata[0].x * 16) + ", " + str(ChunkMetadata[0].y * 16), "Info")
+	ServerSystem.first_chunk = Vector3(ChunkMetadata[0].x * 16, 50, ChunkMetadata[0].y * 16)
 	
 	# Get the total world width | max - min + 1
 	worldAreaWidth = worldAreaWidthTemp - worldAreaX + 1;
@@ -148,17 +144,17 @@ func get_metadata(): ##########################################################
 	worldAreaHeight = worldAreaHeightTemp - worldAreaY + 1;
 	
 	if ChunkLocations.size() < 1:
-		Hud.msg("GetWorldMetadata: ChunkLocations was null!", "Error");
+		Debug.msg("GetWorldMetadata: ChunkLocations was null!", "Error");
 		return false;
 	return true;
 
 
 func get_chunk_data(location): ################################################
 	if ChunkAddresses.size() < 0:
-		Hud.msg("Invaild world data!", "Error");
+		Debug.msg("Invaild world data!", "Error");
 		return false
 	if !ChunkAddresses.has(location):
-		Hud.msg("Chunk data does not exist!", "Warn");
+		Debug.msg("Chunk data does not exist!", "Warn");
 		return false
 	
 	var ChunkData = Array()
@@ -204,7 +200,7 @@ func get_chunk_data(location): ################################################
 					
 					if id != 0 && id <= 79 && id > 0:
 						# Logger.Log("Block is valid", "Debug");
-						#Hud.msg(id, "Trace")
+						#Debug.msg(id, "Trace")
 						var BlockData  = {
 							"position": Position, 
 							"id": id, 
@@ -213,8 +209,8 @@ func get_chunk_data(location): ################################################
 						}
 						
 						ChunkData.append(BlockData);
-						#Hud.msg(["id: ", id], "Trace")
-						#Hud.msg(["Adding Block ", ChunkData.size()], "Debug");
-					#Hud.msg(["Chunk data tmp: ", ChunkData.size(), " blocks"], "Debug");
-	Hud.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug");
+						#Debug.msg(["id: ", id], "Trace")
+						#Debug.msg(["Adding Block ", ChunkData.size()], "Debug");
+					#Debug.msg(["Chunk data tmp: ", ChunkData.size(), " blocks"], "Debug");
+	Debug.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug");
 	return ChunkData;

@@ -8,17 +8,14 @@ func _process(delta):
 	for id in Entity.get_entities_with("terminal"):
 		if get_node("/root/Entity/" + str(id)):
 			if Entity.get_component(id, "terminal.rendered") == false:
-				var node = get_node("/root/Entity/" + str(id))
-				
-				var terminal = load("res://scenes/terminal.tscn").instance()
-				node.add_child(terminal)
-				
-				get_node("/root/Entity/" + str(id) + "/Terminal").rect_position = Entity.get_component(id, "terminal.position")
-				get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
-				Entity.set_component(id, "terminal.rendered", true)
+				Debug.msg("Creating Terminal...", "Info")
+				create_terminal(id)
 			if Entity.get_component(id, "terminal.text_rendered") == false:
-				get_node("/root/Entity/" + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
-				Entity.set_component(id, "terminal.text_rendered", true)
+				var path = Entity.get_node_path(Entity.get_component(id, "terminal.parent"))
+				if get_tree().get_root().has_node(path + str(id)):
+					if Entity.get_component(id, "terminal.text"):
+						get_node(path + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
+					Entity.set_component(id, "terminal.text_rendered", true)
 	
 	for id in Entity.get_entities_with("hud"):
 		if get_node("/root/Entity/" + str(id)):
@@ -68,6 +65,7 @@ func create_hud(id):
 	hud.name = "Hud"
 	hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hud.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	hud.mouse_filter = Control.MOUSE_FILTER_PASS
 	hud.anchor_right = 1
 	hud.anchor_bottom = 1
 	node.add_child(hud)
@@ -80,7 +78,10 @@ func process_hud(id):
 func create_vertical_container(id):
 	var vertical_container = VBoxContainer.new()
 	vertical_container.name = "VerticalContainer"
-	vertical_container.rect_min_size.y = 300
+	
+	if Entity.get_component(id, "vertical_container.min_size"):
+		vertical_container.rect_min_size = Entity.get_component(id, "vertical_container.min_size")
+	
 	vertical_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vertical_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vertical_container.anchor_right = 1
@@ -92,9 +93,23 @@ func process_vertical_container(id):
 	pass
 
 func create_horizontal_container(id):
+	var position = Entity.get_component(id, "horizontal_container.position")
+	if position:
+		var path = Entity.get_node_path(Entity.get_component(id, "horizontal_container.parent"))
+		if get_tree().get_root().has_node(path):
+			Debug.msg(str(get_node(path).get_child_count()), "Debug")
+			if position == 1 && get_node(path).get_child_count() < 1:
+				Debug.msg("Component creation delayed for position " + str(position), "Info")
+				return false
+		else:
+			return false
+	
 	var horizontal_container = HBoxContainer.new()
 	horizontal_container.name = "HorizontalContainer"
-	horizontal_container.rect_min_size.y = 300
+	
+	if Entity.get_component(id, "horizontal_container.min_size"):
+		horizontal_container.rect_min_size = Entity.get_component(id, "horizontal_container.min_size")
+	
 	horizontal_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	horizontal_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	horizontal_container.anchor_right = 1
@@ -108,7 +123,14 @@ func process_horizontal_container(id):
 func create_joystick(id):
 	var joystick = load("res://scenes/joystick.tscn").instance()
 	
-	Entity.add_node(id, "joystick", joystick)
+	var path = Entity.add_node(id, "joystick", joystick)
+	
+	if path:
+		get_node(path + str(id) + "/Joystick/Bottom").connect("button_up", InputSystem, "_joystick_pressed", [false, id])
+		get_node(path + str(id) + "/Joystick/Bottom").connect("button_down", InputSystem, "_joystick_pressed", [true, id])
+		get_node(path + str(id) + "/Joystick/Bottom/Top").connect("button_up", InputSystem, "_joystick_pressed", [false, id])
+		get_node(path + str(id) + "/Joystick/Bottom/Top").connect("button_down", InputSystem, "_joystick_pressed", [true, id])
+		Debug.msg("Linked!", "Debug")
 
 func process_joystick(id):
 	pass
@@ -120,6 +142,20 @@ func create_toolbox(id):
 
 func process_toolbox(id):
 	pass
+
+func create_terminal(id):
+	var path = Entity.get_node_path(Entity.get_component(id, "terminal.parent"))
+	var terminal = load("res://scenes/terminal.tscn").instance()
+	Entity.add_node(id, "terminal", terminal)
+	
+	if get_tree().get_root().has_node(path + str(id)):
+		if Entity.get_component(id, "terminal.min_size"):
+			terminal.rect_min_size = Entity.get_component(id, "terminal.min_size")
+		
+		if Entity.get_component(id, "terminal.position"):
+			get_node(path + str(id) + "/Terminal").rect_position = Entity.get_component(id, "terminal.position")
+		if Entity.get_component(id, "terminal.text"):
+			get_node(path + str(id) + "/Terminal/Text").text = Entity.get_component(id, "terminal.text")
 
 #################################### Main Menu stuff ####################################
 
