@@ -59,5 +59,12 @@
 		- parent (dictonary) {id:int, compnent:string}
 		- min_size (Vector2)
 		- position (int)
-	
+
+	jump_button : hud element
+		- rendered (bool)
+		- parent (dictonary)
+
+	debug_info : on-screen debug infomation
+		- rendered (bool)
+		- parent (dictonary)
 

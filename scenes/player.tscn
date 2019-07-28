@@ -19,4 +19,6 @@ transform = Transform( 1, 0, -1.40908e-27, 0, 1, 0, 0, 0, 1, 0, 0.75, 0 )
 [node name="Camera" type="Camera" parent="Head"]
 environment = ExtResource( 1 )
 current = true
-
+fov = 90.0
+near = 0.01
+far = 1000.0

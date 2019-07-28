@@ -1,11 +1,5 @@
 [gd_scene format=2]
 
-[node name="World" type="Spatial"]
-
-[node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.384832, 0.922986, 0, -0.922986, 0.384832, 0, 50, 0 )
-light_color = Color( 0.941406, 0.937269, 0.676636, 1 )
-light_energy = 0.5
-shadow_enabled = true
-shadow_color = Color( 0.28125, 0.28125, 0.28125, 1 )
-
+[node name="World" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0

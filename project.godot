@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="edenuniversebuilder"
-run/main_scene="res://scenes/ui.tscn"
+run/main_scene="res://scenes/world.tscn"
 boot_splash/image="res://icons/splash2.png"
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
 

@@ -40,39 +40,6 @@ var jump_height = 15
 
 ################################### signals ###################################
 
-func _ready(): ################################################################
-	#World.total_players += 1
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	#camera_width_center = OS.get_window_size().x / 2
-	#camera_height_center = OS.get_window_size().y / 2
-
-#func _physics_process(delta): #################################################
-#	if move_mode == "fly":
-#		fly(delta)
-#	else:
-#		walk(delta)
-	
-#	if false:
-#		var location = World.get_chunk(translation)
-#		var block_location = get_looking_at(OS.get_window_size() / 2)
-#		var normal = get_looking_at_normal(OS.get_window_size() / 2)
-#
-#		#Hud.msg("Normal: " + str(normal), "Debug")
-#		normal = Vector3(int(round(normal.x)), int(round(normal.y)), int(round(normal.z)))
-#		block_location = block_location - normal
-#
-#		if Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z))) != highlighted_block:
-#			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-#			Chunk.place_block(highlighted_block_id, highlighted_block)
-#			highlighted_block = Vector3(int(floor(block_location.x)), int(floor(block_location.y)), int(floor(block_location.z)))
-#
-#		if World.chunk_index.has(location):
-#			var Chunk = get_node("/root/World/" + str(location.x) + ", " + str(location.y) + ", " + str(location.z))
-#			#Hud.msg("Breaking block: " + str(Vector3(int(round(block_location.x)), int(round(block_location.y)), int(round(block_location.z)))), "Info")
-#			Chunk.place_block(0, Vector3(int(floor(block_location)), int(floor(block_location.y)), int(floor(block_location.z))))
-#		else:
-#			Hud.msg("Invalid chunk!", "Error")
-
 
 func _input(event): ###########################################################
 	pass
@@ -233,7 +200,7 @@ func get_looking_at_normal(id, position): ######################################
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
-	var camera = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera")
+	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
@@ -251,7 +218,7 @@ func get_looking_at(id, position): #############################################
 	#var from = camera.project_ray_origin(event.position)
 	#var to = from + camera.project_ray_normal(event.position) * 1000
 	
-	var camera = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera")
+	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
 	var build_normal = camera.project_ray_normal(position) * 1000
@@ -265,6 +232,8 @@ func get_looking_at(id, position): #############################################
 
 
 func walk(delta, id): #############################################################
+	if !get_tree().get_root().has_node("/root/World/" + str(id) + "/Player/Head/Camera"):
+		return false
 	# reset the direction of the player
 	direction = Vector3()
 	
@@ -273,7 +242,7 @@ func walk(delta, id): ##########################################################
 	#	direction += Vector3(move_direction.x / 2, 0,  move_direction.y / 2)
 	#else:
 	# get the rotation of the camera
-	var aim = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera").get_global_transform().basis
+	var aim = get_node("/root/World/" + str(id) + "/Player/Head/Camera").get_global_transform().basis
 	if Input.is_action_pressed("move_forward"): # or World.player_move_forward:
 		direction -= aim.z
 	if Input.is_action_pressed("move_backward"):
@@ -313,7 +282,7 @@ func walk(delta, id): ##########################################################
 	velocity.z = temp_velocity.z
 	
 	# move
-	get_node("/root/Entity/" + str(id) + "/Player").move_and_slide(velocity, Vector3(0, 1, 0))
+	get_node("/root/World/" + str(id) + "/Player").move_and_slide(velocity, Vector3(0, 1, 0))
 	
 	if Input.is_action_just_pressed("jump"):
 		velocity.y = jump_height
@@ -324,7 +293,7 @@ func fly(delta, id): ###########################################################
 	direction = Vector3()
 	
 	# get the rotation of the camera
-	var aim = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera").get_global_transform().basis
+	var aim = get_node("/root/World/" + str(id) + "/Player/Head/Camera").get_global_transform().basis
 	if Input.is_action_pressed("move_forward"):
 		direction -= aim.z
 	if Input.is_action_pressed("move_backward"):
@@ -344,4 +313,4 @@ func fly(delta, id): ###########################################################
 	velocity = velocity.linear_interpolate(target, FLY_ACCEL * delta)
 	
 	# move
-	get_node("/root/Entity/" + str(id) + "/Player").move_and_slide(velocity)
+	get_node("/root/World/" + str(id) + "/Player").move_and_slide(velocity)

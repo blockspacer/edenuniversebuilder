@@ -7,58 +7,62 @@ extends Spatial
 ############################## public variables ###############################
 
 var map_file = File.new()
-var ChunkLocations = Dictionary()
-var ChunkAddresses = Dictionary()
-var ChunkMetadata = Array()
+var chunk_metadata = Dictionary()
 
 
 var worldAreaX = 0
 var worldAreaY = 0
-var worldAreaWidth = 0
-var worldAreaHeight = 0
+var world_width = 0
+var world_height = 0
 
 
 
 
 ################################## functions ##################################
 
-func set_vars(): ##############################################################
-	pass
-	#map_file = ServerSystem.map_path
-	#ChunkLocations = ServerSystem.ChunkLocations
-	#ChunkAddresses = ServerSystem.ChunkAddresses
-	#ChunkMetadata = ServerSystem.ChunkMetadata
-
-	#worldAreaX = ServerSystem.worldAreaX
-	#worldAreaY = ServerSystem.worldAreaY
-	#worldAreaWidth = ServerSystem.worldAreaWidth
-	#worldAreaHeight = ServerSystem.worldAreaHeight
-
-
-func init_world(): ############################################################
-	Debug.msg("We are online. Starting world convertion...", "Info")
+func create_world():
+	Debug.msg("We are online. Starting eden2 world file creation...", "Info")
+	
 	if ServerSystem.map_path == null:
 		Debug.msg("InitializeWorld: WorldPath is null", "Error")
 		return false
+	else:
+		Debug.msg("WorldPath is: " + ServerSystem.map_path, "Info")
+
+func load_world(): ############################################################
+	Debug.msg("We are online. Starting eden2 world file loading...", "Info")
 	
-	Debug.msg("WorldPath is: " + ServerSystem.map_path, "Info")
+	if ServerSystem.map_path == null:
+		Debug.msg("InitializeWorld: WorldPath is null", "Error")
+		return false
+	else:
+		Debug.msg("WorldPath is: " + ServerSystem.map_path, "Info")
 	
-	var file = File.new()
-	if not file.file_exists(ServerSystem.map_path):
+	if not map_file.file_exists(ServerSystem.map_path):
+		Debug.msg("World file does not exist!", "Warn")
 		Debug.msg("Creating file " + ServerSystem.map_path, "Info")
-		ChunkSystem.create_chunk(Vector3(0, 0, 0))
-		#create_metadata()
+		create_world()
+	elif map_file.open(ServerSystem.map_path, File.READ) != 0:
+		Debug.msg("Error opening file", "Error")
+		return false
+	elif read_int(0) == null:
+		Debug.msg("Couldn't open input file for reading", "Error")
 		return false
 	
-	Debug.msg("Geting world metadata...", "Info")
+	# Check if world file is compressed
+	map_file.seek(0)
+	if map_file.get_buffer(1)[0] == 0x1f and map_file.get_buffer(2)[0] == 0x8b:
+		Debug.msg("Map file is compressed... Decompressing", "Debug")
+		if map_file.open_compressed(ServerSystem.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
+			Debug.msg("Error opening file", "Error")
+			return false
+	else:
+		Debug.msg("Map file is uncompressed", "Debug")
+		if map_file.open(ServerSystem.map_path, File.READ) != 0:
+			Debug.msg("Error opening file", "Error")
+			return false
 	
-	if map_file.open(ServerSystem.map_path, File.READ) != 0:
-		Debug.msg("Error opening file", "Error")
-	Debug.msg("File length is " + str(map_file.get_len()), "Debug")
-	Debug.msg("File path was " + map_file.get_path(), "Debug")
-	
-	var compressed = map_file.get_buffer(map_file.get_len())
-	var uncompressed = compressed.decompress(compressed.size()*10, File.COMPRESSION_GZIP)
+	Debug.msg("File is loaded! Length is " + str(map_file.get_len()), "Info")
 	
 	return get_metadata()
 
@@ -68,129 +72,92 @@ func read_int(position): ######################################################
 	var buffer = map_file.get_buffer(1)
 	return buffer[0]
 
+func read_float(position): ####################################################
+	map_file.seek(position)
+	return map_file.get_float()
+
 
 func get_metadata(): ##########################################################
-	# Open existing file
-	if map_file.open_compressed(ServerSystem.map_path, File.READ, File.COMPRESSION_GZIP) != 0:
-		Debug.msg("Error opening file", "Error")
-		Debug.msg("File length was " + str(map_file.get_len()), "Debug")
-		Debug.msg("File path was " + map_file.get_path(), "Debug")
+	var chunk_pointer = read_int(35) * 256 * 256 * 256 + read_int(34) * 256 * 256 + read_int(33) * 256 + read_int(32)
+	Debug.msg("Chunk Pointer: " + str(chunk_pointer), "Debug")
 	
-	var data = map_file.get_buffer(map_file.get_len())
+	ServerSystem.last_location = Vector3(read_float(4), read_float(8), read_float(12))
+	ServerSystem.home_location = Vector3(read_float(16), read_float(20), read_float(24))
+	ServerSystem.home_rotation = read_float(28)
 	
-	#while !file.eof_reached():
-		#Debug.msg("Loading map_data...", "Trace")
-		#map_data.append(file.get_buffer(1)[0])
 	
-	ServerSystem.chunks_cache_size = 0
-	
-	if read_int(0) == null:
-		Debug.msg("Couldn't open input file for reading", "Error")
-		#Debug.msg("World file length is ", FileSize, "", "Error")
-	
-	Debug.msg("WorldData[0]: " + str(read_int(0)) + "!", "Debug")
-	Debug.msg("WorldData[1]: " + str(read_int(1)) + "!", "Debug")
-	Debug.msg("WorldData[4]: " + str(read_int(4)) + "!", "Debug")
-	
-	var chunkPointer = read_int(35) * 256 * 256 * 256 + read_int(34) * 256 * 256 + read_int(33) * 256 + read_int(32)
-	var worldAreaWidthTemp = 0
-	var worldAreaHeightTemp = 0
-	
-	Debug.msg("chunkPointer: " + str(chunkPointer), "Debug")
-	#Debug.msg(map_data.size(), "Debug")
 	Debug.msg("World file path is vaid. All systems are go for launch.", "Info")
-	while chunkPointer + 11 < map_file.get_len():
+	world_width = 0
+	world_height = 0
+	while chunk_pointer + 11 < map_file.get_len():
 		# Find chunk address
-		var address = read_int(chunkPointer + 11) * 256 * 256 * 256 + read_int(chunkPointer + 10) * 256 * 256 + read_int(chunkPointer + 9) * 256 + read_int(chunkPointer + 8)
+		var address = read_int(chunk_pointer + 11) * 256 * 256 * 256 + read_int(chunk_pointer + 10) * 256 * 256 + read_int(chunk_pointer + 9) * 256 + read_int(chunk_pointer + 8)
 		# Find the position of the chunk
-		var x = (read_int(chunkPointer + 1) * 256 + read_int(chunkPointer)) - 4000     # Minus 4000 to center the world around 0, 0
+		var x = (read_int(chunk_pointer + 1) * 256 + read_int(chunk_pointer)) - 4000     # Minus 4000 to center the world around 0, 0
 		
-		var y = (read_int(chunkPointer + 5) * 256 + read_int(chunkPointer + 4)) - 4000 # This shouldn't brake anything
+		var y = (read_int(chunk_pointer + 5) * 256 + read_int(chunk_pointer + 4)) - 4000 # This shouldn't brake anything
 		
 		if worldAreaX > x:
 			worldAreaX = x
 		if worldAreaY > y:
 			worldAreaY = y
 		
-		if worldAreaWidthTemp < x:
-			worldAreaWidthTemp = x
-		if worldAreaHeightTemp < y:
-			worldAreaHeightTemp = y
+		if world_width < x:
+			world_width = x
+		if world_height < y:
+			world_height = y
 		
-		ChunkLocations[address] =  Vector2(x, y)
-		
-		ChunkAddresses[Vector2(x, y)] = address
-		
-		var ChunkData  = {
+		var chunk_data  = {
 			"address": address, 
 			"x": x, 
 			"y": y, 
 		}
 		
-		ChunkMetadata.append(ChunkData)
+		chunk_metadata[Vector3(x, 0, y)] = (chunk_data)
 		
-		chunkPointer += 16
+		chunk_pointer += 16
 	
-	Debug.msg("Found " + str(ChunkLocations.size()) + " chunks", "Info");
-	ServerSystem.total_chunks = ChunkLocations.size()
-	Debug.msg("Starting chunk is at " + str(ChunkMetadata[0].x) + ", " + str(ChunkMetadata[0].y), "Info")
-	Debug.msg("Spawning the player at " + str(ChunkMetadata[0].x * 16) + ", " + str(ChunkMetadata[0].y * 16), "Info")
-	ServerSystem.first_chunk = Vector3(ChunkMetadata[0].x * 16, 50, ChunkMetadata[0].y * 16)
+	
+	Debug.msg("Found " + str(chunk_metadata.size()) + " chunks", "Info");
+	Debug.msg(str(chunk_metadata), "Trace")
+	ServerSystem.total_chunks = chunk_metadata.size()
 	
 	# Get the total world width | max - min + 1
-	worldAreaWidth = worldAreaWidthTemp - worldAreaX + 1;
+	world_width = world_width - worldAreaX + 1;
 	
 	# Get the total world height | max - min + 1
-	worldAreaHeight = worldAreaHeightTemp - worldAreaY + 1;
+	world_height = world_height - worldAreaY + 1;
 	
-	if ChunkLocations.size() < 1:
+	if chunk_metadata.size() < 1:
 		Debug.msg("GetWorldMetadata: ChunkLocations was null!", "Error");
 		return false;
 	return true;
 
 
 func get_chunk_data(location): ################################################
-	if ChunkAddresses.size() < 0:
+	if chunk_metadata.size() < 0:
 		Debug.msg("Invaild world data!", "Error");
 		return false
-	if !ChunkAddresses.has(location):
-		Debug.msg("Chunk data does not exist!", "Warn");
+	if !chunk_metadata.has(Vector3(location.x, 0, location.z)):
+		#Debug.msg("Chunk data does not exist!", "Warn");
 		return false
 	
-	var ChunkData = Array()
-	#var chunk = ChunkMetadata[floor(rand_range(0, 5))].address
-	var chunk = ChunkAddresses[location]
-	
-	#gzFile File;
-	#File = gzopen(TCHAR_TO_UTF8(*WorldPath), "rb");
-	#if(File == NULL)
-	#{
-	#	Logger.Log("Couldn't open input file for reading", "Error");
-	#}
-	
-	# Grabbing the chunk position
-	var globalChunkPosX = ChunkLocations[chunk].x
-	var globalChunkPosY = ChunkLocations[chunk].y
-	
-	var realChunkPosX = (globalChunkPosX*16) * 100
-	var realChunkPosY = (globalChunkPosY*16) * 100
-	
-	# Gets the staring point for placing blocks in the chunk
-	var baseX = (ChunkLocations[chunk].x - worldAreaX) * 16
-	var baseY = (ChunkLocations[chunk].y - worldAreaY) * 16
+	var chunk_data = Dictionary()
+	var chunk_address = chunk_metadata[Vector3(location.x, 0, location.z)].address
+	#Debug.msg("Chunk Address: " + str(chunk_address), "Debug")
 	
 	for baseHeight in range(4):
 		for x in range(16):
 			for y in range(16):
 				for z in range(16):
-					var id = read_int(chunk + baseHeight * 8192 + x * 256 + y * 16 + z)
-					var color = read_int(chunk + baseHeight * 8192 + x * 256 + y * 16 + z + 4096)
+					var id = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z)
+					var color = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z + 4096)
 					
-					var RealX = (x + (globalChunkPosX*16));
-					var RealY = (y + (globalChunkPosY*16));
+					var RealX = (x + (location.x*16));
+					var RealY = (y + (location.z*16));
 					var RealZ = (z + (16 * baseHeight));
 					
-					var Position = Vector3(x, y, z + 16 * baseHeight);
+					var position = Vector3(x, z + 16 * baseHeight, y);
 					
 					#Logger.LogInt("=== Id: ", Id, " ===", "Debug");
 					#Logger.LogInt("Color: ", Color, "", "Debug");
@@ -201,16 +168,14 @@ func get_chunk_data(location): ################################################
 					if id != 0 && id <= 79 && id > 0:
 						# Logger.Log("Block is valid", "Debug");
 						#Debug.msg(id, "Trace")
-						var BlockData  = {
-							"position": Position, 
+						var block_data  = {
 							"id": id, 
-							"color": color, 
-							"chunk": chunk
+							"color": color
 						}
 						
-						ChunkData.append(BlockData);
+						chunk_data[position] = block_data;
 						#Debug.msg(["id: ", id], "Trace")
-						#Debug.msg(["Adding Block ", ChunkData.size()], "Debug");
-					#Debug.msg(["Chunk data tmp: ", ChunkData.size(), " blocks"], "Debug");
-	Debug.msg(["Chunk data contains ", ChunkData.size(), " blocks"], "Debug");
-	return ChunkData;
+						#Debug.msg(["Adding Block ", chunk_data.size()], "Debug");
+					#Debug.msg(["Chunk data tmp: ", chunk_data.size(), " blocks"], "Debug");
+	#Debug.msg(str("Chunk data contains ", chunk_data.size(), " blocks"), "Debug");
+	return chunk_data;

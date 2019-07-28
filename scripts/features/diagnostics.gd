@@ -13,6 +13,7 @@ func run(object, method):
 	var terminal = Dictionary()
 	terminal.rendered = false
 	terminal.position = Vector2(0, 0)
+	terminal.min_size = OS.window_size
 	terminal.debug = true
 	terminal.text = ""
 	
@@ -95,28 +96,26 @@ func _update_terminal(id, components):
 		28:
 			Debug.msg("User Data Directory: " + str(OS.get_user_data_dir()), "Info")
 		29:
-			Debug.msg("Audio Driver: " + str(OS.get_audio_driver_name(OS.get_audio_driver_count())), "Info")
-		30:
 			Debug.msg("Video Driver: " + str(OS.get_video_driver_name(OS.get_video_driver_count())), "Info")
-		31:
+		30:
 			Debug.msg("Virtual Keyboard Height: " + str(OS.get_virtual_keyboard_height()), "Info")
-		32:
+		31:
 			Debug.msg("Window Safe Area: " + str(OS.get_window_safe_area()), "Info")
-		33:
+		32:
 			Debug.msg("Is Debug Feature: " + str(OS.has_feature("debug")), "Info")
-		34:
+		33:
 			Debug.msg("Has Touchscreen: " + str(OS.has_touchscreen_ui_hint()), "Info")
-		35:
+		34:
 			Debug.msg("Has Virtual Keyboard: " + str(OS.has_virtual_keyboard()), "Info")
-		36:
+		35:
 			Debug.msg("Is Debug Build: " + str(OS.is_debug_build()), "Info")
-		37:
+		36:
 			Debug.msg("Is Ok Left and Cancel Right: " + str(OS.is_ok_left_and_cancel_right()), "Info")
-		38:
+		37:
 			Debug.msg("Is Userfs Persistent: " + str(OS.is_userfs_persistent()), "Info")
-		39:
+		38:
 			Debug.msg("Is Window Always on Top: " + str(OS.is_window_always_on_top()), "Info")
-		40:
+		39:
 			show_text(id, components, "Type '" + keyword +"' to continue: ")
 			OS.show_virtual_keyboard()
 			create_text_input()

@@ -2,6 +2,7 @@
 extends Node
 
 var pressed = false
+var move_mode = "walk"
 
 func _ready():
 	Debug.msg("Input System ready.", "Info")
@@ -9,11 +10,11 @@ func _ready():
 func _process(delta):
 	var entities = Entity.get_entities_with("hud")
 #	for id in entities:
-#		if get_node("/root/Entity/" + str(id)):
+#		if get_node("/root/World/" + str(id)):
 #			var components = entities[id].components
 #			if !Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.input_system") and Entity.get_component(id, "hud.horizontal_main.vertical_main.nav_controls.joystick.interface_system"):
-#				var bottom = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Bottom")
-#				var top = get_node("/root/Entity/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Top")
+#				var bottom = get_node("/root/World/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Bottom")
+#				var top = get_node("/root/World/" + str(id) + "/Hud/HorizontalMain/VerticalMain/NavControls/Joystick/Top")
 #
 #				bottom.connect("button_down", self, "_joystick_pressed", [true])
 #				bottom.connect("button_up", self, "_joystick_pressed", [false])
@@ -39,7 +40,7 @@ func _joystick_pressed(down, id):
 
 func ready(): ################################################################
 	World.total_players += 1
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	#camera_width_center = OS.get_window_size().x / 2
 	#camera_height_center = OS.get_window_size().y / 2
 
@@ -49,8 +50,15 @@ func _physics_process(delta): #################################################
 			var components = Entity.objects[id].components
 			if components.has("player"):
 				#connect("submit", components.text_input.object, components.text_input.method, [id])
-				#Player.fly(delta, id)
-				Player.walk(delta, id)
+				var player_path = Entity.get_node_path({"id":id, "component":"player"})
+				if get_tree().get_root().has_node(player_path + "Capsule"):
+					if move_mode == "walk":
+						Player.walk(delta, id)
+						get_node(player_path + "Capsule").disabled = false
+					else:
+						Player.fly(delta, id)
+						get_node(player_path + "Capsule").disabled = true
+				
 				#if event is InputEventKey and event.pressed:
 					#if event.scancode == KEY_ENTER:
 						#emit_signal("submit")
@@ -64,7 +72,7 @@ func _input(event): ###########################################################
 			var components = Entity.objects[id].components
 			if components.has("text_input"):
 				if components.text_input.rendered == false:
-					var node = get_node("/root/Entity/" + str(id))
+					var node = get_node("/root/World/" + str(id))
 					
 					var text_input = Control.new()
 					text_input.name = "TextInput"
@@ -94,8 +102,8 @@ func _input(event): ###########################################################
 	for id in entities:
 		var components = entities[id].components
 		if components.player.rendered == true:
-			var head = get_node("/root/Entity/" + str(id) + "/Player/Head")
-			var camera = get_node("/root/Entity/" + str(id) + "/Player/Head/Camera")
+			var head = get_node("/root/World/" + str(id) + "/Player/Head")
+			var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 			
 			if event is InputEventMouseMotion:
 				#if Hud.analog_is_pressed == false:
@@ -124,15 +132,12 @@ func _input(event): ###########################################################
 			#Entity.edit(id, components)
 	
 	if event.is_action_pressed("fly"):
-		pass
-		#if move_mode == "walk":
-			#Debug.msg("Changing move_mode to fly...", "Info")
-			#move_mode = "fly"
-			#get_node("Capsule").disabled = true
-		#else:
-			#Debug.msg("Changing move_mode to walk...", "Info")
-			#move_mode = "walk"
-			#get_node("Capsule").disabled = false
+		if move_mode == "walk":
+			Debug.msg("Changing move_mode to fly...", "Info")
+			move_mode = "fly"
+		else:
+			Debug.msg("Changing move_mode to walk...", "Info")
+			move_mode = "walk"
 	
 	if event.is_action_pressed("break"):
 		#action(OS.get_window_size() / 2)

@@ -2,40 +2,40 @@ extends Node
 
 const surrounding_blocks = [ Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0), Vector3(-1, 0, 0) ]
 
-func can_be_seen(position):
+func can_be_seen(position, block_data):
 	var num_surrounding_blocks = [ ]
 	
 	for surrounding_position in surrounding_blocks:
-		#if block_data.has(position + surrounding_position):
+		if block_data.has(position + surrounding_position):
 			num_surrounding_blocks.append(surrounding_position)
 	return num_surrounding_blocks
 
-func create_cube(position, id, mesh, vertex_data, materials):
+func create_cube(position, id, mesh, vertex_data, materials, block_data):
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_material(materials[id])
 	
-	var sides_not_to_render = can_be_seen(position)
+	var sides_not_to_render = can_be_seen(position, block_data)
 	
-	#if !sides_not_to_render.has(Vector3(0, -1, 0)):
-	vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, -1, 0), "down")
+	if !sides_not_to_render.has(Vector3(0, -1, 0)):
+		vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, -1, 0), "down")
 	
-	#if !sides_not_to_render.has(Vector3(0, 1, 0)): 
-	vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, 0, 0), "up")
+	if !sides_not_to_render.has(Vector3(0, 1, 0)): 
+		vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, 0, 0), "up")
 	
 	
 	
-	#if !sides_not_to_render.has(Vector3(0, 0, 1)):
-	vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 1), "west")
+	if !sides_not_to_render.has(Vector3(0, 0, 1)):
+		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 1), "west")
 	
-	#if !sides_not_to_render.has(Vector3(0, 0, -1)):
-	vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "east")
+	if !sides_not_to_render.has(Vector3(0, 0, -1)):
+		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "east")
 	
-	#if !sides_not_to_render.has(Vector3(-1, 0, 0)):
-	vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "north")
+	if !sides_not_to_render.has(Vector3(-1, 0, 0)):
+		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "north")
 	
-	#if !sides_not_to_render.has(Vector3(1, 0, 0)):
-	vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(1, 0, 0), "south")
+	if !sides_not_to_render.has(Vector3(1, 0, 0)):
+		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(1, 0, 0), "south")
 	
 	return { "mesh" : st.commit(mesh), "vertex_data" : vertex_data }
 

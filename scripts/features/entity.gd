@@ -1,9 +1,12 @@
 # manages and stores entity data
-extends Node
+extends Control
 
 var objects = Dictionary()
-var delayed = Dictionary()
+#var delayed = Dictionary()
 var unique = 0
+
+func _ready():
+	mouse_filter = MOUSE_FILTER_PASS
 
 func create(components):
 	var entity = Dictionary()
@@ -12,11 +15,12 @@ func create(components):
 	unique+=1
 	entity.components = components
 	
-	var node = Node.new()
+	var node = MarginContainer.new()
 	node.name = str(entity.id)
+	mouse_filter = MOUSE_FILTER_PASS
 	#node.anchor_right = 1
 	#node.anchor_bottom = 1
-	add_child(node)
+	get_node("/root/World").add_child(node)
 	
 	objects[entity.id] = entity
 	
@@ -24,7 +28,8 @@ func create(components):
 
 func destory(id):
 	objects.erase(id)
-	get_node(str(id)).queue_free()
+	if get_tree().get_root().has_node("/root/World/" + str(id)):
+		get_node("/root/World/" + str(id)).queue_free()
 
 func get_entities_with(component):
 	var searched = Dictionary()
@@ -60,7 +65,7 @@ func set_component(id, path, value):
 
 func get_node_path(parent): # {id:int, component:string}
 	if !parent:
-		return "/root/Entity/"
+		return "/root/World/"
 	
 	var parents = Array()
 	var root = false
@@ -74,7 +79,7 @@ func get_node_path(parent): # {id:int, component:string}
 		else:
 			root = true
 	
-	var path = "/root/Entity/"
+	var path = "/root/World/"
 	parents.invert()
 	for entity in parents:
 		var comp = entity.component.capitalize().split(" ").join("")
@@ -88,7 +93,7 @@ func add_node(id, component, node):
 	
 	if get_tree().get_root().has_node(path):
 		if !get_node(path).has_node(path + str(id)):
-			var entity = Control.new()
+			var entity = MarginContainer.new()
 			entity.name = str(id)
 			entity.mouse_filter = Control.MOUSE_FILTER_PASS
 			get_node(path).add_child(entity)
@@ -105,15 +110,12 @@ func add_node(id, component, node):
 func inherit_child_rect(id, component): # component string
 	var parent = get_node(get_node_path(get_component(id, component + ".parent")) + str(id))
 	var child = get_node(get_node_path(get_component(id, component + ".parent")) + str(id) + "/" + component.capitalize().split(" ").join(""))
-	if parent is Control:
-		parent.size_flags_horizontal = Control.SIZE_FILL
-		if component != "joystick":
-			parent.size_flags_vertical = Control.SIZE_FILL
-		parent.rect_min_size.y = child.rect_min_size.y
-		parent.rect_size = child.rect_size
-		parent.margin_bottom = 0
-		parent.margin_left = 0
-		parent.margin_right = 0 
-		parent.margin_top = 0
-		
-	
+	parent.size_flags_horizontal = Control.SIZE_FILL
+	if component != "joystick":
+		parent.size_flags_vertical = Control.SIZE_FILL
+	parent.rect_min_size = child.rect_min_size
+	parent.rect_size = child.rect_size
+	parent.margin_bottom = 0
+	parent.margin_left = 0
+	parent.margin_right = 0 
+	parent.margin_top = 0

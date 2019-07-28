@@ -1,36 +1,36 @@
 extends Node
 
-var version = "EdenUniverseBuilder v3.0.0 beta5"
-var loaded = false
-var player_teleported = false
-var total_players = 0
-var players = Array()
-var total_entities = 0
-var first_chunk = Vector3(0, 0, 0)
-var blocks_loaded = 0
-var blocks_found = 0
-var total_chunks = 0
-var chunks_cache_size = 0
-var loaded_chunks = 0
+var version = "EdenUniverseBuilder v3.0.0 beta6"
+#var loaded = false
+#var player_teleported = false
+#var total_players = 0
+#var players = Array()
+#var total_entities = 0
+#var first_chunk = Vector3(0, 0, 0)
+#var blocks_loaded = 0
+#var blocks_found = 0
+#var total_chunks = 0
+#var chunks_cache_size = 0
+#var loaded_chunks = 0
 var chunk_index = []
-var temp_player_chunk = Vector3(0, 0, 0)
+#var temp_player_chunk = Vector3(0, 0, 0)
 
 
-var map_file = File.new()
-var ChunkLocations = Dictionary()
-var ChunkAddresses = Dictionary()
-var ChunkMetadata = Array()
+#var map_file = File.new()
+#var ChunkLocations = Dictionary()
+#var ChunkAddresses = Dictionary()
+#var ChunkMetadata = Array()
 
 
-var worldAreaX = 0
-var worldAreaY = 0
-var worldAreaWidth = 0
-var worldAreaHeight = 0
+#var worldAreaX = 0
+#var worldAreaY = 0
+#var worldAreaWidth = 0
+#var worldAreaHeight = 0
 
 var player_move_forward = false
 
 
-var local_data = {}
+#var local_data = {}
 const DEFAULT_HOST = "josephtheengineer.ddns.net"
 const DEFAULT_IP = "101.183.54.6"
 const DEFAULT_PORT = 8888
@@ -75,12 +75,12 @@ func world_loaded():
 	
 	var player = Dictionary()
 	player.rendered = false
-	player.position = Vector3(0, 60, 0)
+	player.position = Vector3(99*16, 100, 130*16) #ServerSystem.last_location * 16
 	player.username = "JosephTheEngineer"
 	player.object = Player
 	
-	var player_id = Entity.create({"player" : player})
-	#Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	Entity.create({"player" : player})
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
 	create_hud()
 
@@ -88,68 +88,15 @@ func create_hud():
 	var hud = Dictionary()
 	var hud_id = Entity.create({"hud" : hud})
 	
-	
-	var horizontal_container = Dictionary()
-	horizontal_container.parent = Dictionary()
-	horizontal_container.parent.id = hud_id
-	horizontal_container.parent.component = "hud"
-	var horizontal_id = Entity.create({"horizontal_container" : horizontal_container})
-	
-	var vertical_container = Dictionary()
-	vertical_container.parent = Dictionary()
-	vertical_container.parent.id = horizontal_id
-	vertical_container.parent.component = "horizontal_container"
-	var vertical_id = Entity.create({"vertical_container" : vertical_container})
-	
-	var toolbox = Dictionary()
-	toolbox.parent = Dictionary()
-	toolbox.parent.id = horizontal_id
-	toolbox.parent.component = "horizontal_container"
-	var toolbox_id = Entity.create({"toolbox" : toolbox})
-	
-	
-	var navbox = Dictionary()
-	navbox.min_size = Vector2(0, OS.get_screen_size().y * 1/3)
-	navbox.parent = Dictionary()
-	navbox.position = 1
-	navbox.parent.id = vertical_id
-	navbox.parent.component = "vertical_container"
-	var navbox_id = Entity.create({"horizontal_container" : navbox})
-	
-	var gamearea = Dictionary()
-	gamearea.parent = Dictionary()
-	gamearea.min_size = Vector2(500, 500)
-	gamearea.position = 0
-	gamearea.parent.id = vertical_id
-	gamearea.parent.component = "vertical_container"
-	var gamearea_id = Entity.create({"horizontal_container" : gamearea})
-	
-	var terminal = Dictionary()
-	terminal.parent = Dictionary()
-	terminal.position = Vector2(0, 0)
-	terminal.debug = true
-	terminal.text = ""
-	terminal.min_size =  Vector2(500, 500)
-	terminal.parent.id = gamearea_id
-	terminal.parent.component = "horizontal_container"
-	var terminal_id = Entity.create({"terminal" : terminal})
-	
-	var terminal2 = Dictionary()
-	terminal2.parent = Dictionary()
-	terminal2.position = Vector2(0, 0)
-	terminal2.debug = true
-	terminal2.text = ""
-	terminal2.min_size =  Vector2(500, 500)
-	terminal2.parent.id = gamearea_id
-	terminal2.parent.component = "horizontal_container"
-	var terminal2_id = Entity.create({"terminal" : terminal2})
-	
-	
-	var joystick = Dictionary()
-	joystick.parent = Dictionary()
-	joystick.parent.id = navbox_id
-	joystick.parent.component = "horizontal_container"
-	var joystick_id = Entity.create({"joystick" : joystick})
+#	var terminal = Dictionary()
+#	terminal.parent = Dictionary()
+#	terminal.position = Vector2(0, 0)
+#	terminal.debug = true
+#	terminal.text = ""
+#	terminal.min_size =  Vector2(500, 500)
+#	terminal.parent.id = gamearea_id
+#	terminal.parent.component = "horizontal_container"
+#	Entity.create({"terminal" : terminal})
 
 func init_main_menu():
 	ChunkSystem.create_chunk(Vector3(0, 0, 0))
@@ -163,7 +110,7 @@ func _process(delta): #########################################################
 	for id in entities:
 		var components = entities[id].components
 		if components.player.rendered == false:
-			var node = get_node("/root/Entity/" + str(id))
+			var node = get_node("/root/World/" + str(id))
 			
 			var player = load("res://scenes/player.tscn").instance()
 			node.add_child(player)

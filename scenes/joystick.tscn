@@ -3,7 +3,7 @@
 [ext_resource path="res://textures/ui/eden2/ipad/nav_controls/joystick/joystick_bottom.png" type="Texture" id=1]
 [ext_resource path="res://textures/ui/eden2/ipad/nav_controls/joystick/joystick_top.png" type="Texture" id=2]
 
-[node name="Joystick" type="Control"]
+[node name="Joystick" type="MarginContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 rect_min_size = Vector2( 400, 0 )
@@ -11,8 +11,8 @@ rect_pivot_offset = Vector2( -890, -40 )
 mouse_filter = 2
 
 [node name="Bottom" type="TextureButton" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 mouse_filter = 1
 texture_normal = ExtResource( 1 )
 texture_pressed = ExtResource( 1 )

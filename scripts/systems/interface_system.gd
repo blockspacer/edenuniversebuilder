@@ -6,7 +6,7 @@ func _ready():
 
 func _process(delta):
 	for id in Entity.get_entities_with("terminal"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "terminal.rendered") == false:
 				Debug.msg("Creating Terminal...", "Info")
 				create_terminal(id)
@@ -18,7 +18,7 @@ func _process(delta):
 					Entity.set_component(id, "terminal.text_rendered", true)
 	
 	for id in Entity.get_entities_with("hud"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "hud.rendered"):
 				process_hud(id)
 			else:
@@ -26,7 +26,7 @@ func _process(delta):
 				create_hud(id)
 	
 	for id in Entity.get_entities_with("vertical_container"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "vertical_container.rendered"):
 				process_vertical_container(id)
 			else:
@@ -34,7 +34,7 @@ func _process(delta):
 				create_vertical_container(id)
 	
 	for id in Entity.get_entities_with("horizontal_container"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "horizontal_container.rendered"):
 				process_horizontal_container(id)
 			else:
@@ -42,15 +42,23 @@ func _process(delta):
 				create_horizontal_container(id)
 	
 	for id in Entity.get_entities_with("joystick"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "joystick.rendered"):
 				process_joystick(id)
 			else:
 				Debug.msg("Creating Joystick...", "Info")
 				create_joystick(id)
 	
+	for id in Entity.get_entities_with("jump_button"):
+		if get_node("/root/World/" + str(id)):
+			if Entity.get_component(id, "jump_button.rendered"):
+				process_jump_button(id)
+			else:
+				Debug.msg("Creating Jump Button...", "Info")
+				create_jump_button(id)
+	
 	for id in Entity.get_entities_with("toolbox"):
-		if get_node("/root/Entity/" + str(id)):
+		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "toolbox.rendered"):
 				process_toolbox(id)
 			else:
@@ -59,15 +67,9 @@ func _process(delta):
 	
 
 func create_hud(id):
-	var node = get_node("/root/Entity/" + str(id))
+	var node = get_node("/root/World/" + str(id))
 	
-	var hud = Control.new()
-	hud.name = "Hud"
-	hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hud.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	hud.mouse_filter = Control.MOUSE_FILTER_PASS
-	hud.anchor_right = 1
-	hud.anchor_bottom = 1
+	var hud = load("res://scenes/hud.tscn").instance()
 	node.add_child(hud)
 	
 	Entity.set_component(id, "hud.rendered", true)
@@ -133,6 +135,14 @@ func create_joystick(id):
 		Debug.msg("Linked!", "Debug")
 
 func process_joystick(id):
+	pass
+
+func create_jump_button(id):
+	var jump_button = load("res://scenes/jump_button.tscn").instance()
+	var path = Entity.add_node(id, "jump_button", jump_button)
+	#Entity.inherit_child_rect()
+
+func process_jump_button(id):
 	pass
 
 func create_toolbox(id):

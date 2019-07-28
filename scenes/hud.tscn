@@ -628,7 +628,6 @@ margin_bottom = 408.0
 rect_min_size = Vector2( 0, 50 )
 
 [node name="Toolbox" parent="HorizontalMain" instance=ExtResource( 16 )]
-
 [connection signal="pressed" from="HorizontalMain/VerticalMain/VerticalCenterContent/PauseWindow/MarginContainer/CenterContainer/VBoxContainer/ExitButton" to="." method="_on_ExitButton_pressed"]
 [connection signal="button_down" from="HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop" to="." method="_on_AnalogTop_button_down"]
 [connection signal="button_up" from="HorizontalMain/VerticalMain/Navbox/TextureRect/AnalogTop" to="." method="_on_AnalogTop_button_up"]
