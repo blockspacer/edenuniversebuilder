@@ -71,6 +71,7 @@ func create_hud(id):
 	
 	var hud = load("res://scenes/hud.tscn").instance()
 	node.add_child(hud)
+	node.rect_size = OS.window_size
 	
 	Entity.set_component(id, "hud.rendered", true)
 

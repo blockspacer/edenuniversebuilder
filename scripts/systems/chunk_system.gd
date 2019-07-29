@@ -73,9 +73,7 @@ func _process(delta):
 			chunk.name = "Chunk"
 			node.add_child(chunk)
 			
-			components.chunk.materials = BlockData.blocks()
-			
-			var chunk_data = compile(components.chunk.block_data, components.chunk.materials) # Returns blocks_loaded, mesh, vertex_data
+			var chunk_data = compile(components.chunk.block_data, BlockData.blocks()) # Returns blocks_loaded, mesh, vertex_data
 			
 			var mesh_instance = MeshInstance.new()
 			mesh_instance.name = "MeshInstance"
@@ -188,7 +186,7 @@ func create_surrounding_chunks(center_chunk): #################################
 
 func compile(block_data, materials): # Returns blocks_loaded, mesh, vertex_data
 	var blocks_loaded = 0
-	#Debug.msg("Compiling chunk...", "Info")
+	Debug.msg("Compiling chunk...", "Info")
 	var mesh_instance = MeshInstance.new()
 	mesh_instance.mesh = null
 	var mesh
@@ -207,7 +205,7 @@ func compile(block_data, materials): # Returns blocks_loaded, mesh, vertex_data
 	#st.generate_normals(false)
 	#st.index()
 	#mesh = st.commit()
-	
+	Debug.msg("Finished compiling!", "Debug")
 	return {"blocks_loaded" : blocks_loaded, "mesh" : mesh, "vertex_data" : vertex_data}
 
 

@@ -17,42 +17,32 @@
 [ext_resource path="res://textures/ui/eden2/ipad/nav_controls/jump/jump_pressed.png" type="Texture" id=15]
 [ext_resource path="res://toolbox.tscn" type="PackedScene" id=16]
 
-[node name="HUD" type="Control"]
+[node name="HUD" type="MarginContainer"]
 show_behind_parent = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-size_flags_horizontal = 7
-size_flags_vertical = 7
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="Crosshair" type="TextureRect" parent="."]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -20.0
-margin_top = -20.0
-margin_right = 20.0
-margin_bottom = 20.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 texture = ExtResource( 1 )
 
 [node name="DebugStats" type="VBoxContainer" parent="."]
 editor/display_folded = true
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -1055.0
-margin_top = 30.0
-margin_right = -235.0
-margin_bottom = 702.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 size_flags_horizontal = 9
 size_flags_vertical = 9
 
 [node name="Client Info" type="VBoxContainer" parent="DebugStats"]
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 326.0
 
 [node name="Version" type="Label" parent="DebugStats/Client Info"]
-margin_left = 526.0
-margin_right = 820.0
+margin_left = 1626.0
+margin_right = 1920.0
 margin_bottom = 29.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -62,9 +52,9 @@ text = "Eden Universe Builder"
 align = 2
 
 [node name="Player XYZ" type="Label" parent="DebugStats/Client Info"]
-margin_left = 624.0
+margin_left = 1724.0
 margin_top = 33.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 62.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -74,9 +64,9 @@ text = "XYZ: 0 / 0 / 0"
 align = 2
 
 [node name="Looking XYZ" type="Label" parent="DebugStats/Client Info"]
-margin_left = 456.0
+margin_left = 1556.0
 margin_top = 66.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 95.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -86,9 +76,9 @@ text = "Looking at: XYZ: 0 / 0 / 0"
 align = 2
 
 [node name="Looking at Chunk" type="Label" parent="DebugStats/Client Info"]
-margin_left = 372.0
+margin_left = 1472.0
 margin_top = 99.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 128.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -98,9 +88,9 @@ text = "Looking at chunk: XYZ: 0 / 0 / 0"
 align = 2
 
 [node name="Orentation" type="Label" parent="DebugStats/Client Info"]
-margin_left = 582.0
+margin_left = 1682.0
 margin_top = 132.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 161.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -110,9 +100,9 @@ text = "Orentation: North"
 align = 2
 
 [node name="Mode" type="Label" parent="DebugStats/Client Info"]
-margin_left = 638.0
+margin_left = 1738.0
 margin_top = 165.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 194.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -122,9 +112,9 @@ text = "Mode: nothing"
 align = 2
 
 [node name="Entities" type="Label" parent="DebugStats/Client Info"]
-margin_left = 484.0
+margin_left = 1584.0
 margin_top = 198.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 227.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -134,9 +124,9 @@ text = "Entities: 0 | Players: 0"
 align = 2
 
 [node name="All Blocks Loaded" type="Label" parent="DebugStats/Client Info"]
-margin_left = 596.0
+margin_left = 1696.0
 margin_top = 231.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 260.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -146,9 +136,9 @@ text = "Blocks Loaded: 0"
 align = 2
 
 [node name="Blocks Found" type="Label" parent="DebugStats/Client Info"]
-margin_left = 610.0
+margin_left = 1710.0
 margin_top = 264.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 293.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -158,9 +148,9 @@ text = "Blocks Found: 0"
 align = 2
 
 [node name="FPS" type="Label" parent="DebugStats/Client Info"]
-margin_left = 736.0
+margin_left = 1836.0
 margin_top = 297.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 326.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -171,17 +161,17 @@ align = 2
 
 [node name="Separator 1" type="HSeparator" parent="DebugStats"]
 margin_top = 330.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 334.0
 
 [node name="World Stats" type="VBoxContainer" parent="DebugStats"]
 margin_top = 338.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 532.0
 
 [node name="World Name" type="Label" parent="DebugStats/World Stats"]
-margin_left = 512.0
-margin_right = 820.0
+margin_left = 1612.0
+margin_right = 1920.0
 margin_bottom = 29.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -191,9 +181,9 @@ text = "== JTE's Test World =="
 align = 2
 
 [node name="World Path" type="Label" parent="DebugStats/World Stats"]
-margin_left = 512.0
+margin_left = 1612.0
 margin_top = 33.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 62.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -203,9 +193,9 @@ text = "/data/test_world.eden2"
 align = 2
 
 [node name="Total Chunks" type="Label" parent="DebugStats/World Stats"]
-margin_left = 610.0
+margin_left = 1710.0
 margin_top = 66.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 95.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -215,9 +205,9 @@ text = "Total Chunks: 0"
 align = 2
 
 [node name="Chunks Cache" type="Label" parent="DebugStats/World Stats"]
-margin_left = 624.0
+margin_left = 1724.0
 margin_top = 99.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 128.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -227,9 +217,9 @@ text = "Chunk Cache: 0"
 align = 2
 
 [node name="Chunks Loaded" type="Label" parent="DebugStats/World Stats"]
-margin_left = 596.0
+margin_left = 1696.0
 margin_top = 132.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 161.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -239,9 +229,9 @@ text = "Chunks Loaded: 0"
 align = 2
 
 [node name="Seed" type="Label" parent="DebugStats/World Stats"]
-margin_left = 722.0
+margin_left = 1822.0
 margin_top = 165.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 194.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -252,17 +242,17 @@ align = 2
 
 [node name="Separator 2" type="HSeparator" parent="DebugStats"]
 margin_top = 536.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 540.0
 
 [node name="Chunk Info" type="VBoxContainer" parent="DebugStats"]
 margin_top = 544.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 672.0
 
 [node name="Chunk Address" type="Label" parent="DebugStats/Chunk Info"]
-margin_left = 540.0
-margin_right = 820.0
+margin_left = 1640.0
+margin_right = 1920.0
 margin_bottom = 29.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -272,9 +262,9 @@ text = "== Chunk: 7191367 =="
 align = 2
 
 [node name="Chunk XYZ" type="Label" parent="DebugStats/Chunk Info"]
-margin_left = 624.0
+margin_left = 1724.0
 margin_top = 33.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 62.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -284,9 +274,9 @@ text = "XYZ: 0 / 0 / 0"
 align = 2
 
 [node name="Blocks loaded" type="Label" parent="DebugStats/Chunk Info"]
-margin_left = 596.0
+margin_left = 1696.0
 margin_top = 66.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 95.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -296,9 +286,9 @@ text = "Blocks Loaded: 0"
 align = 2
 
 [node name="Blocks" type="Label" parent="DebugStats/Chunk Info"]
-margin_left = 610.0
+margin_left = 1710.0
 margin_top = 99.0
-margin_right = 820.0
+margin_right = 1920.0
 margin_bottom = 128.0
 size_flags_horizontal = 8
 custom_styles/normal = ExtResource( 2 )
@@ -308,8 +298,8 @@ text = "Total Blocks: 0"
 align = 2
 
 [node name="HorizontalMain" type="HBoxContainer" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 size_flags_horizontal = 7
 size_flags_vertical = 7
 
