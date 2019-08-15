@@ -25,38 +25,6 @@ func _process(delta):
 				Debug.msg("Creating HUD...", "Info")
 				create_hud(id)
 	
-	for id in Entity.get_entities_with("vertical_container"):
-		if get_node("/root/World/" + str(id)):
-			if Entity.get_component(id, "vertical_container.rendered"):
-				process_vertical_container(id)
-			else:
-				Debug.msg("Creating Vertical Container...", "Info")
-				create_vertical_container(id)
-	
-	for id in Entity.get_entities_with("horizontal_container"):
-		if get_node("/root/World/" + str(id)):
-			if Entity.get_component(id, "horizontal_container.rendered"):
-				process_horizontal_container(id)
-			else:
-				Debug.msg("Creating Horizontal Container...", "Info")
-				create_horizontal_container(id)
-	
-	for id in Entity.get_entities_with("joystick"):
-		if get_node("/root/World/" + str(id)):
-			if Entity.get_component(id, "joystick.rendered"):
-				process_joystick(id)
-			else:
-				Debug.msg("Creating Joystick...", "Info")
-				create_joystick(id)
-	
-	for id in Entity.get_entities_with("jump_button"):
-		if get_node("/root/World/" + str(id)):
-			if Entity.get_component(id, "jump_button.rendered"):
-				process_jump_button(id)
-			else:
-				Debug.msg("Creating Jump Button...", "Info")
-				create_jump_button(id)
-	
 	for id in Entity.get_entities_with("toolbox"):
 		if get_node("/root/World/" + str(id)):
 			if Entity.get_component(id, "toolbox.rendered"):
@@ -78,72 +46,7 @@ func create_hud(id):
 func process_hud(id):
 	pass
 
-func create_vertical_container(id):
-	var vertical_container = VBoxContainer.new()
-	vertical_container.name = "VerticalContainer"
-	
-	if Entity.get_component(id, "vertical_container.min_size"):
-		vertical_container.rect_min_size = Entity.get_component(id, "vertical_container.min_size")
-	
-	vertical_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vertical_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vertical_container.anchor_right = 1
-	vertical_container.anchor_bottom = 1
-	
-	Entity.add_node(id, "vertical_container", vertical_container)
-
-func process_vertical_container(id):
-	pass
-
-func create_horizontal_container(id):
-	var position = Entity.get_component(id, "horizontal_container.position")
-	if position:
-		var path = Entity.get_node_path(Entity.get_component(id, "horizontal_container.parent"))
-		if get_tree().get_root().has_node(path):
-			Debug.msg(str(get_node(path).get_child_count()), "Debug")
-			if position == 1 && get_node(path).get_child_count() < 1:
-				Debug.msg("Component creation delayed for position " + str(position), "Info")
-				return false
-		else:
-			return false
-	
-	var horizontal_container = HBoxContainer.new()
-	horizontal_container.name = "HorizontalContainer"
-	
-	if Entity.get_component(id, "horizontal_container.min_size"):
-		horizontal_container.rect_min_size = Entity.get_component(id, "horizontal_container.min_size")
-	
-	horizontal_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	horizontal_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	horizontal_container.anchor_right = 1
-	horizontal_container.anchor_bottom = 1
-	
-	Entity.add_node(id, "horizontal_container", horizontal_container)
-
 func process_horizontal_container(id):
-	pass
-
-func create_joystick(id):
-	var joystick = load("res://scenes/joystick.tscn").instance()
-	
-	var path = Entity.add_node(id, "joystick", joystick)
-	
-	if path:
-		get_node(path + str(id) + "/Joystick/Bottom").connect("button_up", InputSystem, "_joystick_pressed", [false, id])
-		get_node(path + str(id) + "/Joystick/Bottom").connect("button_down", InputSystem, "_joystick_pressed", [true, id])
-		get_node(path + str(id) + "/Joystick/Bottom/Top").connect("button_up", InputSystem, "_joystick_pressed", [false, id])
-		get_node(path + str(id) + "/Joystick/Bottom/Top").connect("button_down", InputSystem, "_joystick_pressed", [true, id])
-		Debug.msg("Linked!", "Debug")
-
-func process_joystick(id):
-	pass
-
-func create_jump_button(id):
-	var jump_button = load("res://scenes/jump_button.tscn").instance()
-	var path = Entity.add_node(id, "jump_button", jump_button)
-	#Entity.inherit_child_rect()
-
-func process_jump_button(id):
 	pass
 
 func create_toolbox(id):
@@ -156,6 +59,8 @@ func process_toolbox(id):
 
 func create_terminal(id):
 	var path = Entity.get_node_path(Entity.get_component(id, "terminal.parent"))
+	if !path:
+		path = "/root/World/"
 	var terminal = load("res://scenes/terminal.tscn").instance()
 	Entity.add_node(id, "terminal", terminal)
 	

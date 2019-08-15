@@ -112,7 +112,7 @@ func blocks():
 
 func generate_block_mesh(id, block_name, textures): ###########################
 	var mat = SpatialMaterial.new()
-	var tex = load("res://textures/" + textures[0] + ".png")
+	var tex = load("res://assets/textures/" + textures[0] + ".png")
 	mat.albedo_texture = tex
 	
 	block_materials[id] = mat
