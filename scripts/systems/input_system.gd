@@ -39,7 +39,7 @@ func _joystick_pressed(down, id):
 ################################### signals ###################################
 
 func ready(): ################################################################
-	World.total_players += 1
+	ClientSystem.total_players += 1
 	#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	#camera_width_center = OS.get_window_size().x / 2
 	#camera_height_center = OS.get_window_size().y / 2
@@ -149,22 +149,22 @@ func _input(event): ###########################################################
 	
 	if event.is_action_pressed("burn"):
 		Debug.msg("Changing action_mode to burn...", "Info")
-		#action_mode = "burn"
+		ClientSystem.action_mode = "burn"
 		#Debug.switch_mode("burn")
 		
 	if event.is_action_pressed("mine"):
 		Debug.msg("Changing action_mode to mine...", "Info")
-		#action_mode = "mine"
+		ClientSystem.action_mode = "mine"
 		#Debug.switch_mode("mine")
 		
 	if event.is_action_pressed("build"):
 		Debug.msg("Changing action_mode to build...", "Info")
-		#action_mode = "build"
+		ClientSystem.action_mode = "build"
 		#Debug.switch_mode("build")
 		
 	if event.is_action_pressed("paint"):
 		Debug.msg("Changing action_mode to paint...", "Info")
-		#action_mode = "paint"
+		ClientSystem.action_mode = "paint"
 		#Debug.switch_mode("paint")
 
 ################################## functions ##################################

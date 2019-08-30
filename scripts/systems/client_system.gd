@@ -3,12 +3,12 @@ extends Node
 var version = "EdenUniverseBuilder v3.0.0 beta6"
 #var loaded = false
 #var player_teleported = false
-#var total_players = 0
-#var players = Array()
-#var total_entities = 0
+var total_players = 0
+var players = Array()
+var total_entities = 0
 #var first_chunk = Vector3(0, 0, 0)
-#var blocks_loaded = 0
-#var blocks_found = 0
+var blocks_loaded = 0
+var blocks_found = 0
 #var total_chunks = 0
 #var chunks_cache_size = 0
 #var loaded_chunks = 0
@@ -27,7 +27,9 @@ var chunk_index = []
 #var worldAreaWidth = 0
 #var worldAreaHeight = 0
 
+var render_distance = 2
 var player_move_forward = false
+var action_mode = "nothing"
 
 
 #var local_data = {}
@@ -51,20 +53,6 @@ func _ready(): #################################################################
 	Debug.msg("Logs stored at user://logs/", "Info")
 	Debug.init()
 	Diagnostics.run(self, "diagnostics_finised")
-	
-	#if ServerSystem.map_seed == MAIN_MENU_SEED:
-	#	init_main_menu()
-	#else:
-	#	init_world()
-	#
-	#InterfaceSystem.process_interface()
-	
-	# Networking
-	#get_tree().connect("network_peer_connected", self, "_player_connected")
-	#get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
-	#get_tree().connect("connected_to_server", self, "_connected_ok")
-	#get_tree().connect("connection_failed", self, "_connected_fail")
-	#get_tree().connect("server_disconnected", self, "_server_disconnected")
 
 func diagnostics_finised():
 	ServerSystem.start()

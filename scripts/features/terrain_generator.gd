@@ -40,20 +40,29 @@ func generate_flat_terrain(): #################################################
 
 func generate_natural_terrain():
 	var chunk_data = Dictionary()
+	var id = 0
+	var color = 0
 	for x in 16:
 		for y in 16:
 			for z in 16:
 				var value = noise.get_noise_3d(float(x), float(y), float(z))
 				if value > 0:
 					if y == 0:
-						chunk_data[Vector3(x, y, z)] = 1
+						id = 1
 					elif y == 15:
-						chunk_data[Vector3(x, y, z)] = 8
+						id = 8
 					elif y > 10:
-						chunk_data[Vector3(x, y, z)] = 3
+						id = 3
 					else:
-						chunk_data[Vector3(x, y, z)] = 2
+						id = 2
 					#chunk_data[Vector3(x, y, z)] = int(floor(rand_range(1, 4)))
+					
+					var block_data  = {
+						"id": id, 
+						"color": color
+					}
+				
+					chunk_data[Vector3(x, y, z)] = block_data;
 	return chunk_data
 
 

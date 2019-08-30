@@ -44,7 +44,11 @@ func create_hud(id):
 	Entity.set_component(id, "hud.rendered", true)
 
 func process_hud(id):
-	pass
+	DebugInfo.player_move_update(id)
+	DebugInfo.action_mode_update(id)
+	DebugInfo.frame_update(id)
+	DebugInfo.world_stats_update(id)
+	
 
 func process_horizontal_container(id):
 	pass

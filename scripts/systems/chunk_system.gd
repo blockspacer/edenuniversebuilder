@@ -14,9 +14,7 @@ func _ready():
 	Debug.msg("Chunk System ready.", "Info")
 
 func create_chunk(position):
-	if position.y != 0:
-		return true
-	if chunks_processed_this_frame > 1:
+	if chunks_processed_this_frame > 1:# and !Player.can_see_chunk(position):
 		return false
 	chunks_processed_this_frame+=1
 	
@@ -26,9 +24,11 @@ func create_chunk(position):
 	
 	if !chunk_data:
 		if ServerSystem.map_seed == 0:
-			chunk_data = TerrainGenerator.generate_natural_terrain()
+			#chunk_data = TerrainGenerator.generate_natural_terrain()
+			return false
 		else:
-			chunk_data = TerrainGenerator.generate_flat_terrain()
+			return false
+			#chunk_data = TerrainGenerator.generate_flat_terrain()
 	
 	var chunk = Dictionary()
 	chunk.rendered = false
@@ -48,8 +48,6 @@ func create_chunk(position):
 	Entity.create({"chunk" : chunk})
 	
 	return true
-	
-	
 
 func destroy_chunk(position):
 	#var chunk = Dictionary()
@@ -59,6 +57,7 @@ func destroy_chunk(position):
 			Entity.destory(entity.id)
 
 signal rendered
+var thread
 
 func _process(delta):
 	chunks_processed_this_frame = 0
@@ -67,41 +66,11 @@ func _process(delta):
 		var components = entities[id].components
 		if components.chunk.rendered == false and chunk_wait_time > 60:
 			chunk_wait_time=0
-			var node = get_node("/root/World/" + str(id))
-			
-			var chunk = Spatial.new()
-			chunk.name = "Chunk"
-			node.add_child(chunk)
-			
-			var chunk_data = compile(components.chunk.block_data, BlockData.blocks()) # Returns blocks_loaded, mesh, vertex_data
-			
-			var mesh_instance = MeshInstance.new()
-			mesh_instance.name = "MeshInstance"
-			chunk.add_child(mesh_instance)
-			mesh_instance.mesh = chunk_data.mesh
-			
-			var body = StaticBody.new()
-			body.name = "StaticBody"
-			mesh_instance.add_child(body)
-			
-			var collision_shape = CollisionShape.new()
-			var shape = ConcavePolygonShape.new()
-			shape.set_faces(chunk_data.vertex_data)
-			collision_shape.name = "CollisionShape"
-			collision_shape.shape = shape
-			body.add_child(collision_shape)
-			
-			#Debug.msg("Materials: " + str(components.chunk.materials), "Debug")
-			#Debug.msg(str(mesh_instance.mesh), "Debug")
-			var pos = components.chunk.position
-			chunk.translation = Vector3(pos.x * 16, pos.y * 16, pos.z * 16)
-			components.chunk.rendered = true
-			ClientSystem.chunk_index.append(pos)
-			Entity.edit(id, components)
-			
-			if components.chunk.object != null or components.chunk.method != null:
-				connect("rendered", components.chunk.object, components.chunk.method)
-				emit_signal("rendered")
+			# The thread will start here.
+			#thread = Thread.new()
+			# Third argument is optional userdata, it can be any variable.
+			#thread.start(self, "_process_chunk", id)
+			_process_chunk(id)
 		else:
 			chunk_wait_time+=1
 	
@@ -114,55 +83,125 @@ func _process(delta):
 				Debug.msg("z: " + str(sur_chunk_z), "Debug")
 				timer=0
 			timer+=1
-			create_surrounding_chunks(get_chunk(get_node("/root/World/" + str(id) + "/Player").translation))
-	
-	pass
-	# check if we should unload / load chunks
-	#create_chunk(position)
-	#destroy_chunk(position)
-	
-	# check if chunks are not compiled
-	#compile_chunk()
+			create_surrounding_chunks(get_chunk(get_node("/root/World/" + str(id) + "/Player").translation), ClientSystem.render_distance)
 
-#func compile_chunk(position):
-	#pass
+# Run here and exit.
+# The argument is the userdata passed from start().
+# If no argument was passed, this one still needs to
+# be here and it will be null.
+func _process_chunk(id):
+	var entities = Entity.get_entities_with("chunk")
+	var components = entities[id].components
+	var node = get_node("/root/World/" + str(id))
+	
+	var chunk = Spatial.new()
+	chunk.name = "Chunk"
+	node.add_child(chunk)
+
+	var chunk_data = compile(components.chunk.block_data, BlockData.blocks(), components.chunk.position) # Returns blocks_loaded, mesh, vertex_data
+	
+	var mesh_instance = MeshInstance.new()
+	mesh_instance.name = "MeshInstance"
+	chunk.add_child(mesh_instance)
+	mesh_instance.mesh = chunk_data.mesh
+	
+	var body = StaticBody.new()
+	body.name = "StaticBody"
+	mesh_instance.add_child(body)
+	
+	var collision_shape = CollisionShape.new()
+	var shape = ConcavePolygonShape.new()
+	shape.set_faces(chunk_data.vertex_data)
+	collision_shape.name = "CollisionShape"
+	collision_shape.shape = shape
+	body.add_child(collision_shape)
+	
+	ClientSystem.blocks_found += components.chunk.block_data.size()
+	ClientSystem.blocks_loaded += chunk_data.blocks_loaded
+	
+	#Debug.msg("Materials: " + str(components.chunk.materials), "Debug")
+	#Debug.msg(str(mesh_instance.mesh), "Debug")
+	var pos = components.chunk.position
+	chunk.translation = Vector3(pos.x * 16, pos.y * 16, pos.z * 16)
+	components.chunk.rendered = true
+	ClientSystem.chunk_index.append(pos)
+	Entity.edit(id, components)
+	
+	if components.chunk.object != null or components.chunk.method != null:
+		connect("rendered", components.chunk.object, components.chunk.method)
+		emit_signal("rendered")
+	#_exit_tree()
+
+# Thread must be disposed (or "joined"), for portability.
+func _exit_tree():
+    thread.wait_to_finish()
 
 #VoxelTerrain._precalculate_priority_positions()
 #VoxelTerrain._precalculate_neighboring()
 #VoxelTerrain._update_pending_blocks()
 
-func create_surrounding_chunks(center_chunk): #################################
-	var created_chunks = []
-	if !(ClientSystem.chunk_index.has(Vector3(sur_chunk_x + center_chunk.x - 1, 0, sur_chunk_z + center_chunk.z - 1))):
-		#print("Creating chunk... ")
-		create_chunk(Vector3(sur_chunk_x + center_chunk.x - 1, 0, sur_chunk_z + center_chunk.z - 1))
-	if sur_chunk_z < 4:
-		if sur_chunk_x < 4:
-			sur_chunk_x+=1
-		else:
-			sur_chunk_x=0
-			sur_chunk_z+=1
-	else:
-		sur_chunk_x=0
-		sur_chunk_z=0
+# Creates one surrounding chunk per call
+func create_surrounding_chunks(center_chunk, distance):
+	var surrounding_chunks = []
 	
-	for x in range(6):
-		for z in range(6):
-			created_chunks.append(Vector3(x + center_chunk.x - 1, 0, z + center_chunk.z - 1))
+	var top = center_chunk.x - distance;
+	var bottom = top + distance * 2;
 	
+	var front = center_chunk.y - distance;
+	var back = front + distance * 2;
+	
+	var left = center_chunk.z - distance;
+	var right = left + distance * 2;
+	
+	for x in range(top, bottom):
+		for y in range(front, back):
+			for z in range(left, right):
+				var dx = x - center_chunk.x
+				var dy = y - center_chunk.y
+				var dz = z - center_chunk.z
+				var distance_squared = dx * dx + dy * dy + dz * dz
+				
+				if distance_squared <= (distance * distance):
+					surrounding_chunks.append(Vector3(x, y, z))
+	
+#	for x in range(distance + 200):
+#		for z in range(distance + 200):
+#			var dx = x - center_chunk.x
+#			var dz = z - center_chunk.z
+#			var distance_squared = dx * dx + dz * dz
+#
+#			if distance_squared <= (radius * radius):
+#				surrounding_chunks.append(Vector3(x + center_chunk.x - 1, 0, (z + center_chunk.z - 1) * distance + 200))
+	
+	var chunks_to_create = []
+	
+	for chunk in surrounding_chunks:
+		if !ClientSystem.chunk_index.has(chunk):
+			chunks_to_create.append(chunk)
+	
+	var min_distance = ClientSystem.render_distance + 500
+	var cloest_chunk = Vector3()
+	
+	var woah = center_chunk.distance_to(Vector3(0, 0, 0))
+	
+	for chunk in chunks_to_create:
+		if center_chunk.distance_to(chunk) < min_distance:
+			min_distance = center_chunk.distance_to(chunk)
+			cloest_chunk = chunk
+	
+	if cloest_chunk != Vector3(0, 0, 0):
+		create_chunk(cloest_chunk)
+	
+	# Remove chunks outside of bounds
 	var entities = Entity.get_entities_with("chunk")
 	for id in entities:
-		var components = entities[id].components
-		if !created_chunks.has(components.chunk.position):
-			ClientSystem.chunk_index.erase(components.chunk.position)
+		var pos = Entity.get_component(id, "chunk.position")
+		if !surrounding_chunks.has(pos):
+			ClientSystem.chunk_index.erase(pos)
+			ClientSystem.blocks_loaded -= Entity.get_component(id, "chunk.blocks_loaded")
+			ClientSystem.blocks_found -= Entity.get_component(id, "chunk.block_data").size()
+			Debug.msg("Destroyed chunk" + str(pos), "Debug")
 			Entity.destory(id)
-		
-	for chunk in ClientSystem.chunk_index:
-		if created_chunks.has(chunk) == false and ServerSystem.map_seed != -1:
-			var path = "/root/World/" + str(chunk.x) + ", " + str(chunk.y) + ", " + str(chunk.z)
-			if get_tree().get_root().has_node(path):
-				get_node(path).queue_free()
-				#chunk_index.erase(chunk)
 
 #func init_chunk(id):
 #	if World.map_seed == -1 and chunk_location == Vector3(0, 0, 0):
@@ -184,22 +223,28 @@ func create_surrounding_chunks(center_chunk): #################################
 #		
 #		compile()
 
-func compile(block_data, materials): # Returns blocks_loaded, mesh, vertex_data
+func compile(block_data, materials, pos): # Returns blocks_loaded, mesh, vertex_data
 	var blocks_loaded = 0
 	Debug.msg("Compiling chunk...", "Info")
 	var mesh_instance = MeshInstance.new()
 	mesh_instance.mesh = null
 	var mesh
-	var vertex_data = PoolVector3Array()
+	var vertex_data = []
+	var block_data_ext = block_data
 	
 	#mat.albedo_color = Color(1, 0, 0, 1)
+	
+	#for surrounding_position in Geometry.surrounding_blocks:
+	#	var block_data_temp = EdenWorldDecoder.get_chunk_data(pos + surrounding_position)
+	#	for block in block_data_temp.keys():
+	#		block_data_ext[block + surrounding_position * 16] = block_data_temp[block]
 	
 	for position in block_data.keys():
 		if Geometry.can_be_seen(position, block_data).size() != 6:# and position.y > 20:
 			#Debug.msg("Compiling block in position " + str(position), "Trace")
-			var cube_data = Geometry.create_cube(position, block_data[position].id, mesh, vertex_data, materials, block_data) # Returns mesh, vertex_data
+			var cube_data = Geometry.create_cube(position, block_data[position].id, mesh, materials, block_data) # Returns mesh, vertex_data
 			mesh = cube_data.mesh
-			vertex_data = cube_data.vertex_data
+			vertex_data += cube_data.vertex_data
 			blocks_loaded += 1
 	
 	#st.generate_normals(false)
@@ -217,7 +262,7 @@ func break_block(chunk_id, location): ##########################################
 	block_data.erase(location - Entity.get_component(chunk_id, "chunk.position"))
 	Entity.set_component(chunk_id, "chunk.block_data", block_data)
 
-	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials")) # Returns blocks_loaded, mesh, vertex_data
+	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials"), Entity.get_component(chunk_id, "chunk.position")) # Returns blocks_loaded, mesh, vertex_data
 	
 	get_node("/root/World/" + str(chunk_id) + "/Chunk/MeshInstance").mesh = chunk_data.mesh
 	
@@ -236,7 +281,7 @@ func place_block(chunk_id, block_id, location): ################################
 	block_data[location - Entity.get_component(chunk_id, "chunk.position")] = block_id
 	Entity.set_component(chunk_id, "chunk.block_data", block_data)
 
-	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials")) # Returns blocks_loaded, mesh, vertex_data
+	var chunk_data = compile(Entity.get_component(chunk_id, "chunk.block_data"), Entity.get_component(chunk_id, "chunk.materials"), Entity.get_component(chunk_id, "chunk.position")) # Returns blocks_loaded, mesh, vertex_data
 	
 	get_node("/root/World/" + str(chunk_id) + "/Chunk/MeshInstance").mesh = chunk_data.mesh
 	

@@ -114,12 +114,15 @@ func get_metadata(): ##########################################################
 		}
 		
 		chunk_metadata[Vector3(x, 0, y)] = (chunk_data)
+		chunk_metadata[Vector3(x, 1, y)] = (chunk_data)
+		chunk_metadata[Vector3(x, 2, y)] = (chunk_data)
+		chunk_metadata[Vector3(x, 3, y)] = (chunk_data)
 		
 		chunk_pointer += 16
 	
 	
 	Debug.msg("Found " + str(chunk_metadata.size()) + " chunks", "Info");
-	Debug.msg(str(chunk_metadata), "Trace")
+	#Debug.msg(str(chunk_metadata), "Trace")
 	ServerSystem.total_chunks = chunk_metadata.size()
 	
 	# Get the total world width | max - min + 1
@@ -138,44 +141,45 @@ func get_chunk_data(location): ################################################
 	if chunk_metadata.size() < 0:
 		Debug.msg("Invaild world data!", "Error");
 		return false
-	if !chunk_metadata.has(Vector3(location.x, 0, location.z)):
-		#Debug.msg("Chunk data does not exist!", "Warn");
+	if !chunk_metadata.has(location):
+		Debug.msg("Chunk data does not exist!", "Warn");
 		return false
 	
 	var chunk_data = Dictionary()
-	var chunk_address = chunk_metadata[Vector3(location.x, 0, location.z)].address
+	var chunk_address = chunk_metadata[location].address
 	#Debug.msg("Chunk Address: " + str(chunk_address), "Debug")
 	
-	for baseHeight in range(4):
-		for x in range(16):
-			for y in range(16):
-				for z in range(16):
-					var id = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z)
-					var color = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z + 4096)
+	var baseHeight = location.y
+	for x in range(16):
+		for y in range(16):
+			for z in range(16):
+				var id = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z)
+				var color = read_int(chunk_address + baseHeight * 8192 + x * 256 + y * 16 + z + 4096)
+				
+				var RealX = (x + (location.x*16))
+				var RealY = (y + (location.z*16))
+				var RealZ = (z + (16 * baseHeight))
+				
+				#var position = Vector3(x, z + 16 * baseHeight, y)
+				var position = Vector3(x, z, y)
+				
+				#Logger.LogInt("=== Id: ", Id, " ===", "Debug");
+				#Logger.LogInt("Color: ", Color, "", "Debug");
+				#Logger.LogFloat("X: ", (x + (globalChunkPosX*16)) * 100, "", "Debug");
+				#Logger.LogFloat("Y: ", (y + (globalChunkPosY*16)) * 100, "", "Debug");
+				#Logger.LogFloat("Z: ", (z + (16 * baseHeight)) * 100, "", "Debug");
+				
+				if id != 0 && id <= 79 && id > 0:
+					# Logger.Log("Block is valid", "Debug");
+					#Debug.msg(id, "Trace")
+					var block_data  = {
+						"id": id, 
+						"color": color
+					}
 					
-					var RealX = (x + (location.x*16));
-					var RealY = (y + (location.z*16));
-					var RealZ = (z + (16 * baseHeight));
-					
-					var position = Vector3(x, z + 16 * baseHeight, y);
-					
-					#Logger.LogInt("=== Id: ", Id, " ===", "Debug");
-					#Logger.LogInt("Color: ", Color, "", "Debug");
-					#Logger.LogFloat("X: ", (x + (globalChunkPosX*16)) * 100, "", "Debug");
-					#Logger.LogFloat("Y: ", (y + (globalChunkPosY*16)) * 100, "", "Debug");
-					#Logger.LogFloat("Z: ", (z + (16 * baseHeight)) * 100, "", "Debug");
-					
-					if id != 0 && id <= 79 && id > 0:
-						# Logger.Log("Block is valid", "Debug");
-						#Debug.msg(id, "Trace")
-						var block_data  = {
-							"id": id, 
-							"color": color
-						}
-						
-						chunk_data[position] = block_data;
-						#Debug.msg(["id: ", id], "Trace")
-						#Debug.msg(["Adding Block ", chunk_data.size()], "Debug");
-					#Debug.msg(["Chunk data tmp: ", chunk_data.size(), " blocks"], "Debug");
+					chunk_data[position] = block_data;
+					#Debug.msg(["id: ", id], "Trace")
+					#Debug.msg(["Adding Block ", chunk_data.size()], "Debug");
+				#Debug.msg(["Chunk data tmp: ", chunk_data.size(), " blocks"], "Debug");
 	#Debug.msg(str("Chunk data contains ", chunk_data.size(), " blocks"), "Debug");
 	return chunk_data;

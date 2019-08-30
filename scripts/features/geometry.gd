@@ -10,7 +10,8 @@ func can_be_seen(position, block_data):
 			num_surrounding_blocks.append(surrounding_position)
 	return num_surrounding_blocks
 
-func create_cube(position, id, mesh, vertex_data, materials, block_data):
+func create_cube(position, id, mesh, materials, block_data):
+	var vertex_data = []
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_material(materials[id])
@@ -18,24 +19,24 @@ func create_cube(position, id, mesh, vertex_data, materials, block_data):
 	var sides_not_to_render = can_be_seen(position, block_data)
 	
 	if !sides_not_to_render.has(Vector3(0, -1, 0)):
-		vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, -1, 0), "down")
+		vertex_data += create_horizontal_plane(st, position + Vector3(0, -1, 0), "down")
 	
 	if !sides_not_to_render.has(Vector3(0, 1, 0)): 
-		vertex_data = create_horizontal_plane(st, vertex_data, position + Vector3(0, 0, 0), "up")
+		vertex_data += create_horizontal_plane(st, position + Vector3(0, 0, 0), "up")
 	
 	
 	
 	if !sides_not_to_render.has(Vector3(0, 0, 1)):
-		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 1), "west")
+		vertex_data += create_vertical_plane(st, position + Vector3(0, 0, 1), "west")
 	
 	if !sides_not_to_render.has(Vector3(0, 0, -1)):
-		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "east")
+		vertex_data += create_vertical_plane(st, position + Vector3(0, 0, 0), "east")
 	
 	if !sides_not_to_render.has(Vector3(-1, 0, 0)):
-		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(0, 0, 0), "north")
+		vertex_data += create_vertical_plane(st, position + Vector3(0, 0, 0), "north")
 	
 	if !sides_not_to_render.has(Vector3(1, 0, 0)):
-		vertex_data = create_vertical_plane(st, vertex_data, position + Vector3(1, 0, 0), "south")
+		vertex_data += create_vertical_plane(st, position + Vector3(1, 0, 0), "south")
 	
 	return { "mesh" : st.commit(mesh), "vertex_data" : vertex_data }
 
@@ -45,7 +46,8 @@ const vertical_plane_vertices = [ Vector3(0, 0, 0), Vector3(1, 0, 0), Vector3(0,
 const vertical_plane_uvs2 = [ Vector2(0, 1), Vector2(1, 1), Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(1, 1) ]
 const vertical_plane_vertices2 = [ Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, -1, 0), Vector3(0, -1, 1), Vector3(0, -1, 0), Vector3(0, 0, 1) ]
 
-func create_vertical_plane(st, vertex_data, position, direction):
+func create_vertical_plane(st, position, direction):
+	var vertex_data = []
 	if direction == "west":
 		for i in range(vertical_plane_vertices.size()):
 			st.add_uv(vertical_plane_uvs[i])
@@ -86,7 +88,8 @@ func create_vertical_plane(st, vertex_data, position, direction):
 const horizontal_plane_uvs = [ Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 0) ]
 const horizontal_plane_vertices = [ Vector3(0, 0, 0), Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(1, 0, 1), Vector3(0, 0, 1), Vector3(1, 0, 0) ]
 
-func create_horizontal_plane(st, vertex_data, position, direction):
+func create_horizontal_plane(st, position, direction):
+	var vertex_data = []
 	if direction == "up":
 		for i in range(horizontal_plane_vertices.size()):
 			st.add_uv(horizontal_plane_uvs[i])

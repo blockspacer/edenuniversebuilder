@@ -175,8 +175,8 @@ func _stop_player(player):
 	player.queue_free()
 
 
-func get_orientation(): #######################################################
-	var camera = $Head/Camera
+func get_orientation(id): #######################################################
+	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 	var looking_at = camera.project_ray_normal(OS.get_window_size() / 2)
 	#Hud.msg(str(looking_at), "Trace")
 	if looking_at.x > 0.5:
@@ -203,11 +203,11 @@ func get_looking_at_normal(id, position): ######################################
 	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
-	var build_normal = camera.project_ray_normal(position) * 1000
+	var build_normal = camera.project_ray_normal(position) * 10000
 	
 	var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
 	if result:
-		#Hud.msg(str(result.position), "Debug")
+		#Debug.msg(str(result.position), "Debug")
 		return result.normal
 	else:
 		return Vector3(0, 0, 0)
@@ -221,7 +221,7 @@ func get_looking_at(id, position): #############################################
 	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
 	var space_state = camera.get_world().direct_space_state
 	var build_origin = camera.project_ray_origin(position)
-	var build_normal = camera.project_ray_normal(position) * 1000
+	var build_normal = camera.project_ray_normal(position) * 10000
 	
 	var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
 	if result:
@@ -229,6 +229,26 @@ func get_looking_at(id, position): #############################################
 		return result.position
 	else:
 		return Vector3(0, 0, 0)
+
+func can_see_chunk(id, chunk): ################################################
+	#var camera = $Head/Camera
+	#var from = camera.project_ray_origin(event.position)
+	#var to = from + camera.project_ray_normal(event.position) * 1000
+	
+	var camera = get_node("/root/World/" + str(id) + "/Player/Head/Camera")
+	var space_state = camera.get_world().direct_space_state
+	
+	for x in range(OS.get_window_size().x):
+		for y in range(OS.get_window_size().y):
+			var build_origin = camera.project_ray_origin(Vector2(x, y))
+			var build_normal = camera.project_ray_normal(Vector2(x, y)) * 10000
+			
+			var result = space_state.intersect_ray(build_origin, build_normal, [self], 1)
+			#if result:
+				#Hud.msg(str(result.position), "Debug")
+				#return result.position
+			#else:
+				#return Vector3(0, 0, 0)
 
 
 func walk(delta, id): #############################################################
