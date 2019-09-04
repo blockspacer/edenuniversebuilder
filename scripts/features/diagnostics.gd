@@ -1,4 +1,7 @@
 extends Node
+var Entity = load("res://scripts/features/entity.gd")
+onready var ClientSystem = get_node("/root/World/Systems/Client")
+var Debug = load("res://scripts/features/debug.gd")
 
 var progress = 0
 var timer = Timer.new()

@@ -1,4 +1,8 @@
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
+var Entity = load("res://scripts/features/entity.gd")
+var EdenWorldDecoder = load("res://scripts/features/eden_world_decoder.gd")
+onready var ChunkSystem = get_node("/root/World/Systems/Chunk")
 
 var map_seed = 0
 var map_path = "user://worlds/direct_city.eden2"

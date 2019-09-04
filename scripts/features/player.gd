@@ -1,4 +1,6 @@
 extends Node #KinematicBody
+onready var ChunkSystem = get_node("/root/World/Systems/Chunk")
+var Debug = load("res://scripts/features/debug.gd")
 
 ############################## public variables ###############################
 

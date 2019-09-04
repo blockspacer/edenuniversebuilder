@@ -1,4 +1,5 @@
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
 
 var music_player = AudioStreamPlayer3D.new()
 var playlist_progress = 0

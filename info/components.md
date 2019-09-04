@@ -47,24 +47,3 @@
 
 	hud : container of hud elements
 		- rendered (bool) : triggers the system to render
-
-	vertical_container : arranges child components vertically
-		- rendered (bool)
-		- parent (dictonary) {id:int, compnent:string}
-		- min_size (Vector2)
-		- position (int)
-
-	horizontal_container : arranges child components horizontally
-		- rendered (bool)
-		- parent (dictonary) {id:int, compnent:string}
-		- min_size (Vector2)
-		- position (int)
-
-	jump_button : hud element
-		- rendered (bool)
-		- parent (dictonary)
-
-	debug_info : on-screen debug infomation
-		- rendered (bool)
-		- parent (dictonary)
-

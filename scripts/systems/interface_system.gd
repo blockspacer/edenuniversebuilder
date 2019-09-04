@@ -1,4 +1,7 @@
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
+var Entity = load("res://scripts/features/entity.gd")
+var DebugInfo = load("res://scripts/features/debug_info.gd")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -93,7 +96,6 @@ onready var TitleScreenPlayer = get_node("TitleScreen/AnimationPlayer")
 
 ############################## public variables ###############################
 
-onready var world_template = preload("res://scenes/world.tscn")
 onready var dot_template = preload("res://scenes/dot.tscn")
 
 const info = [ "changelog.md", "featured-worlds.md", "game-stats.md", "info.md", "news.md", "new-worlds.md", "top-users.md", "top-worlds.md" ]

@@ -1,4 +1,9 @@
 extends Node
+var Entity = load("res://scripts/features/entity.gd")
+var Player = load("res://scripts/features/player.gd")
+onready var ChunkSystem = get_node("/root/World/Systems/Chunk")
+onready var ClientSystem = get_node("/root/World/Systems/Client")
+onready var ServerSystem = get_node("/root/World/Systems/Server")
 
 func player_move_update(id):
 	var stats = "/root/World/" + str(id) + "/Hud/HorizontalMain/VerticalMain/VerticalCenterContent/DebugStats/ClientInfo/"

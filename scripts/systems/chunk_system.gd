@@ -1,8 +1,13 @@
 # manages chunk data
 # classified as a system because it gets run every frame and scans entities
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
+var EdenWorldDecoder = load("res://scripts/features/eden_world_decoder.gd")
+var Entity = load("res://scripts/features/entity.gd")
+var BlockData = load("res://scripts/features/block_data.gd")
+onready var ServerSystem = get_node("/root/World/Systems/Server")
+onready var ClientSystem = get_node("/root/World/Systems/Client")
 
-#var commands = [ "create_chunk", "destroy_chunk" ]
 var timer = 0
 var chunks_processed_this_frame = 0
 var chunk_wait_time = 0
@@ -25,9 +30,9 @@ func create_chunk(position):
 	if !chunk_data:
 		if ServerSystem.map_seed == 0:
 			#chunk_data = TerrainGenerator.generate_natural_terrain()
-			return false
+			pass
 		else:
-			return false
+			pass
 			#chunk_data = TerrainGenerator.generate_flat_terrain()
 	
 	var chunk = Dictionary()
@@ -66,29 +71,17 @@ func _process(delta):
 		var components = entities[id].components
 		if components.chunk.rendered == false and chunk_wait_time > 60:
 			chunk_wait_time=0
-			# The thread will start here.
-			#thread = Thread.new()
-			# Third argument is optional userdata, it can be any variable.
-			#thread.start(self, "_process_chunk", id)
+			
 			_process_chunk(id)
 		else:
 			chunk_wait_time+=1
 	
 	entities = Entity.get_entities_with("player")
 	for id in entities:
-		if get_tree().get_root().has_node("/root/World/" + str(id) + "/Player"):
-			if timer >= 100:
-				Debug.msg(str(get_chunk(get_node("/root/World/" + str(id) + "/Player").translation)), "Trace")
-				Debug.msg("x: " + str(sur_chunk_x), "Debug")
-				Debug.msg("z: " + str(sur_chunk_z), "Debug")
-				timer=0
-			timer+=1
-			create_surrounding_chunks(get_chunk(get_node("/root/World/" + str(id) + "/Player").translation), ClientSystem.render_distance)
+		var player = "/root/World/" + str(id) + "/Player"
+		if has_node(player):
+			create_surrounding_chunks(get_chunk(get_node(player).translation), ClientSystem.render_distance)
 
-# Run here and exit.
-# The argument is the userdata passed from start().
-# If no argument was passed, this one still needs to
-# be here and it will be null.
 func _process_chunk(id):
 	var entities = Entity.get_entities_with("chunk")
 	var components = entities[id].components
@@ -97,7 +90,15 @@ func _process_chunk(id):
 	var chunk = Spatial.new()
 	chunk.name = "Chunk"
 	node.add_child(chunk)
-
+	
+	if !components.chunk.block_data:
+		var pos = components.chunk.position
+		chunk.translation = Vector3(pos.x * 16, pos.y * 16, pos.z * 16)
+		components.chunk.rendered = true
+		ClientSystem.chunk_index.append(pos)
+		Entity.edit(id, components)
+		return
+	
 	var chunk_data = compile(components.chunk.block_data, BlockData.blocks(), components.chunk.position) # Returns blocks_loaded, mesh, vertex_data
 	
 	var mesh_instance = MeshInstance.new()
@@ -119,8 +120,6 @@ func _process_chunk(id):
 	ClientSystem.blocks_found += components.chunk.block_data.size()
 	ClientSystem.blocks_loaded += chunk_data.blocks_loaded
 	
-	#Debug.msg("Materials: " + str(components.chunk.materials), "Debug")
-	#Debug.msg(str(mesh_instance.mesh), "Debug")
 	var pos = components.chunk.position
 	chunk.translation = Vector3(pos.x * 16, pos.y * 16, pos.z * 16)
 	components.chunk.rendered = true
@@ -164,16 +163,9 @@ func create_surrounding_chunks(center_chunk, distance):
 				if distance_squared <= (distance * distance):
 					surrounding_chunks.append(Vector3(x, y, z))
 	
-#	for x in range(distance + 200):
-#		for z in range(distance + 200):
-#			var dx = x - center_chunk.x
-#			var dz = z - center_chunk.z
-#			var distance_squared = dx * dx + dz * dz
-#
-#			if distance_squared <= (radius * radius):
-#				surrounding_chunks.append(Vector3(x + center_chunk.x - 1, 0, (z + center_chunk.z - 1) * distance + 200))
-	
 	var chunks_to_create = []
+	
+	
 	
 	for chunk in surrounding_chunks:
 		if !ClientSystem.chunk_index.has(chunk):
@@ -198,8 +190,9 @@ func create_surrounding_chunks(center_chunk, distance):
 		var pos = Entity.get_component(id, "chunk.position")
 		if !surrounding_chunks.has(pos):
 			ClientSystem.chunk_index.erase(pos)
-			ClientSystem.blocks_loaded -= Entity.get_component(id, "chunk.blocks_loaded")
-			ClientSystem.blocks_found -= Entity.get_component(id, "chunk.block_data").size()
+			if Entity.get_component(id, "chunk.blocks_loaded"):
+				ClientSystem.blocks_loaded -= Entity.get_component(id, "chunk.blocks_loaded")
+				ClientSystem.blocks_found -= Entity.get_component(id, "chunk.block_data").size()
 			Debug.msg("Destroyed chunk" + str(pos), "Debug")
 			Entity.destory(id)
 

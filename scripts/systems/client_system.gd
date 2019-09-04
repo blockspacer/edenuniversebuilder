@@ -1,4 +1,10 @@
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
+var Diagnostics = load("res://scripts/features/diagnostics.gd")
+var Player = load("res://scripts/features/player.gd")
+var Entity = load("res://scripts/features/entity.gd")
+onready var ServerSystem = get_node("/root/World/Systems/Server")
+onready var ChunkSystem = get_node("/root/World/Systems/Chunk")
 
 var version = "EdenUniverseBuilder v3.0.0 beta6"
 #var loaded = false
@@ -161,7 +167,6 @@ func _on_ForwardButton_pressed(): #############################################
 
 func _on_ForwardButton_released(): ############################################
 	player_move_forward = false
-
 
 
 

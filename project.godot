@@ -22,26 +22,7 @@ boot_splash/bg_color=Color( 0, 0, 0, 1 )
 
 [autoload]
 
-Entity="*res://scripts/features/entity.gd"
-ChunkSystem="*res://scripts/systems/chunk_system.gd"
-ClientSystem="*res://scripts/systems/client_system.gd"
-ServerSystem="*res://scripts/systems/server_system.gd"
-Debug="*res://scripts/features/debug.gd"
-InputSystem="*res://scripts/systems/input_system.gd"
-BuildWindow="*res://scripts/features/build_window.gd"
-ChatItem="*res://scripts/features/chat_item.gd"
-DebugCamera="*res://scripts/features/debug_camera.gd"
-EdenWorldDecoder="*res://scripts/features/eden_world_decoder.gd"
-TerrainGenerator="*res://scripts/features/terrain_generator.gd"
-InterfaceSystem="*res://scripts/systems/interface_system.gd"
-DownloadSystem="*res://scripts/systems/download_system.gd"
-SoundSystem="*res://scripts/systems/sound_system.gd"
-Diagnostics="*res://scripts/features/diagnostics.gd"
-Geometry="*res://scripts/features/geometry.gd"
-BlockData="*res://scripts/features/block_data.gd"
-Player="*res://scripts/features/player.gd"
-DictonaryFunc="*res://scripts/features/dictonary_func.gd"
-DebugInfo="*res://scripts/features/debug_info.gd"
+Events="*res://scripts/systems/events.gd"
 
 [display]
 

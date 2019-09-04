@@ -1,4 +1,5 @@
 extends Node
+var Debug = load("res://scripts/features/debug.gd")
 
 const EDEN2_SEARCH = "http://app.edengame.net/list2.php?search="
 const EDEN2_DOWNLOAD = "http://files.edengame.net/"

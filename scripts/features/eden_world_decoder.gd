@@ -2,7 +2,9 @@
 # Based on code from Vuenctools for Eden || http://forum.edengame.net/index.php?/topic/295-vuenctools-for-eden-eden-world-manipulation-tool/
 # with help from Robert Munafo || http://www.mrob.com/pub/vidgames/eden-file-format.html
 
-extends Spatial
+extends Node
+var Debug = load("res://scripts/features/debug.gd")
+onready var ServerSystem = get_node("/root/World/Systems/Server")
 
 ############################## public variables ###############################
 

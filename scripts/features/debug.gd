@@ -1,4 +1,5 @@
 extends Node
+var Entity = load("res://scripts/features/entity.gd")
 
 func init():
 	var file = File.new()

@@ -1,5 +1,11 @@
 # just routes input signals to other systems
 extends Node
+var Debug = preload("res://scripts/features/debug.gd").new()
+var Entity = preload("res://scripts/features/entity.gd").new()
+var Player = preload("res://scripts/features/player.gd").new()
+var Manager = preload("res://scripts/features/manager.gd").new()
+var Comp = preload("res://scripts/features/comp.gd").new()
+onready var ClientSystem = get_node("/root/World/Systems/Client")
 
 var pressed = false
 var move_mode = "walk"
@@ -45,7 +51,7 @@ func ready(): ################################################################
 	#camera_height_center = OS.get_window_size().y / 2
 
 func _physics_process(delta): #################################################
-	for id in Entity.get_entities_with("player"):
+	for id in Manager.get_entities_with(Comp.PLAYER):
 		if Entity.objects.has(id):
 			var components = Entity.objects[id].components
 			if components.has("player"):
